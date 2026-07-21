@@ -9,20 +9,10 @@
 \usepackage{xcolor}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{listings}
-% minted package for code highlighting
 \usepackage{minted}
 \usepackage{tikz}
-%\usemintedstyle{monokai}
-%\setmonofont{Menlo}
+
 \setmonofont{DejaVu Sans Mono}
-
-
-\definecolor{midgray}{rgb}{0.65, 0.65, 0.65}
-\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
-
-% Set the slide body to black background with white text
-\setbeamercolor{background canvas}{bg=black}
-\setbeamercolor{normal text}{fg=white}
 
 % Set the title bar to black background with white text
 \setbeamercolor{frametitle}{bg=black, fg=white}
@@ -34,7 +24,6 @@
 \setsansfont{Libertinus Sans}
 \setmathfont{STIX Two Math}
 
-
 % Define colors for syntax highlighting
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -44,6 +33,17 @@
 \definecolor{codecomment}{rgb}{0.97, 0.74, 0.4} %{#F8BC65}
 \definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
 \definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.65, 0.65, 0.65}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{6pt}\\}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+
 
 \lstdefinestyle{mypystyle}{
     commentstyle=\color{codecomment},
@@ -94,17 +94,11 @@
 
 \usemintedstyle{mymint}
 
-\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
-\newcommand{\snl}{\vspace*{6pt}\\}
-\newcommand{\nl}{\vspace*{1em}\\}
-\newcommand{\vsp}{\vspace*{1em}}
-
-
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp NumPy and PyTorch \\}}
 
-\author{\center{Manipal School of Information Sciences \\ Manipal \\}}
-\date{\center{Friday, 24 April 2026}}
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
+\date{\center{Monday, 3 August 2026}}
 \maketitle
 
 \begin{frame}[fragile]\FrameTitle{Array Basics}{NumPy}
@@ -121,22 +115,6 @@
         assert(a.shape == ?)
     \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]\FrameTitle{Array Shape}{NumPy}
-\begin{lstlisting}{python}
-    import numpy as np
-
-    a = np.array([1, 2, 3])
-    assert(a.shape == (3,))
-
-    assert(a.shape != (3)) # why?
-    assert(a.shape != 3) # why so?
-
-    ## what's the type of a.shape?
-    assert(isinstance(a.shape, ?))
-\end{lstlisting}
-\end{frame}
-
 
 \begin{frame}[fragile]\FrameTitle{Array Shape}{NumPy}
 \begin{lstlisting}{python}

@@ -1,3 +1,7 @@
+vector-spaces:
+	xelatex --shell-escape vec-spaces.tex
+	open vec-spaces.pdf
+
 numpy:
 	xelatex --shell-escape np00.tex
 	open np00.pdf

@@ -1,0 +1,319 @@
+\documentclass[12pt]{beamer}
+% \usetheme{umbc4}
+\usetheme{moloch}
+
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{twemojis}
+\usepackage{nicematrix}
+
+\usetikzlibrary{fit}
+
+\setmonofont{DejaVu Sans Mono}
+
+% Set the title bar to black background with white text
+\setbeamercolor{frametitle}{bg=black, fg=white}
+
+% Ensure other structural elements (bullets, etc.) are visible
+\setbeamercolor{structure}{fg=white}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIX Two Math}
+
+% Define colors for syntax highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{question}{rgb}{1.0,0.75,0.1}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{8pt}\\}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+
+\begin{document}
+\title{\center{Applied Linear Algebra \\\vsp Vector Spaces \\}}
+
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
+\date{\center{Monday, 3 August 2026}}
+\maketitle
+
+
+\begin{frame}\FrameTitle{Scalars}{Unit 1}
+    \begin{itemize}
+        \item A scalar is a single value, which can be an integer, a real number, or a complex number.
+        \item Scalars are the simplest mathematical objects.
+    \end{itemize}
+    \vsp
+    {\color{question}{\Large\textbf{Quiz:}}} \snl {\color{white}{\large{Name a few good examples of scalars.}}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vectors}{Unit 1}
+    \begin{itemize}
+        \item A vector is a more structured mathematical object.
+        \item A vector is an ordered sequence of scalars.\snl
+        \item[] \textbf{v} $ = (a_1, a_2, \ldots, a_n) \in \mathbb{R}^n$
+        \item[] \hspace*{1em} $where \ \mathbb{R}^n$ is the set of all n-dimensional real vectors. \snl
+        \item[]$ v = [0.35, 0.71, 0.23, 0.8] \in \mathbb{R}^4$ \snl
+        \item[]$ v = [0.35] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$ v = [0.35, 0.71] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$ v = [] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vectors}{Unit 1}
+    Let \Matrix{A} be a $m \times n$ matrix.\snl
+    The $n$ columns of \Matrix{A} are vectors in $\mathbb{R}^m$.\snl
+
+    \[
+    \begin{pNiceMatrix}[
+        margin=3pt,
+        code-after = {
+            \tikz[remember picture, overlay]
+            \node [
+                draw=yellow,          % Soft blue border line
+                % fill=blue!10,          % Very light blue interior fill
+                opacity=0.9,           % High transparency for the shape
+                text opacity=1,        % Keeps numbers dark and 100% readable
+                thick,                  % outline border style
+                rounded corners=5pt,   % Smooths the rectangle corners perfectly
+                inner xsep=4pt,        % Padding to prevent numbers from touching the border
+                inner ysep=6pt,        % Vertical padding at the top and bottom
+                fit = (1-2) (5-2)      % Fits from Row 1, Col 2 down to Row 5, Col 2
+            ] {} ;
+        }
+    ]
+    .1 & .2 & .3 & 0.6\\
+    .4 & .5 & .6 & 0.12\\
+    .7 & .8 & .9 & 0.18\\
+    .11 & .12 & .13 & 0.26\\
+    .21 & .22 & .23 & 0.33
+    \end{pNiceMatrix}
+    \]
+\end{frame}
+
+
+
+\begin{frame}\FrameTitle{Vectors}{Unit 1}
+    A vector can be represented as a row or column of scalars.\\
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering{\color{lightblue}{Row vector}}
+            \[
+            \begin{bmatrix}
+                0.35 & 0.71 & 0.23 & 0.8
+            \end{bmatrix}
+            \]
+            \[
+            \begin{pmatrix}
+                0.35 & 0.71 & 0.23 & 0.8
+            \end{pmatrix}
+            \]
+        \end{column}
+        \vline{\color{darkgray}\vrule width 0.2pt}
+        \begin{column}{0.48\textwidth}
+            \centering{\color{lightblue}{Column vector}}
+            \[
+            \begin{bmatrix}
+                0.35 \\ 0.71 \\ 0.23 \\ 0.8
+            \end{bmatrix}
+            \]
+            \[
+            \begin{pmatrix}
+                0.35 \\ 0.71 \\ 0.23 \\ 0.8
+            \end{pmatrix}
+            \]
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}\FrameTitle{The Zero-Dimensional Vector Space $\mathbb{R}^0$}{Unit 1}
+    % 1. Definition Block
+    \begin{definition}[The Trivial Space]
+        The space $\mathbb{R}^0$ is the unique zero-dimensional real vector space.
+        It contains exactly one element, the empty vector $v$:
+        \[
+        v \in \mathbb{R}^0 \quad \text{where} \quad v = [ ]
+        \]
+    \end{definition}
+
+\end{frame}
+
+\begin{frame}\FrameTitle{Vectors}{Unit 1}
+    {\color{question}{\Large\textbf{Quiz:}}} \snl {\color{white}{\large{Name a few good examples of vectors.}}}
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
+    --- Textbooks use \emph{column vectors} for single samples.\snl
+    --- {\color{midgray}{PyTorch uses \emph{row vectors} to handle batches.}}\snl
+
+    \begin{itemize}
+        \item Single sample $\mathbf{x}$ is a column vector.
+        \item Forward pass formula:
+            \[
+            \mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}
+            \]
+            \item Dimensions:
+            \[
+            \begin{matrix}
+            \mathbf{y} & = & \mathbf{W} & \mathbf{x} & + & \mathbf{b} \\
+            {\color{yellow}{\scriptstyle(c \times 1)}} & & {\color{yellow}{\scriptstyle(c \times d)}} & {\color{yellow}{\scriptstyle(d \times 1)}} & & {\color{yellow}{\scriptstyle(c \times 1)}}
+            \end{matrix}
+            \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
+    --- {\color{midgray}{Textbooks use \emph{column vectors} for single samples.}}\snl
+    --- PyTorch uses \emph{row vectors} to handle batches.\snl
+    \begin{itemize}
+        \item Batch $\mathbf{X}$ stacks samples as rows.
+        \item PyTorch \emph{nn.Linear} formula:
+        \[
+        \mathbf{Y} = \mathbf{X}\mathbf{W}^T + \mathbf{B}
+        \]
+        \item Dimensions ($N$ = batch size):
+        \[
+        \begin{matrix}
+        \mathbf{Y} & = & \mathbf{X} & \mathbf{W}^T & + & \mathbf{B} \\
+        {\color{yellow}{\scriptstyle(N \times c)}} & & {\color{yellow}{\scriptstyle(N \times d)}} & {\color{yellow}{\scriptstyle(d \times c)}} & & {\color{yellow}{\scriptstyle(1 \times c)}}
+        \end{matrix}
+        \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{NumPy and PyTorch}}{\twemoji{light bulb}}
+    The standard convention for data analysis and machine learning is that
+    \begin{itemize}
+        \item[---] rows represent samples or observations: \textcolor{brown}{\textbf{axis 0}}
+        \item[---] columns represent features or attributes: \textcolor{brown}{\textbf{axis 1}}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Spaces}{Unit 1}
+A vector space $V$ is a set endowed with a rule for addition and a
+rule for scalar multiplication
+    \begin{align*}
+        +: V \times V \rightarrow V \\
+        \cdot: \mathbb{R} \times V \rightarrow V
+    \end{align*}
+
+such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{1}, c_{2} \in \mathbb{R}$:
+    \begin{enumerate}
+        \item $u + v = v + u$
+        \item $(u + v) + w = u + (v + w)$
+        \item $v + \mathbf{0} = v$
+        \item $v + (-v) = \mathbf{0}$ where $-v$ is the unique additive inverse of $v$
+        \item $c_1 \cdot (v + w) = c_1 \cdot v + c_1 \cdot w$
+        \item $(c_1 + c_2) \cdot v = c_1 \cdot v + c_2\cdot v$
+        \item $c_1 \cdot (c_2 \cdot v) = (c_1 c_2) \cdot v$
+        \item $1 \cdot v = v$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Spaces}{Unit 1}
+    {\center{\Large\textbf{Examples of Vector Spaces}}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Spaces - Quiz}{Unit 1}
+    \color{question}{\Large\textbf{Question:}} \snl
+    {\color{white}{\large{is a $3 \times 2$ matrix of $\mathbb{R}$ a vector space?}}}
+    \snl
+    {\color{white}{\large{is a $3 \times 2$ matrix with non-negative entries a vector space?}}}
+    \snl
+    {\color{white}{\large{is a $m \times n$ matrix of $\mathbb{R}$ a vector space?}}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Spaces - $\mathbb{R}^1, \mathbb{R}^2, \mathbb{R}^3,\ldots,\mathbb{R}^n$}{Unit 1}
+    \begin{definition}
+        The space $\mathbb{R}^n$ consists of all column vectors with $n$ components,
+        where each component is a real number.
+    \end{definition}
+
+    \vsp
+    {\Large\textbf{\color{question}Quiz}}
+    \vsp
+    \begin{enumerate}
+    \item {\textcolor{question}{
+        Suppose addition in $\mathbb{R}^2$ adds an extra 1 to each component.
+        With scalar multiplication unchanged, which rules are broken?
+    }}
+    \nl
+    \item {\textcolor{question}{
+        Show that the set of all positive real numbers, with $x + y$ and $cx$ redefined to
+        equal the usual $xy$ and $x^c$, is a vector space. What is the ``zero vector''?
+    }}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{Subspaces}{Unit 1}
+    \begin{definition}
+        A subspace $W$ of a vector space $V$ is a non-empty subset of $V$
+        that is itself a vector space under the same operations of addition
+        and scalar multiplication defined on $V$.
+    \end{definition}
+    \begin{enumerate}
+        \item The zero vector of $V$ is in $W$.
+        \item If $u, v \in W$, then $u + v \in W$ (closed under addition).
+        \item If $c$ is a scalar and $v \in W$, then $cv \in W$ (closed under scalar multiplication).
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector subspaces}{Unit 1}
+    Consider all vectors in $\mathbb{R}^2$ whose components are positive or zero. \snl
+    This subset is the first quadrant of the x-y plane.\snl
+    It is not a subspace of $\mathbb{R}^2$ because it is not closed under scalar multiplication.\snl
+    For example, if
+    $$
+        v = [1, 1]
+    $$
+    is in the first quadrant,
+    then
+    $$
+        -1 \cdot v = [-1, -1]
+    $$
+    is not in the first quadrant.
+\end{frame}
+
+\begin{frame}\FrameTitle{Subspaces}{Unit 1}
+    If we include the third quadrant along with the first, scalar multiplication is closed,
+    but the set is still not a subspace because it is not closed under addition. \snl
+
+    For example, if
+    $$
+        u = [1, 2] \quad \text{and} \quad v = [-2, -1]
+    $$
+    are in the first and third quadrants, then
+    $$
+        u + v = [-1, 1]
+    $$
+    is not in the first or third quadrant.
+\end{frame}
+
+\begin{frame}\FrameTitle{Subspaces}{Unit 1}
+    The smallest subspace of $\mathbb{R}^2$ that contains
+    the first quadrant is the entire space $\mathbb{R}^2$.
+\end{frame}
+
+\end{document}
