@@ -1,3 +1,7 @@
+intro:
+	xelatex --shell-escape intro.tex
+	open intro.pdf
+
 vector-spaces:
 	xelatex --shell-escape vec-spaces.tex
 	open vec-spaces.pdf

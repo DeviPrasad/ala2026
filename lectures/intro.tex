@@ -1,0 +1,217 @@
+\documentclass[12pt]{beamer}
+% \usetheme{umbc4}
+\usetheme{moloch}
+
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,       % internal document links
+    citecolor=cyan,       % bibliography citations
+    urlcolor=lightblue    % web URLs
+}
+
+\setmonofont{DejaVu Sans Mono}
+
+\setbeamercolor{frametitle}{bg=black, fg=white}
+
+% Ensure other structural elements (bullets, etc.) are visible
+\setbeamercolor{structure}{fg=white}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIX Two Math}
+
+% Define colors for syntax highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{question}{rgb}{1.0,0.75,0.1}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+\definecolor{darkgold}{HTML}{5D3D00}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{6pt}\\}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+
+\lstdefinestyle{mypystyle}{
+    commentstyle=\color{codecomment},
+    keywordstyle=\color{lightblue},
+    numberstyle=\scriptsize\color{codegray},
+    stringstyle=\color{codecoffee},
+    basicstyle=\ttfamily\scriptsize\color{codepy},
+    breakatwhitespace=false,
+    breaklines=true,
+    lineskip=2pt,  % introduces a small gap between lines for better readability
+    % captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    firstnumber=1,  % Forces reset to 1 for EVERY listing
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python,
+    backgroundcolor=\color{black},
+    emph=[2]{__init__, calculate},
+    emphstyle=[2]\color{funcColor},
+}
+\lstset{style=mypystyle}
+
+\begin{document}
+\title{\center{Applied Linear Algebra\\}}
+
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\\vsp\vsp\color{orange!45}{https://github.com/DeviPrasad/ala2026}}}
+\date{\center{Monday, 3 August 2026}}
+\maketitle
+
+\begin{frame}\FrameTitle{The Basics}{Introduction}
+    \begin{itemize}
+        \item[] {\Large\textbf{What is algebra?}}
+        \item[]
+        \item[] {\Large\textbf{What is linear algebra?}}
+        \item[]
+        \item[] {\Large\textbf{What is applied linear algebra?}}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{The Basics}{Introduction}
+    \begin{itemize}
+        \item[] {\Large\textbf{What is algebra?}}
+        \begin{itemize}
+            \item[] \href{https://en.wikipedia.org/wiki/Algebra}{Algebra - Wikipedia}
+        \end{itemize}
+    \end{itemize}
+    \vspace*{1em}
+    \begin{itemize}
+        \item[] {\Large\textbf{What is linear algebra?}}
+        \begin{itemize}
+            \item[] \href{https://en.wikipedia.org/wiki/Linear_algebra}{\color{yellow!40}Linear Algebra - Wikipedia}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{The Basics}{Introduction}
+    \begin{itemize}
+        \item[] {\Large\textbf{What is applied linear algebra?}}
+        \begin{itemize}
+            \item[] \href{https://en.wikipedia.org/wiki/Numerical_linear_algebra}{\color{orange!40}Numerical Linear Algebra - Wikipedia}
+            \item[] \href{https://comp-lin-alg.github.io/}{\color{orange!40}Computational Linear Algebra - GitHub}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    Consider the set of linear algebraic equations:
+    \begin{align*}
+        a_{00}x_{0} + a_{01}x_{1} + a_{02}x_{2} + \ldots + a_{0,N-1}x_{N-1} = b_0\\
+        a_{10}x_{0} + a_{11}x_{1} + a_{12}x_{2} + \ldots + a_{1,N-1}x_{N-1} = b_1\\
+        a_{20}x_{0} + a_{21}x_{1} + a_{22}x_{2} + \ldots + a_{2,N-1}x_{N-1} = b_2\\
+        \ldots\\
+        a_{M-1,0}x_{0} + a_{M-1,1}x_{1} + \ldots + a_{M-1,N-1}x_{N-1} = b_{M-1}\\
+    \end{align*}
+
+    \vspace*{-1em}{\Large\textbf{\color{question}{Quiz:}}}\vspace*{6pt}
+    \begin{enumerate}
+        \item[1.] How many equations do you see here?
+        \item[2.] How many unknowns do we have in this system?
+        \item[3.] What is each $a_{ij}$ referred to as?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    Consider the set of linear algebraic equations:
+    \begin{align*}
+        a_{00}x_0 + a_{01}x_1 + a_{02}x_2 + \ldots + a_{0,N-1}x_{N-1} = b_0\\
+        a_{10}x_0 + a_{11}x_1 + a_{12}x_2 + \ldots + a_{1,N-1}x_{N-1} = b_1\\
+        a_{20}x_0 + a_{21}x_1 + a_{22}x_2 + \ldots + a_{2,N-1}x_{N-1} = b_2\\
+        \ldots\\
+        a_{M-1,0}x_0 + a_{M-1,1}x_1 + \ldots + a_{M-1,N-1}x_{N-1} = b_{M-1}\\
+    \end{align*}
+
+    \vspace*{-1em}{\Large\textbf{\color{question}{Quiz:}}}\vspace*{6pt}
+    \begin{enumerate}
+        \item[4.] What is each $x_j$?
+        \item[5.] What do each $b_m$ represent?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    Consider the set of linear algebraic equations:
+    \begin{align*}
+        a_{00}x_0 + a_{01}x_1 + a_{02}x_2 + \ldots + a_{0,N-1}x_{N-1} = b_0\\
+        a_{10}x_0 + a_{11}x_1 + a_{12}x_2 + \ldots + a_{1,N-1}x_{N-1} = b_1\\
+        a_{20}x_0 + a_{21}x_1 + a_{22}x_2 + \ldots + a_{2,N-1}x_{N-1} = b_2\\
+        \ldots\\
+        a_{M-1,0}x_0 + a_{M-1,1}x_1 + \ldots + a_{M-1,N-1}x_{N-1} = b_{M-1}\\
+    \end{align*}
+
+    \vspace*{-1em}{\Large\textbf{\color{question}{Quiz:}}}\vspace*{6pt}
+    \begin{enumerate}
+        \item[6.] \textbf{Why do we care about such a system of equations?}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\FrameTitle{Solving Systems of Linear Equations}{Introduction}
+    \vspace*{-2em}
+    \begin{align*}
+        2x_1 + 8x_2 + 4x_3  &= 2 \\
+        2x_1 + 5x_2 + 1x_3  &= 5 \\
+        4x_1 + 10x_2 - x_3  &= 1 \\
+    \end{align*}
+    \vspace*{-1.5em}
+    \begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+        import numpy as np
+        A = np.array([[2, 8, 4],[2, 5, 1],[4, 10, -1]])
+        b = np.array([2, 5, 1])
+        x = (*@\colorbox{darkgold}{np.linalg.solve}@*)(A, b)
+        assert np.allclose(np.dot(A, x), b)
+        assert np.equal(x, np.array([11, -4, 3])).all()
+        assert (x == np.array([11, -4, 3])).all()\end{lstlisting}
+    \hfill
+\end{frame}
+
+
+\begin{frame}[fragile]\FrameTitle{Solving Systems of Linear Equations}{Introduction}
+    \vspace*{-2em}
+    \begin{align*}
+                         x_3 - x_4 - x_5 &= 4 \\
+        2x_1 + 4x_2 + 2x_3 + 4x_4 + 2x_5 &= 4 \\
+        2x_1 + 4x_2 + 3x_3 + 3x_4 + 3x_5 &= 4 \\
+        3x_1 + 6x_2 + 6x_3 + 3x_4 + 6x_5 &= 6 \\
+    \end{align*}
+
+    \vspace*{-1.5em}
+
+    \begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+        import numpy as np
+        A = np.array([[0, 0, 1, -1, -1],
+                      [2, 4, 2, 4, 2],
+                      [2, 4, 3, 3, 3],
+                      [3, 6, 6, 3, 6]])
+        b = np.array([4, 4, 4, 6])
+        x, _residuals, _rank, _s = (*@\colorbox{darkgold}{np.linalg.lstsq}@*)(A, b)
+        assert np.allclose(np.dot(A, x), b)\end{lstlisting}
+\end{frame}
+
+\end{document}
