@@ -26,6 +26,7 @@ class Vec:
 
         return Vec([round(x + y, 5) for x, y in zip(self.elements, t.elements)])
 
+
     def __rmul__(self, scalar: int | float) -> Self:
         if not isinstance(scalar, (int, float)):
             raise TypeError(f"Vector multiplication with invalid type: {type(scalar)}")
@@ -53,6 +54,11 @@ class Vec:
     def __neg__(self) -> Self:
         raise RuntimeError("vec negation unimplemented")
 
+    def __radd__(self, other):
+        raise RuntimeError("vec _radd_ unimplemented")
+
+    def __iadd__(self, other):
+        raise RuntimeError("vec _iadd_ unimplemented")
 
     # return a vector of @n zeroes. precondition: @n > 0
     @staticmethod
@@ -80,13 +86,14 @@ class Vec:
 (2) Document each function.
 (3) Implement all unimplemented methods.
 (4) Create appropriate tests for this implementation, increasing the confidence about its correctness.
+(5) Test this implementation by importing the class in a sepatate python script.
 
-(5) Measure the performance of each of these functions on vectors of varying lengths.
+(6) Measure the performance of each of these functions on vectors of varying lengths.
     Try 2k to 64k dimension vectors and time the results.
     How would you do the measurements?
-(6) Measure the performance on your machine. Check it on colab.
+(7) Measure the performance on your machine. Check it on colab.
 
-(7) use numpy and compare the performance.
+(8) use numpy and compare the performance.
 """
 
 
@@ -99,6 +106,7 @@ if __name__ == "__main__":
     print(v1)
     v3 = 2.2 * v1
     v3 *= 5
+    # v3 = 1 + v3
     print(v3)
     v2 = v1 + v3
     print(v1 + v3)
