@@ -7,11 +7,13 @@
 \usepackage{unicode-math}
 \usepackage{pifont}
 \usepackage{xcolor}
+\usepackage{colortbl}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{listings}
 \usepackage{minted}
 \usepackage{tikz}
 \usepackage{hyperref}
+\usepackage[normalem]{ulem}
 
 \hypersetup{
     colorlinks=true,
@@ -115,8 +117,9 @@
     \begin{itemize}
         \item[] {\Large\textbf{What is applied linear algebra?}}
         \begin{itemize}
-            \item[] \href{https://en.wikipedia.org/wiki/Numerical_linear_algebra}{\color{orange!40}Numerical Linear Algebra - Wikipedia}
-            \item[] \href{https://comp-lin-alg.github.io/}{\color{orange!40}Computational Linear Algebra - GitHub}
+            \item[---] \href{https://en.wikipedia.org/wiki/Numerical_linear_algebra}{\color{orange!40}Numerical Linear Algebra - Wikipedia}
+            \vspace*{2pt}
+            \item[---] \href{https://comp-lin-alg.github.io/}{\color{orange!40}Computational Linear Algebra - GitHub}
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -172,6 +175,54 @@
     \end{enumerate}
 \end{frame}
 
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    At the beginning of a semester, {\color{blue!20}{55}} students have signed up for ALA.
+    The course is offered in two sections. Because of personal preferences,
+    {\color{blue!20}{20\%}} of students in section A switch to section B, while {\color{blue!20}{30\%}} of
+    students in section B switch to section A, resulting in a net loss
+    of 4 students for section B.
+
+    \vsp
+    {\color{question}{How large are the two sections at the beginning of the semester?}}$^\dagger$
+
+    \vfill
+    $^\dagger${\color{yellow!20}{\scriptsize{No student dropped ALA or joined the course later.}}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    At the beginning of a semester, {\color{blue!20}{55}} students have signed up for ALA.
+    The course is offered in two sections. Because of personal preferences,
+    {\color{blue!20}{20\%}} of students in section A switch to section B, while {\color{blue!20}{30\%}} of
+    students in section B switch to section A, resulting in a {\emph{\uline{net loss
+    of {\color{blue!20}{4}} students for section B}}}.
+
+    \vsp
+    {\color{question}{How large are the two sections at the beginning of the semester?}}
+    \begin{align*}
+        a + b & = 55 \tag{1}\\
+        b + 0.2a - 0.3b & = \textbf{?} \notag \\
+        {\color{yellow}{\vdots}}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Algebra}{Introduction}
+    At the beginning of a semester, {\color{blue!20}{55}} students have signed up for ALA.
+    The course is offered in two sections. Because of personal preferences,
+    {\color{blue!20}{20\%}} of students in section A switch to section B, while {\color{blue!20}{30\%}} of
+    students in section B switch to section A, resulting in a net loss
+    of 4 students for section B.
+
+    \vsp
+    {\color{question}{How large are the two sections at the beginning of the semester?}}
+    \begin{align*}
+        a + b & = 55 \tag{1}\\
+        b + 0.2a - 0.3b & = b-4 \notag \\
+        2a - 3b & = -40 \tag{2}\\
+        {\color{yellow}{\vdots}}
+    \end{align*}
+\end{frame}
+
+
 \begin{frame}[fragile]\FrameTitle{Solving Systems of Linear Equations}{Introduction}
     \vspace*{-2em}
     \begin{align*}
@@ -180,15 +231,51 @@
         4x_1 + 10x_2 - x_3  &= 1 \\
     \end{align*}
     \vspace*{-1.5em}
-    \begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    \begin{lstlisting}[language=Python, escapeinside={**@}{@**}]
         import numpy as np
         A = np.array([[2, 8, 4],[2, 5, 1],[4, 10, -1]])
         b = np.array([2, 5, 1])
-        x = (*@\colorbox{darkgold}{np.linalg.solve}@*)(A, b)
+        x = **@\colorbox{darkgold}{np.linalg.solve}@**(A, b)
         assert np.allclose(np.dot(A, x), b)
         assert np.equal(x, np.array([11, -4, 3])).all()
         assert (x == np.array([11, -4, 3])).all()\end{lstlisting}
     \hfill
+\end{frame}
+
+\begin{frame}\FrameTitle{Solving Systems of Linear Equations}{Introduction}
+    \vspace*{-2em}
+    \begin{align*}
+        2x_1 + 8x_2 + 4x_3  &= 2 \\
+        2x_1 + 5x_2 + 1x_3  &= 5 \\
+        4x_1 + 10x_2 - x_3  &= 1 \\
+    \end{align*}
+
+    \vspace*{-1.5em}
+    \[
+        \underbrace{
+            \begin{bmatrix}
+                2 & 8 & 4 \\
+                2 & 5 & 1 \\
+                4 & 10 & -1
+            \end{bmatrix}
+        }_{\mathbf{A}:\mathbb{R}^{3 \times 3}}
+        \,
+        \underbrace{
+            \begin{bmatrix}
+                x_1 \\
+                x_2 \\
+                x_3
+            \end{bmatrix}
+        }_{\textbf{x}: \mathbb{R}^{3 \times 1}}
+        =
+        \underbrace{
+            \begin{bmatrix}
+                2 \\
+                5 \\
+                1
+            \end{bmatrix}
+        }_{\textrm{\textbf{b}}: \mathbb{R}^{3 \times 1}}
+    \]
 \end{frame}
 
 
@@ -214,4 +301,17 @@
         assert np.allclose(np.dot(A, x), b)\end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]\FrameTitle{Solving Systems of Linear Equations}{Introduction}
+    \begin{definition}[\color{orange!50}{Underdetermined systems (M < N)}]
+        -- There are fewer equations than unknowns. \vspace*{2pt}\\
+        -- Infinitely many exact solutions exist. \vspace*{2pt}\\
+        -- so the system is underconstrained.
+    \end{definition}
+    \vspace*{3pt}
+    \begin{definition}[\color{orange!50}{Overdetermined systems (M > N)}]
+        -- There are more equations than unknowns. \vspace*{2pt}\\
+        -- No single vector {\textrm{\textbf{x}}} satisfies $Ax = b$ exactly.  \vspace*{2pt}\\
+        -- The vector \textbf{b} simply lies outside the column space of A.
+    \end{definition}
+\end{frame}
 \end{document}

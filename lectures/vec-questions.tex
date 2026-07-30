@@ -1,0 +1,99 @@
+\documentclass[11pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{twemojis}
+\usepackage{nicematrix}
+
+\usetikzlibrary{fit}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.2cm, right=2.2cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIX Two Math}
+
+\newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\snl}{\vspace*{2pt}}
+
+\title{Finite-Dimensional Vector Spaces}
+\author{Devi Prasad M}
+\begin{document}
+
+\maketitle
+
+\section{\emph{Auto-regressive model}}.
+
+Suppose that $z_1,z_2,\ldots$ is a time series, with the number $z_t$ giving
+the value in period or time $t$. For example $z_t$ could be the gross sales
+at a particular store on day $t$. An \emph{auto-regressive} (AR) model is used to
+predict $z_{t+1}$ from the previous
+$M$ values, $z_t,z_{t-1},\ldots,z_{t-M+1}$:
+\[
+    z_{t+1} = (z_t,z_{t-1},\ldots z_{t-M+1})^{\textrm{T}} \beta, \ \, t= M,M + 1,\ldots
+\]
+
+Here $z_{t+1}$ denotes the AR model's prediction of $z_{t+1}$, $M$ is the
+memory length of the AR model, and the $M$-vector $\beta$ is the AR model
+coefficient vector. For this problem we will assume that the time period
+is daily, and $M = 10$. Thus, the AR model predicts tomorrow's value,
+given the values over the last 10 days.
+
+For each of the following cases, give a short interpretation or description of the AR model
+in English, without referring to mathematical concepts like vectors, inner product, and
+so on. You can use words like `yesterday' or `today'.
+
+\begin{itemize}
+    \item [(a)] $\beta \approx e_1$.
+    \item [(b)] $\beta \approx 2e_1 - e_2$.
+    \item [(c)] $\beta \approx e_6$.
+    \item [(d)] $\beta \approx 0.5 e_1 + 0.5 e_2$.
+\end{itemize}
+
+\subsection{Answer}
+{\noindent{\textbf(a)} \ \ $\beta \approx e_1$}\snl
+
+Tomorrow's value will be roughly the same as today's value.
+The model ignores everything that happened earlier in the past 10 days
+and simply predicts that whatever sales or numbers you had today will
+repeat tomorrow.
+
+\vsp
+
+{\noindent{\textbf{(b)}} \ \ $\beta \approx 2e_1 - e_2$}\snl
+
+Tomorrow's value continues today's trend (the direction and amount of
+change from yesterday to today).
+
+If sales grew by $100$ between yesterday and today, the model predicts
+they will grow by another $100$ tomorrow. Expressed as
+$e_1 + (e_1 - e_2)$ it takes today's value and adds today's change.
+
+\vsp
+
+{\noindent{\textbf{(c)}} \ \ $\beta \approx e_6$}\snl
+
+Tomorrow's value will match the value from 6 days ago.
+The model looks back almost a full week and assumes tomorrow will look
+identical to whatever happened on that same day earlier in the cycle.
+
+\vsp
+
+{\noindent{\textbf{(d)}} \ \ $\beta \approx 0.5e_1 + 0.5e_2$}\snl
+
+Tomorrow's value will be the simple average of today's and yesterday's values.
+The model smooths out day-to-day noise by taking a two-day moving average and
+using that to predict what comes next.
+
+\end{document}

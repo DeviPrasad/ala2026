@@ -53,7 +53,7 @@
 \newcommand{\Matrix}[1]{\textbf{#1}}
 
 \begin{document}
-\title{\center{Applied Linear Algebra \\\vsp Vector Spaces \\}}
+\title{\center{Applied Linear Algebra \\\vsp Finite-Dimensional Vector Spaces \\}}
 
 \author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
 \date{\center{Monday, 3 August 2026}}
@@ -75,10 +75,10 @@
         \item A vector is an ordered sequence of scalars.\snl
         \item[] \textbf{v} $ = (a_1, a_2, \ldots, a_n) \in \mathbb{R}^n$
         \item[] \hspace*{1em} $where \ \mathbb{R}^n$ is the set of all n-dimensional real vectors. \snl
-        \item[]$ v = [0.35, 0.71, 0.23, 0.8] \in \mathbb{R}^4$ \snl
-        \item[]$ v = [0.35] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
-        \item[]$ v = [0.35, 0.71] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
-        \item[]$ v = [] \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$ v = (0.35, 0.71, 0.23, 0.8) \in \mathbb{R}^4$ \snl
+        \item[]$ v = (0.35) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$ v = (0.35, 0.71) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$ v = () \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
     \end{itemize}
 \end{frame}
 
@@ -87,17 +87,17 @@
     The $n$ columns of \Matrix{A} are vectors in $\mathbb{R}^m$.\snl
 
     \[
-    \begin{pNiceMatrix}[
-        margin=3pt,
+    \begin{bNiceMatrix}[
+        margin=2pt,
         code-after = {
             \tikz[remember picture, overlay]
             \node [
-                draw=yellow,          % Soft blue border line
-                % fill=blue!10,          % Very light blue interior fill
-                opacity=0.9,           % High transparency for the shape
-                text opacity=1,        % Keeps numbers dark and 100% readable
+                draw=yellow,            % yellow border line
+                %fill=blue!10,          % Very light blue interior fill
+                %opacity=0.9,           % High transparency for the shape
+                text opacity=1,         % Keeps numbers dark and 100% readable
                 thick,                  % outline border style
-                rounded corners=5pt,   % Smooths the rectangle corners perfectly
+                %rounded corners=5pt,   % Smooths the rectangle corners perfectly
                 inner xsep=4pt,        % Padding to prevent numbers from touching the border
                 inner ysep=6pt,        % Vertical padding at the top and bottom
                 fit = (1-2) (5-2)      % Fits from Row 1, Col 2 down to Row 5, Col 2
@@ -109,7 +109,7 @@
     .7 & .8 & .9 & 0.18\\
     .11 & .12 & .13 & 0.26\\
     .21 & .22 & .23 & 0.33
-    \end{pNiceMatrix}
+    \end{bNiceMatrix}
     \]
 \end{frame}
 
@@ -120,14 +120,14 @@
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \centering{\color{lightblue}{Row vector}}
-            \[
-            \begin{bmatrix}
-                0.35 & 0.71 & 0.23 & 0.8
-            \end{bmatrix}
-            \]
+            %\[
+            %\begin{bmatrix}
+            %    0.35 & 0.71 & 0.23 & 0.8
+            %\end{bmatrix}
+            %\]
             \[
             \begin{pmatrix}
-                0.35 & 0.71 & 0.23 & 0.8
+                0.35, & 0.71, & 0.23, & 0.8
             \end{pmatrix}
             \]
         \end{column}
@@ -139,11 +139,11 @@
                 0.35 \\ 0.71 \\ 0.23 \\ 0.8
             \end{bmatrix}
             \]
-            \[
-            \begin{pmatrix}
-                0.35 \\ 0.71 \\ 0.23 \\ 0.8
-            \end{pmatrix}
-            \]
+            %\[
+            %\begin{pmatrix}
+            %    0.35 \\ 0.71 \\ 0.23 \\ 0.8
+            %\end{pmatrix}
+            %\]
         \end{column}
     \end{columns}
 \end{frame}
@@ -182,6 +182,21 @@
             \end{matrix}
             \]
     \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Inner Product}{}
+    \begin{definition}[Inner or Dot Product]
+        The inner product of two $n$-vectors is defined as the \emph{scalar}
+        \[
+            a^Tb = a_1b_1 + a_2b_2 + \ldots + a_nb_n,
+        \]
+        the sum of the products of corresponding entries.
+    \end{definition}
+    \vsp
+    If a, b, and c are vectors of the same size, and $\gamma$ is a scalar, then the following hold:\vspace*{2pt}\\
+    1. \emph{Commutativity}: $a^{\textrm{T}}b = b^{\textrm{T}}a$ \vspace*{3pt}\\
+    2. \emph{Associativity with scalar multiplication}: $(\gamma a)^{\textrm{T}}b = \gamma (a^{\textrm{T}}b)$ \vspace*{3pt}\\
+    3. \emph{Distributivity with vector addition}: $(a+b)^{\textrm{T}}c = a^{\textrm{T}}c + b^{\textrm{T}}c$ \\
 \end{frame}
 
 \begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}

@@ -2,6 +2,10 @@ intro:
 	xelatex --shell-escape intro.tex
 	open intro.pdf
 
+vec-questions:
+	xelatex --shell-escape vec-questions.tex
+	open vec-questions.pdf
+
 vector-spaces:
 	xelatex --shell-escape vec-spaces.tex
 	open vec-spaces.pdf
