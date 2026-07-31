@@ -164,26 +164,6 @@
     {\color{question}{\Large\textbf{Quiz:}}} \snl {\color{white}{\large{Name a few good examples of vectors.}}}
 \end{frame}
 
-\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
-    --- Textbooks use \emph{column vectors} for single samples.\snl
-    --- {\color{midgray}{PyTorch uses \emph{row vectors} to handle batches.}}\snl
-
-    \begin{itemize}
-        \item Single sample $\mathbf{x}$ is a column vector.
-        \item Forward pass formula:
-            \[
-            \mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}
-            \]
-            \item Dimensions:
-            \[
-            \begin{matrix}
-            \mathbf{y} & = & \mathbf{W} & \mathbf{x} & + & \mathbf{b} \\
-            {\color{yellow}{\scriptstyle(c \times 1)}} & & {\color{yellow}{\scriptstyle(c \times d)}} & {\color{yellow}{\scriptstyle(d \times 1)}} & & {\color{yellow}{\scriptstyle(c \times 1)}}
-            \end{matrix}
-            \]
-    \end{itemize}
-\end{frame}
-
 \begin{frame}\FrameTitle{Inner Product}{}
     \begin{definition}[Inner or Dot Product]
         The inner product of two $n$-vectors is defined as the \emph{scalar}
@@ -199,32 +179,6 @@
     3. \emph{Distributivity with vector addition}: $(a+b)^{\textrm{T}}c = a^{\textrm{T}}c + b^{\textrm{T}}c$ \\
 \end{frame}
 
-\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
-    --- {\color{midgray}{Textbooks use \emph{column vectors} for single samples.}}\snl
-    --- PyTorch uses \emph{row vectors} to handle batches.\snl
-    \begin{itemize}
-        \item Batch $\mathbf{X}$ stacks samples as rows.
-        \item PyTorch \emph{nn.Linear} formula:
-        \[
-        \mathbf{Y} = \mathbf{X}\mathbf{W}^T + \mathbf{B}
-        \]
-        \item Dimensions ($N$ = batch size):
-        \[
-        \begin{matrix}
-        \mathbf{Y} & = & \mathbf{X} & \mathbf{W}^T & + & \mathbf{B} \\
-        {\color{yellow}{\scriptstyle(N \times c)}} & & {\color{yellow}{\scriptstyle(N \times d)}} & {\color{yellow}{\scriptstyle(d \times c)}} & & {\color{yellow}{\scriptstyle(1 \times c)}}
-        \end{matrix}
-        \]
-    \end{itemize}
-\end{frame}
-
-\begin{frame}\FrameTitle{\color{question}{NumPy and PyTorch}}{\twemoji{light bulb}}
-    The standard convention for data analysis and machine learning is that
-    \begin{itemize}
-        \item[---] rows represent samples or observations: \textcolor{brown}{\textbf{axis 0}}
-        \item[---] columns represent features or attributes: \textcolor{brown}{\textbf{axis 1}}
-    \end{itemize}
-\end{frame}
 
 \begin{frame}\FrameTitle{Vector Spaces}{Unit 1}
 A vector space $V$ is a set endowed with a rule for addition and a
@@ -329,6 +283,53 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
 \begin{frame}\FrameTitle{Subspaces}{Unit 1}
     The smallest subspace of $\mathbb{R}^2$ that contains
     the first quadrant is the entire space $\mathbb{R}^2$.
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
+    --- Textbooks use \emph{column vectors} for single samples.\snl
+    --- {\color{midgray}{PyTorch uses \emph{row vectors} to handle batches.}}\snl
+
+    \begin{itemize}
+        \item Single sample $\mathbf{x}$ is a column vector.
+        \item Forward pass formula:
+            \[
+            \mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}
+            \]
+            \item Dimensions:
+            \[
+            \begin{matrix}
+            \mathbf{y} & = & \mathbf{W} & \mathbf{x} & + & \mathbf{b} \\
+            {\color{yellow}{\scriptstyle(c \times 1)}} & & {\color{yellow}{\scriptstyle(c \times d)}} & {\color{yellow}{\scriptstyle(d \times 1)}} & & {\color{yellow}{\scriptstyle(c \times 1)}}
+            \end{matrix}
+            \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{Math vs. Code}}{\twemoji{light bulb}}
+    --- {\color{midgray}{Textbooks use \emph{column vectors} for single samples.}}\snl
+    --- PyTorch uses \emph{row vectors} to handle batches.\snl
+    \begin{itemize}
+        \item Batch $\mathbf{X}$ stacks samples as rows.
+        \item PyTorch \emph{nn.Linear} formula:
+        \[
+        \mathbf{Y} = \mathbf{X}\mathbf{W}^T + \mathbf{B}
+        \]
+        \item Dimensions ($N$ = batch size):
+        \[
+        \begin{matrix}
+        \mathbf{Y} & = & \mathbf{X} & \mathbf{W}^T & + & \mathbf{B} \\
+        {\color{yellow}{\scriptstyle(N \times c)}} & & {\color{yellow}{\scriptstyle(N \times d)}} & {\color{yellow}{\scriptstyle(d \times c)}} & & {\color{yellow}{\scriptstyle(1 \times c)}}
+        \end{matrix}
+        \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{\color{question}{NumPy and PyTorch}}{\twemoji{light bulb}}
+    The standard convention for data analysis and machine learning is that
+    \begin{itemize}
+        \item[---] rows represent samples or observations: \textcolor{brown}{\textbf{axis 0}}
+        \item[---] columns represent features or attributes: \textcolor{brown}{\textbf{axis 1}}
+    \end{itemize}
 \end{frame}
 
 \end{document}
