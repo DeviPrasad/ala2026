@@ -1,0 +1,201 @@
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{nicematrix}
+\usepackage[most]{tcolorbox}
+
+\usetikzlibrary{fit}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIX Two Math}
+
+\definecolor{lightyellow}{rgb}{1, 1, 0.8} % Define a subtle highlight color
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+\definecolor{darkgold}{HTML}{8F3F0F}
+\definecolor{amber}{RGB}{255, 191, 0}
+\definecolor{brickred}{RGB}{205, 92, 92}
+
+%\newfontfamily\symbolfont{DejaVu Sans}
+
+\newcommand{\srccodesize}{\fontsize{9pt}{10pt}\selectfont}
+
+%\newcommand{\warnicon}{
+%    {\symbolfont\textcolor{red}{\textbf\Large{\symbol{"26A0}}}}%
+%}
+
+
+\lstdefinestyle{mypystyle}{
+    aboveskip=2pt,
+    belowskip=2pt,
+    frame=single,
+    framerule=0pt, % disable the frame rules
+    framextopmargin=2pt,
+    framexbottommargin=2pt,
+    lineskip=3pt,
+    % expand the margins to pull everything inside the box
+    framexleftmargin=4.4mm,     % Makes the left side of the black box wider
+    xleftmargin=5.8mm,
+    xrightmargin=4pt,
+    commentstyle=\color{codecomment},
+    keywordstyle=\color{lightblue},
+    numberstyle=\srccodesize\color{white!40},
+    stringstyle=\color{codecoffee},
+    basicstyle=\ttfamily\srccodesize\color{codepy},
+    breakatwhitespace=false,
+    breaklines=true,
+    % captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=0pt,
+    firstnumber=1,  % Forces reset to 1 for EVERY listing
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python,
+    backgroundcolor=\color{black!80},
+    emph=[2]{__init__, calculate},
+    emphstyle=[2]\color{funcColor},
+}
+\lstset{style=mypystyle}
+
+\newcommand{\vsp}{\vspace*{8pt}}
+\newcommand{\snl}{\vspace*{2pt}}
+
+\title{Introduction to NumPy Arrays and Matrices}
+\author{Devi Prasad M}
+\begin{document}
+
+\pagecolor{yellow!15}
+
+\maketitle
+
+\section{Working with ndarray}
+An \emph{ndarray} object is the core data structure in NumPy, and
+it can represent vectors, matrices, and higher-dimensional arrays.
+NumPy arrays are \emph{fixed-size}, homogeneous data structures.
+
+\vsp\subsection{Creating a 1D array}
+\begin{lstlisting}[language=Python]
+    a = np.array(np.arange(1, 25, 1, np.int8))
+    assert(a.shape == (24,))
+    assert(a.size == 24)
+    assert(len(a) == 24)
+    assert(a.ndim == 1)
+\end{lstlisting}
+
+$ndim$ represents the number of dimensions (axes) of
+the array. In this case, since $a$ is a 1D array.
+
+The $len$ function returns the number of elements along the
+first axis of an array. For a 1D array, this is simply the total
+number of elements in the array.
+
+\subsection{Reshaping a 1D array into a 2D array}
+The \emph{reshape} method is used to change the shape of
+an array without changing its data. The total number of elements
+in the reshaped array must match the total number of elements
+in the original array.
+
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a = np.array(np.arange(1, 25, 1, np.int8))
+    assert (a == [x for x in range(1, 25)]).all()
+    b = (*@\setlength{\fboxsep}{0pt}\colorbox{darkgold!90}{a.reshape}@*)(2, 12)
+    assert(b.shape == (2, 12))
+    assert(b.size == 24)
+    (*@\setlength{\fboxsep}{0pt}\colorbox{darkgold}{assert(len(b) == 2)}@*)
+    assert(b.ndim == 2)
+\end{lstlisting}
+
+In the following we create a 2D array with 4 rows and 6 columns.
+The total number of elements in the reshaped array must match
+the total number of elements in the original 1D array.
+
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a = np.array(np.arange(1, 25, 1, np.int8))
+    assert (a == [x for x in range(1, 25)]).all()
+    c = a.reshape(4, 6)
+    assert(c.shape == (4, 6))
+    assert(c.size == 24)
+    (*@\setlength{\fboxsep}{0pt}\colorbox{darkgold}{assert(len(c) == 4)}@*)
+    assert(c.ndim == 2)
+\end{lstlisting}
+
+\subsection{Accessing rows and columns in a 2D array}
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    # Check the first row of the reshaped array
+    assert (b[0] == [x for x in range(1, 13)]).all()
+    # Check the second row of the reshaped array
+    assert (b[1] == [x for x in range(13, 25)]).all()
+    # Check the first column of the reshaped array
+    assert (b[:, 0] == [1, 13]).all()
+    assert np.array_equal(b[:, 0], [1, 13])
+    # access the second column
+    assert np.array_equal(b[:, 1], [2, 14])
+    # the last column
+    assert np.array_equal(b[:, 11], [12, 24])
+\end{lstlisting}
+
+\subsection{Reshaping the 2x12 array into a 2x3 array}
+We can further reshape the 2x12 array into a 2x3 array by slicing the first
+three columns of the 2x12 array.
+
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a2x3 = b[:, 0:3]
+    assert(a2x3.shape == (2, 3))
+    assert(a2x3.size == 6)
+    (*@\setlength{\fboxsep}{0pt}\colorbox{darkgold}{assert(len(a2x3) == 2)}@*)
+    assert(a2x3.ndim == 2)
+    # access the last column of the 2x3 array
+    assert np.array_equal(a2x3[:, 2], [3, 15])
+\end{lstlisting}
+
+
+\section{Combining NumPy arrays}
+Two \emph{ndarray} objects can be combined using the \emph{concatenate} function.
+This function takes a sequence of arrays and joins them along an existing axis.
+The arrays must have the same shape, except in the dimension corresponding
+to the axis along which they are concatenated.
+
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a = np.concatenate(([1,2,3], [4,5], [7], [8,9], []), axis=0)
+    assert(np.array_equal(a, [1, 2, 3, 4, 5, 7, 8, 9]))
+\end{lstlisting}
+
+\begin{tcolorbox}[
+    colframe=brickred,
+    colback=white,
+    title=Efficiency Note,
+    fonttitle=\bfseries
+]
+NumPy arrays have a fixed size: once an array is created, its shape cannot be
+changed in place. Therefore, operations such as repeated
+concatenation are inefficient - each concatenation creates a new array and
+copies the accumulated data. When building an array incrementally, it is
+more efficient to first collect the data in a Python list and create a
+NumPy array from that list.
+\end{tcolorbox}
+
+\end{document}
