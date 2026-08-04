@@ -56,7 +56,7 @@
 \title{\center{Applied Linear Algebra \\\vsp Finite-Dimensional Vector Spaces \\}}
 
 \author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
-\date{\center{Monday, 3 August 2026}}
+\date{\center{Wednesday, 5 August 2026}}
 \maketitle
 
 
@@ -148,20 +148,134 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}\FrameTitle{The Zero-Dimensional Vector Space $\mathbb{R}^0$}{Unit 1}
-    % 1. Definition Block
-    \begin{definition}[The Trivial Space]
-        The space $\mathbb{R}^0$ is the unique zero-dimensional real vector space.
-        It contains exactly one element, the empty vector $v$:
-        \[
-        v \in \mathbb{R}^0 \quad \text{where} \quad v = [ ]
-        \]
-    \end{definition}
+\begin{frame}\FrameTitle{Unit Vector}{Unit 1}
+    A \emph{unit vector} is a vector with all elements equal to zero,
+    except one element which is equal to one.
+    \vsp
+    The \emph{i}th unit vector (of size \emph{n}) is the unit vector
+    with \emph{i}th element one, and denoted $e_i$.
 
+    \[
+        e_1 = \begin{bmatrix}
+            1 \\ 0 \\ 0 \\ \vdots \\ 0
+        \end{bmatrix}, \quad
+        e_2 = \begin{bmatrix}
+            0 \\ 1 \\ 0 \\ \vdots \\ 0
+        \end{bmatrix}, \quad
+        e_3 = \begin{bmatrix}
+            0 \\ 0 \\ 1 \\ \vdots \\ 0
+        \end{bmatrix}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Unit Vector}{Unit 1}
+    The \emph{i}th unit vector (of size \emph{n}) is the unit vector
+    with \emph{i}th element one, and denoted $e_i$.
+
+    \begin{equation}
+        (e_i)_j = \begin{cases}
+            \ 1 & i = j \\
+            \ 0 & i \neq j
+        \end{cases}
+    \end{equation}
+    for $i,j = 1, \ldots, n$.
+
+    $e_i$ is an \emph{n}-vector.
+    $(e_i)_j$ is a number, its \emph{j}th entry.
+\end{frame}
+
+\begin{frame}\FrameTitle{Ones Vector}{Unit 1}
+    A \emph{ones vector} is a vector with all elements equal to one.
+    \vsp
+    The \emph{n}-dimensional ones vector is denoted $1_n$.
+
+    \[
+        1_3 = \begin{bmatrix}
+            1 \\ 1 \\ 1
+        \end{bmatrix}, \quad
+        1_4 = \begin{bmatrix}
+            1 \\ 1 \\ 1 \\ 1
+        \end{bmatrix}, \quad
+        1_5 = \begin{bmatrix}
+            1 \\ 1 \\ 1 \\ 1 \\ 1
+        \end{bmatrix}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Addition}{Unit 1}
+    \begin{columns}[c]
+        \begin{column}{0.8\textwidth}
+            \begin{center}
+            \begin{tikzpicture}[scale=0.8]
+                % 1. Draw the square grid
+                \draw[thin, gray!70] (0,0) grid (8,7);
+
+                \draw[thick, -stealth, yellow] (1,1) -- (6,2)
+                    node[midway, below, yellow] {$\vec{u}$};
+                \draw[thick, -stealth, yellow] (6,2) -- (2,5.5)
+                    node[midway, above right, yellow] {$\vec{v}$};
+
+                \draw[thick, -stealth, orange] (1,1) -- (2,5.5)
+                    node[midway, left, orange] {$\vec{u} + \vec{v}$};
+            \end{tikzpicture}
+            \end{center}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \begin{frame}\FrameTitle{Vectors}{Unit 1}
     {\color{question}{\Large\textbf{Quiz:}}} \snl {\color{white}{\large{Name a few good examples of vectors.}}}
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Linear Combinations}{Unit 1}
+    if $a_1, \ldots, a_m$ are \emph{n}-vectors, and $\beta_1,\ldots,\beta_m$ are scalars,
+    the \emph{n}-vector
+    \[
+        \beta_1 a_1 + \cdots + \beta_m a_m
+    \]
+    is called the \emph{linear combination} of the vectors $a_1,\ldots,a_m$.
+
+    \vsp
+
+    The scalars $\beta_1,\ldots,\beta_m$ are called the \emph{coefficients}
+    of the linear combination.
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear combination of unit vectors}{Unit 1}
+    \[
+        \begin{bmatrix}
+            8.3 \\
+            -0.2 \\
+            10
+        \end{bmatrix} =
+        8.3 \begin{bmatrix}
+            1 \\
+            0 \\
+            0
+        \end{bmatrix} +
+        (-0.2)\begin{bmatrix}
+            0 \\
+            1 \\
+            0
+        \end{bmatrix} +
+        10\begin{bmatrix}
+            0 \\
+            0 \\
+            1
+        \end{bmatrix}
+    \]
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Affine Combination}{Unit 1}
+    When the coefficients sum to one, i.e., $\beta_1 + \cdots + \beta_m = 1$,
+    the linear combination is called an \emph{affine combination}.
+
+    \vsp
+
+    When the coefficients in an affine combination are nonnegative,
+    it is called a \emph{convex combination}, or a \emph{weighted average}.
 \end{frame}
 
 \begin{frame}\FrameTitle{Inner Product}{}
@@ -173,11 +287,52 @@
         the sum of the products of corresponding entries.
     \end{definition}
     \vsp
-    If a, b, and c are vectors of the same size, and $\gamma$ is a scalar, then the following hold:\vspace*{2pt}\\
-    1. \emph{Commutativity}: $a^{\textrm{T}}b = b^{\textrm{T}}a$ \vspace*{3pt}\\
-    2. \emph{Associativity with scalar multiplication}: $(\gamma a)^{\textrm{T}}b = \gamma (a^{\textrm{T}}b)$ \vspace*{3pt}\\
-    3. \emph{Distributivity with vector addition}: $(a+b)^{\textrm{T}}c = a^{\textrm{T}}c + b^{\textrm{T}}c$ \\
+    If a, b, and c are vectors of the same size, and {\color{yellow}$\gamma$} is a scalar, then the following hold:\vspace*{2pt}\\
+    \begin{enumerate}
+        \item \emph{Commutativity}: $a^{\textrm{T}}b = b^{\textrm{T}}a$ aka \emph{symmetric}\vspace*{3pt}\\
+        \item \emph{Associativity with scalar multiplication}: $({\color{yellow}\gamma} a)^{\textrm{T}}b = {\color{yellow}\gamma} (a^{\textrm{T}}b)$ \vspace*{3pt}\\
+        \item \emph{Distributivity with vector addition}: $(a+b)^{\textrm{T}}c = a^{\textrm{T}}c + b^{\textrm{T}}c$
+    \end{enumerate}
 \end{frame}
+
+\begin{frame}\FrameTitle{Inner Product: Special Examples}{Unit 1}
+    \begin{itemize}
+        \item \emph{Unit vector}. $e^{\textrm{T}}_i a = a_i$
+        \item \emph{Sum}. $1^{\textrm{T}} a= a_1 + \cdots + a_n$
+        \item \emph{Sum of squares}. $a^{\textrm{T}} a = a^2_1 + \cdots + a^2_n$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Inner Product: Applications}{Unit 1}
+    \begin{itemize}
+        \item \emph{Co-occurrence}. $a^{\textrm{T}} b = a_1b_1 + \cdots + a_nb_n$ counts the number of times
+        \item \emph{Weighs,features, and scores}. $w^{\textrm{T}} x = w_1x_1 + \cdots + w_nx_n$
+        \item \emph{Polynomial evaluation}. $p(x) = a_0 + a_1x + \cdots + a_nx^n = [1, x, \ldots, x^n]^{\textrm{T}}[a_0, a_1, \ldots, a_n]$
+        \item \emph{Probability and expected values.} $E[X] = \sum_{i=1}^{n} x_i p_i = [x_1, \ldots, x_n]^{\textrm{T}}[p_1, \ldots, p_n]$
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Outer Product}{}
+    \begin{definition}[Outer Product]
+        The outer product of a \emph{m}-vector \emph{a} and an \emph{n}-vector \emph{b} is
+        given by $ab^T$, which is an m×n matrix
+        \[
+            ab^T = \begin{bmatrix}
+                a_1b_1 & a_1b_2 & \cdots & a_1b_n \\
+                a_2b_1 & a_2b_2 & \cdots & a_2b_n \\
+                \vdots & \vdots & \ddots & \vdots \\
+                a_mb_1 & a_mb_2 & \cdots & a_mb_n
+            \end{bmatrix},
+        \]
+        whose entries are all products of the entries of \emph{a} and the entries of \emph{b}.
+    \end{definition}
+
+    \vsp
+    In general, $a^{\textrm{T}}b \neq b^{\textrm{T}}a$, \emph{i.e.},
+    it is not \emph{symmetric}\vspace*{3pt}\\
+\end{frame}
+
 
 
 \begin{frame}\FrameTitle{Vector Spaces}{Unit 1}
@@ -234,6 +389,17 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
         equal the usual $xy$ and $x^c$, is a vector space. What is the ``zero vector''?
     }}
     \end{enumerate}
+\end{frame}
+
+\begin{frame}\FrameTitle{The Zero-Dimensional Vector Space $\mathbb{R}^0$}{Unit 1}
+    % 1. Definition Block
+    \begin{definition}[The Trivial Space]
+        The space $\mathbb{R}^0$ is the unique zero-dimensional real vector space.
+        It contains exactly one element, the empty vector $v$:
+        \[
+        v \in \mathbb{R}^0 \quad \text{where} \quad v = [ ]
+        \]
+    \end{definition}
 \end{frame}
 
 \begin{frame}\FrameTitle{Subspaces}{Unit 1}

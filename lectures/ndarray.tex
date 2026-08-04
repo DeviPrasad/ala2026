@@ -88,7 +88,21 @@
 \author{Devi Prasad M}
 \begin{document}
 
-\pagecolor{yellow!15}
+% A soft, light gray background that is easy on the eyes
+\pagecolor{yellow!30!brown!20}
+
+% A rich, warm cream that mimics expensive book paper
+% \pagecolor{yellow!20!brown!10!white!70}
+
+% A sophisticated, cool-toned paper look
+% \pagecolor{cyan!10!yellow!10!black!6}
+
+% A soft, warm sepia that feels gentle on the eyes
+% \pagecolor{red!10!yellow!18!black!6}
+
+% High-contrast but low-glare dark mode text theme
+%\pagecolor{yellow!5!cyan!10!black!85}
+%\color{white!90!yellow!10} % Pair with this text color
 
 \maketitle
 
@@ -145,6 +159,8 @@ the total number of elements in the original 1D array.
 
 \subsection{Accessing rows and columns in a 2D array}
 \vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a = np.array(np.arange(1, 25, 1, np.int8))
+    b = a.reshape(2, 12)
     # Check the first row of the reshaped array
     assert (b[0] == [x for x in range(1, 13)]).all()
     # Check the second row of the reshaped array
@@ -170,6 +186,42 @@ three columns of the 2x12 array.
     assert(a2x3.ndim == 2)
     # access the last column of the 2x3 array
     assert np.array_equal(a2x3[:, 2], [3, 15])
+\end{lstlisting}
+
+\section{The Memory of \emph{ndarray} Objects}
+NumPy arrays enable flexible reshaping and slicing of the underlying data
+without actually copying data. When an array is sliced or reshaped,
+NumPy creates a \emph{view} of the same \emph{base} array.
+When a new view is created, it does not copy the data but instead provides
+a new way to access the underlying array. This strategy avoids unnecessary
+data duplication for large arrays.
+
+In the following exmaple, notice how modifying the view affects the original array.
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    a = np.array(np.arange(1, 25, 1, np.int8))
+    a_slice = a[10:20] # holds a[10]...a[19]
+    assert a_slice.size == 10 and a_slice.shape == (10,) and a_slice.ndim == 1
+
+    ### create a view of the original array
+    assert a.base is None  # 'a' is the base array
+    assert a_slice.base is a  # 'a_slice' is a view of 'a'
+    # Modifying 'a_slice' will modify 'a'
+    a_slice[0] = 127 # modifies a[10]
+    assert a[10] == 127
+    assert a_slice.base is a
+\end{lstlisting}
+
+We can also create a view of a view. In this case, the new view will still reference
+the original base array, not the intermediate view. This means that changes made
+to the new view will affect the original array, not the intermediate view.
+
+\vsp\begin{lstlisting}[language=Python, escapeinside={(*@}{@*)}]
+    ### mint a view of a view
+    c = a_slice.reshape(2,5)
+    assert c.base is a  # 'c' is a view of 'a', NOT 'a_slice'!
+    c[0, 0] = 127
+    assert a_slice[0] == 127
+    assert a[10] == 127
 \end{lstlisting}
 
 
