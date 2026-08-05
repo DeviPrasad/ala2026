@@ -10,6 +10,14 @@ vector-spaces:
 	xelatex --shell-escape vec-spaces.tex
 	open vec-spaces.pdf
 
+linear-functions:
+	xelatex --shell-escape linear-functions.tex
+	open linear-functions.pdf
+
+norm-dist:
+	xelatex --shell-escape norm-dist-std.tex
+	open norm-dist-std.pdf
+
 np:
 	xelatex --shell-escape np00.tex
 	open np00.pdf

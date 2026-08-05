@@ -1,0 +1,120 @@
+\documentclass[12pt]{beamer}
+% \usetheme{umbc4}
+\usetheme{moloch}
+
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{twemojis}
+\usepackage{nicematrix}
+
+\usetikzlibrary{fit}
+
+\setmonofont{DejaVu Sans Mono}
+
+% aet the title bar to black background with white text
+\setbeamercolor{frametitle}{bg=black, fg=white}
+
+% ensure other structural elements (bullets, etc.) are visible
+\setbeamercolor{structure}{fg=white}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIX Two Math}
+
+% define colors for syntax highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{question}{rgb}{1.0,0.75,0.1}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{8pt}}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+
+\begin{document}
+\title{\center{Applied Linear Algebra \\\vsp Linear Functions \\}}
+
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
+\date{\center{Friday, 7 August 2026}}
+\maketitle
+
+
+\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+    Consider the vector inner product function
+    \[
+        f(x) = a^{\textrm{T}} x = a_1x_1 + \cdots + a_nx_n
+    \]
+    where $a$ is a fixed $n$-vector, and $x$ is a variable $n$-vector.
+
+    \snl The function $f$ is called a \emph{linear function} of $x$.
+
+    \snl The vector $a$ is called the \emph{coefficient vector} of the linear function $f$.
+
+    \snl $a$ is also called the \emph{weight vector} of the linear function $f$.
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+    A linear function satisfies the following two properties:
+    \begin{itemize}
+        \item \emph{Additivity}. $f(x + y) = f(x) + f(y)$ for all $n$-vectors $x$ and $y$.
+        \item \emph{Homogeneity}. $f(\alpha x) = \alpha\, f(x)$ for all $n$-vectors $x$ and all scalars $\alpha$.
+    \end{itemize}
+
+    \vsp The vector inner product function
+    \[
+        f(x) = a^{\textrm{T}} x = a_1x_1 + \cdots + a_nx_n, \ \ \  a: \mathbb{R}^n, \ \ x: \mathbb{R}^n
+    \]
+    is linear.
+\end{frame}
+
+\begin{frame}\FrameTitle{Superposition and Linearity}{Unit 1}
+    \begin{definition}
+        A function $f$ is \emph{linear} if it satisfies the \emph{superposition principle}:
+        \[
+            f(\alpha \, x + \beta \, y) = \alpha \, f(x) + \beta \,f(y)
+        \]
+        for all $n$-vectors $x$ and $y$, and all scalars $\alpha$ and $\beta$.
+    \end{definition}
+
+    \vsp
+    Given the inner product function $f(x) = a^{\textrm{T}} x$, we can verify that it is linear:
+    \[
+        \begin{array}{rll}
+        f(\alpha \, x + \beta \, y) & = & a^{\textrm{T}} (\alpha \, x + \beta \, y) \\
+                                      & = & a^{\textrm{T}} (\alpha \, x) + a^{\textrm{T}} (\beta \, y) \\
+                                      & = & \alpha (a^{\textrm{T}} \, x) + \beta (a^{\textrm{T}} \, y) \\
+                                      & = & \alpha f(x) + \beta f(y)
+        \end{array}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+\end{frame}
+
+
+
+\end{document}
