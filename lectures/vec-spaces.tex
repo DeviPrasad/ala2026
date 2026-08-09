@@ -49,8 +49,12 @@
 \newcommand{\snl}{\vspace*{8pt}\\}
 \newcommand{\nl}{\vspace*{1em}\\}
 \newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\smallvspace}{\vspace*{0.5em}}
 
 \newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\Scalar}[1]{\textnormal{#1}}
+\newcommand{\Quiz}[1]{{\Large\textbf{\color{question}{#1}}}}
 
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp Finite-Dimensional Vector Spaces \\}}
@@ -66,19 +70,20 @@
         \item Scalars are the simplest mathematical objects.
     \end{itemize}
     \vsp
-    {\color{question}{\Large\textbf{Quiz:}}} \snl {\color{white}{\large{Name a few good examples of scalars.}}}
+    {\Quiz{Quiz}}\snl
+    {\color{white}{\large{Name a few good examples of scalars.}}}
 \end{frame}
 
 \begin{frame}\FrameTitle{Vectors}{Unit 1}
     \begin{itemize}
         \item A vector is a more structured mathematical object.
         \item A vector is an ordered sequence of scalars.\snl
-        \item[] \textbf{v} $ = (a_1, a_2, \ldots, a_n) \in \mathbb{R}^n$
+        \item[] \Vector{v} $ = (a_1, a_2, \ldots, a_n) \in \mathbb{R}^n$
         \item[] \hspace*{1em} $where \ \mathbb{R}^n$ is the set of all n-dimensional real vectors. \snl
-        \item[]$ v = (0.35, 0.71, 0.23, 0.8) \in \mathbb{R}^4$ \snl
-        \item[]$ v = (0.35) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
-        \item[]$ v = (0.35, 0.71) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
-        \item[]$ v = () \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$\Vector{v} = (0.35, 0.71, 0.23, 0.8) \in \mathbb{R}^4$ \snl
+        \item[]$\Vector{v} = (0.35) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$\Vector{v} = (0.35, 0.71) \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
+        \item[]$\Vector{v} = () \in \mathbb{R}^{\textbf{\color{yellow}{?}}}$ \snl
     \end{itemize}
 \end{frame}
 
@@ -143,16 +148,16 @@
     \vsp
 
     The \emph{i}-th unit vector (of size \emph{n}) is the unit vector
-    with \emph{i}-th element one, and denoted $e_i$.
+    with \emph{i}-th element one, and denoted $\Vector{e}_i$.
 
     \[
-        e_1 = \begin{bmatrix}
+        \Vector{e}_1 = \begin{bmatrix}
             1 \\ 0 \\ 0 \\ \vdots \\ 0
         \end{bmatrix}, \quad
-        e_2 = \begin{bmatrix}
+        \Vector{e}_2 = \begin{bmatrix}
             0 \\ 1 \\ 0 \\ \vdots \\ 0
         \end{bmatrix}, \quad
-        e_3 = \begin{bmatrix}
+        \Vector{e}_3 = \begin{bmatrix}
             0 \\ 0 \\ 1 \\ \vdots \\ 0
         \end{bmatrix}
     \]
@@ -160,10 +165,10 @@
 
 \begin{frame}\FrameTitle{Unit Vector}{Unit 1}
     The \emph{i}-th unit vector (of size \emph{n}) is the unit vector
-    with \emph{i}-th element one, and denoted $e_i$.
+    with \emph{i}-th element one, and denoted $\Vector{e}_i$.
 
     \begin{equation}
-        (e_i)_j = \begin{cases}
+        (\Vector{e}_i)_j = \begin{cases}
             \ 1 & i = j \\
             \ 0 & otherwise
         \end{cases}
@@ -171,35 +176,35 @@
     for $i,j = 1, \ldots, n$.
 
     \vsp
-    $e_i$ is an \emph{n}-vector. $(e_i)_j$ is a number, its \emph{j}-th entry.
+    $\Vector{e}_i$ is an \emph{n}-vector. $(\Vector{e}_i)_j$ is a number, its \emph{j}-th entry.
 \end{frame}
 
 \begin{frame}\FrameTitle{Ones Vector}{Unit 1}
     A \emph{ones vector} is a vector with all elements equal to one.
     \vsp
-    The \emph{n}-dimensional ones vector is denoted $1_n$.
+    The \emph{n}-dimensional ones vector is denoted $\Vector{1}_n$.
 
     \[
-        1_3 = \begin{bmatrix}
+        \Vector{1}_3 = \begin{bmatrix}
             1 \\ 1 \\ 1
         \end{bmatrix}, \quad
-        1_4 = \begin{bmatrix}
+        \Vector{1}_4 = \begin{bmatrix}
             1 \\ 1 \\ 1 \\ 1
         \end{bmatrix}, \quad
-        1_5 = \begin{bmatrix}
+        \Vector{1}_5 = \begin{bmatrix}
             1 \\ 1 \\ 1 \\ 1 \\ 1
         \end{bmatrix}
     \]
 \end{frame}
 
 \begin{frame}\FrameTitle{Properties of Vector Addition}{Unit 1}
-    For any $n$-vectors a, b, and c, the following properties hold:
+    For any $n$-vectors \Vector{a}, \Vector{b}, and \Vector{c}, the following properties hold:
     \begin{itemize}
-        \item Vector addition is \emph{commutative}: a + b= b + a.
-        \item Vector addition is \emph{associative}: (a + b) + c = a + (b + c). We can therefore
-        write both as a + b + c.
-        \item a + \textbf{0} = \textbf{0} + a = a. Adding the zero vector to a vector has no effect.$^{\dagger}$
-        \item a - a = \textbf{0}. Subtracting a vector from itself gives the zero vector.
+        \item Vector addition is \emph{commutative}: \Vector{a} + \Vector{b} = \Vector{b} + \Vector{a}.
+        \item Vector addition is \emph{associative}: (\Vector{a} + \Vector{b}) + \Vector{c} = \Vector{a} + (\Vector{b} + \Vector{c}). We can therefore
+        write both as \Vector{a} + \Vector{b} + \Vector{c}.
+        \item \Vector{a} + \textbf{0} = \Vector{0} + \Vector{a} = \Vector{a}. Adding the zero vector to a vector has no effect.$^{\dagger}$
+        \item \Vector{a} - \Vector{a} = \Vector{0}. Subtracting a vector from itself gives the zero vector.
     \end{itemize}
     \vsp
     {\color{question}{Can you think of the geometric interpretation of these properties?}}
@@ -230,15 +235,15 @@
 
 
 \begin{frame}\FrameTitle{Scalar-vector multiplication}{Unit 1}
-    For any $a \in \mathbb{R}^n$, and scalars $\alpha, \beta, \gamma \in \mathbb{R}$,
+    For any $\Vector{a} \in \mathbb{R}^n$, and scalars $\alpha, \beta, \gamma \in \mathbb{R}$,
     the following properties hold:
     \begin{itemize}
-        \item scalar-vector multiplication is \emph{commutative}: $\alpha a = a \alpha$.
-        \item scalar-vector multiplication is \emph{associative}: $(\beta \gamma) a = \beta (\gamma a)$.
-        \item 1 a = a. Multiplying a vector by the scalar 1 has no effect.
-        \item 0 a = \textbf{0}. Multiplying a vector by the scalar 0 gives the zero vector.
-        \item $\beta (a + b) = \beta a + \beta b$. Scalar multiplication distributes over vector addition.
-        \item $(\beta + \gamma) a = \beta a + \gamma a$. The distributive property of scalar-vector multiplication.
+        \item scalar-vector multiplication is \emph{commutative}: $\alpha \Vector{a} = \Vector{a} \alpha$.
+        \item scalar-vector multiplication is \emph{associative}: $(\beta \gamma) \Vector{a} = \beta (\gamma \Vector{a})$.
+        \item $\Scalar{1} \Vector{a} = \Vector{a}$. Multiplying a vector by the scalar 1 has no effect.
+        \item $\Scalar{0} \Vector{a} = \Vector{0}$. Multiplying a vector by the scalar 0 gives the zero vector.
+        \item $\beta (\Vector{a} + \Vector{b}) = \beta \Vector{a} + \beta \Vector{b}$. Scalar multiplication distributes over vector addition.
+        \item $(\beta + \gamma) \Vector{a} = \beta \Vector{a} + \gamma \Vector{a}$. The distributive property of scalar-vector multiplication.
 
     \end{itemize}
 \end{frame}
@@ -251,16 +256,16 @@ rule for scalar multiplication
         \cdot: \mathbb{R} \times V \rightarrow V
     \end{align*}
 
-such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{1}, c_{2} \in \mathbb{R}$:
+such that the following axioms hold for all $\Vector{u}, \Vector{v}, \Vector{w} \in V$ and all scalars $c_{1}, c_{2} \in \mathbb{R}$:
     \begin{enumerate}
-        \item $u + v = v + u$
-        \item $(u + v) + w = u + (v + w)$
-        \item $v + \mathbf{0} = v$
-        \item $v + (-v) = \mathbf{0}$ where $-v$ is the unique additive inverse of $v$
-        \item $c_1 \cdot (v + w) = c_1 \cdot v + c_1 \cdot w$
-        \item $(c_1 + c_2) \cdot v = c_1 \cdot v + c_2\cdot v$
-        \item $c_1 \cdot (c_2 \cdot v) = (c_1 c_2) \cdot v$
-        \item $1 \cdot v = v$
+        \item $\Vector{u} + \Vector{v} = \Vector{v} + \Vector{u}$
+        \item $(\Vector{u} + \Vector{v}) + \Vector{w} = \Vector{u} + (\Vector{v} + \Vector{w})$
+        \item $\Vector{v} + \Vector{0} = \Vector{v}$
+        \item $\Vector{v} + (-\Vector{v}) = \mathbf{0}$ where $-\Vector{v}$ is the unique additive inverse of $\Vector{v}$
+        \item $c_1 \cdot (\Vector{v} + \Vector{w}) = c_1 \cdot \Vector{v} + c_1 \cdot \Vector{w}$
+        \item $(c_1 + c_2) \cdot \Vector{v} = c_1 \cdot \Vector{v} + c_2\cdot \Vector{v}$
+        \item $c_1 \cdot (c_2 \cdot \Vector{v}) = (c_1 c_2) \cdot \Vector{v}$
+        \item $\Scalar{1} \cdot \Vector{v} = \Vector{v}$
     \end{enumerate}
 \end{frame}
 
@@ -268,23 +273,16 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     {\center{\Large\textbf{Examples of Vector Spaces}}}
 \end{frame}
 
-\begin{frame}\FrameTitle{Vector Spaces - Quiz}{Unit 1}
-    \color{question}{\Large\textbf{Question:}} \snl
-    {\color{white}{\large{is a $3 \times 2$ matrix of $\mathbb{R}$ a vector space?}}}
-    \snl
-    {\color{white}{\large{is a $3 \times 2$ matrix with non-negative entries a vector space?}}}
-    \snl
-    {\color{white}{\large{is a $m \times n$ matrix of $\mathbb{R}$ a vector space?}}}
+\begin{frame}\FrameTitle{Vector Spaces - Questions}{Unit 1}
+    \vsp
+    \begin{enumerate}
+        \item {\color{question}{\large{is a $3 \times 2$ matrix of $\mathbb{R}$ a vector space?}}}
+        \item {\color{question}{\large{is a $3 \times 2$ matrix of $\mathbb{R}$ with non-negative entries a vector space?}}}
+        \item {\color{question}{\large{is a $m \times n$ matrix of $\mathbb{R}$ a vector space?}}}
+    \end{enumerate}
 \end{frame}
 
-\begin{frame}\FrameTitle{Vector Spaces - $\mathbb{R}^1, \mathbb{R}^2, \mathbb{R}^3,\ldots,\mathbb{R}^n$}{Unit 1}
-    \begin{definition}
-        The space $\mathbb{R}^n$ consists of all column vectors with $n$ components,
-        where each component is a real number.
-    \end{definition}
-
-    \vsp
-    {\Large\textbf{\color{question}Quiz}}
+\begin{frame}\FrameTitle{Vector Spaces - Questions}{Unit 1}
     \vsp
     \begin{enumerate}
     \item {\textcolor{question}{
@@ -301,12 +299,13 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
 
 
 \begin{frame}\FrameTitle{Linear Combinations}{Unit 1}
-    if $a_1, \ldots, a_m$ are \emph{n}-vectors, and $\beta_1,\ldots,\beta_m$ are scalars,
+    if $\Vector{a}_1, \ldots, \Vector{a}_m$ are \emph{n}-vectors, and $\beta_1,\ldots,\beta_m$ are scalars,
     the \emph{n}-vector
+
     \[
-        \beta_1 a_1 + \cdots + \beta_m a_m
+        \beta_1 \Vector{a}_1 + \cdots + \beta_m \Vector{a}_m
     \]
-    is called the \emph{linear combination} of the vectors $a_1,\ldots,a_m$.
+    is called the \emph{linear combination} of the vectors $\Vector{a}_1,\ldots,\Vector{a}_m$.
 
     \vsp
 
@@ -350,36 +349,39 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     it is called a \emph{convex combination}, or a \emph{weighted average}.
 \end{frame}
 
-\begin{frame}\FrameTitle{Inner Product}{}
+\begin{frame}\FrameTitle{Inner Product}{Unit 1}
     \begin{definition}[Inner or Dot Product]
         The inner product of two $n$-vectors is defined as the \emph{scalar}
         \[
-            a^Tb = a_1b_1 + a_2b_2 + \ldots + a_nb_n,
+            \Vector{a}^{\textrm{T}}\,\Vector{b} = a_1b_1 + a_2b_2 + \ldots + a_nb_n,
         \]
         the sum of the products of corresponding entries.
     \end{definition}
     \vsp
-    If a, b, and c are vectors of the same size, and {\color{yellow}$\gamma$} is a scalar, then the following hold:\vspace*{2pt}\\
+    If $\Vector{a}$, $\Vector{b}$, and $\Vector{c}$ are vectors of the same size, and {\color{yellow}$\gamma$} is a scalar, then the following hold:\vspace*{2pt}\\
     \begin{enumerate}
-        \item \emph{Commutativity}: $a^{\textrm{T}}b = b^{\textrm{T}}a$ aka \emph{symmetric}\vspace*{3pt}\\
-        \item \emph{Associativity with scalar multiplication}: $({\color{yellow}\gamma} a)^{\textrm{T}}b = {\color{yellow}\gamma} (a^{\textrm{T}}b)$ \vspace*{3pt}\\
-        \item \emph{Distributivity with vector addition}: $(a+b)^{\textrm{T}}c = a^{\textrm{T}}c + b^{\textrm{T}}c$
+        \item \emph{Commutativity}: $\Vector{a}^{\textrm{T}}\,\Vector{b} = \Vector{b}^{\textrm{T}}\,\Vector{a}$ aka \emph{symmetric}\vspace*{3pt}\\
+        \item \emph{Associativity with scalar multiplication}: $(\gamma \Vector{a})^{\textrm{T}}\,\Vector{b} = \gamma (\Vector{a}^{\textrm{T}}\,\Vector{b})$ \vspace*{3pt}\\
+        \item \emph{Distributivity with vector addition}: $(\Vector{a}+\Vector{b})^{\textrm{T}}\,\Vector{c} = \Vector{a}^{\textrm{T}}\,\Vector{c} + \Vector{b}^{\textrm{T}}\,\Vector{c}$
     \end{enumerate}
 \end{frame}
 
 \begin{frame}\FrameTitle{Inner Product: Special Examples}{Unit 1}
     \begin{itemize}
-        \item \emph{Unit vector}. $e^{\textrm{T}}_i a = a_i$
-        \item \emph{Sum}. $1^{\textrm{T}} a= a_1 + \cdots + a_n$
-        \item \emph{Sum of squares}. $a^{\textrm{T}} a = a^2_1 + \cdots + a^2_n$
+        \item \emph{Unit vector}. $e^{\textrm{T}}_i \Vector{a} = a_i$
+        \item \emph{Sum}. $1^{\textrm{T}} \Vector{a}= a_1 + \cdots + a_n$
+        \item \emph{Sum of squares}. $\Vector{a}^{\textrm{T}} \Vector{a} = a^2_1 + \cdots + a^2_n$
     \end{itemize}
 \end{frame}
 
 \begin{frame}\FrameTitle{Inner Product: Applications}{Unit 1}
     \begin{itemize}
-        \item \emph{Co-occurrence}. $a^{\textrm{T}} b = a_1b_1 + \cdots + a_nb_n$ counts the number of times
-        \item \emph{Weighs,features, and scores}. $w^{\textrm{T}} x = w_1x_1 + \cdots + w_nx_n$
+        \item \emph{Co-occurrence}. $\Vector{a}^{\textrm{T}} \Vector{b} = a_1b_1 + \cdots + a_nb_n$ counts the number of times the two vectors have non-zero entries in the same position.
+        \smallvspace
+        \item \emph{Weighs, features, and scores}. $\Vector{w}^{\textrm{T}} \Vector{x} = w_1x_1 + \cdots + w_nx_n$
+        \smallvspace
         \item \emph{Polynomial evaluation}. $p(x) = a_0 + a_1x + \cdots + a_nx^n = [1, x, \ldots, x^n]^{\textrm{T}}[a_0, a_1, \ldots, a_n]$
+        \smallvspace
         \item \emph{Probability and expected values.} $E[X] = \sum_{i=1}^{n} x_i p_i = [x_1, \ldots, x_n]^{\textrm{T}}[p_1, \ldots, p_n]$
     \end{itemize}
 \end{frame}
@@ -387,10 +389,10 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
 
 \begin{frame}\FrameTitle{Outer Product}{}
     \begin{definition}[Outer Product]
-        The outer product of a \emph{m}-vector \emph{a} and an \emph{n}-vector \emph{b} is
-        given by $ab^T$, which is an m×n matrix
+        The outer product of a \emph{m}-vector \Vector{a} and an \emph{n}-vector \Vector{b} is
+        given by $\Vector{a}\Vector{b}^{\textrm{T}}$, which is an m×n matrix
         \[
-            ab^T = \begin{bmatrix}
+            \Vector{a}\Vector{b}^{\textrm{T}} = \begin{bmatrix}
                 a_1b_1 & a_1b_2 & \cdots & a_1b_n \\
                 a_2b_1 & a_2b_2 & \cdots & a_2b_n \\
                 \vdots & \vdots & \ddots & \vdots \\
@@ -401,7 +403,7 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     \end{definition}
 
     \vsp
-    In general, $a^{\textrm{T}}b \neq b^{\textrm{T}}a$, \emph{i.e.},
+    In general, $\Vector{a}^{\textrm{T}}\,\Vector{b} \neq \Vector{b}^{\textrm{T}}\,\Vector{a}$, \emph{i.e.},
     it is not \emph{symmetric}\vspace*{3pt}\\
 \end{frame}
 
@@ -411,9 +413,9 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     % 1. Definition Block
     \begin{definition}[The Trivial Space]
         The space $\mathbb{R}^0$ is the unique zero-dimensional real vector space.
-        It contains exactly one element, the empty vector $v$:
+        It contains exactly one element, the empty vector $\Vector{v}$:
         \[
-        v \in \mathbb{R}^0 \quad \text{where} \quad v = [ ]
+            \Vector{v} \in \mathbb{R}^0 \quad \text{where} \quad \Vector{v} = [ ]
         \]
     \end{definition}
 \end{frame}
@@ -437,12 +439,12 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     It is not a subspace of $\mathbb{R}^2$ because it is not closed under scalar multiplication.\snl
     For example, if
     $$
-        v = [1, 1]
+        \Vector{v} = [1, 1]
     $$
     is in the first quadrant,
     then
     $$
-        -1 \cdot v = [-1, -1]
+        -1 \cdot \Vector{v} = [-1, -1]
     $$
     is not in the first quadrant.
 \end{frame}
@@ -453,11 +455,11 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
 
     For example, if
     $$
-        u = [1, 2] \quad \text{and} \quad v = [-2, -1]
+        \Vector{u} = [1, 2] \quad \text{and} \quad \Vector{v} = [-2, -1]
     $$
     are in the first and third quadrants, then
     $$
-        u + v = [-1, 1]
+        \Vector{u} + \Vector{v} = [-1, 1]
     $$
     is not in the first or third quadrant.
 \end{frame}
@@ -472,15 +474,15 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     --- {\color{midgray}{PyTorch uses \emph{row vectors} to handle batches.}}\snl
 
     \begin{itemize}
-        \item Single sample $\mathbf{x}$ is a column vector.
+        \item Single sample $\Vector{x}$ is a column vector.
         \item Forward pass formula:
             \[
-            \mathbf{y} = \mathbf{W}\mathbf{x} + \mathbf{b}
+            \Vector{y} = \Vector{W}\Vector{x} + \Vector{b}
             \]
             \item Dimensions:
             \[
             \begin{matrix}
-            \mathbf{y} & = & \mathbf{W} & \mathbf{x} & + & \mathbf{b} \\
+            \Vector{y} & = & \Vector{W} & \Vector{x} & + & \Vector{b} \\
             {\color{yellow}{\scriptstyle(c \times 1)}} & & {\color{yellow}{\scriptstyle(c \times d)}} & {\color{yellow}{\scriptstyle(d \times 1)}} & & {\color{yellow}{\scriptstyle(c \times 1)}}
             \end{matrix}
             \]
@@ -491,15 +493,15 @@ such that the following axioms hold for all $u, v, w \in V$ and all scalars $c_{
     --- {\color{midgray}{Textbooks use \emph{column vectors} for single samples.}}\snl
     --- PyTorch uses \emph{row vectors} to handle batches.\snl
     \begin{itemize}
-        \item Batch $\mathbf{X}$ stacks samples as rows.
+        \item Batch $\Vector{X}$ stacks samples as rows.
         \item PyTorch \emph{nn.Linear} formula:
         \[
-        \mathbf{Y} = \mathbf{X}\mathbf{W}^T + \mathbf{B}
+        \Vector{Y} = \Vector{X}\Vector{W}^T + \Vector{B}
         \]
         \item Dimensions ($N$ = batch size):
         \[
         \begin{matrix}
-        \mathbf{Y} & = & \mathbf{X} & \mathbf{W}^T & + & \mathbf{B} \\
+        \Vector{Y} & = & \Vector{X} & \Vector{W}^T & + & \Vector{B} \\
         {\color{yellow}{\scriptstyle(N \times c)}} & & {\color{yellow}{\scriptstyle(N \times d)}} & {\color{yellow}{\scriptstyle(d \times c)}} & & {\color{yellow}{\scriptstyle(1 \times c)}}
         \end{matrix}
         \]

@@ -51,39 +51,57 @@
 \newcommand{\vsp}{\vspace*{1em}}
 
 \newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\Scalar}[1]{\textnormal{#1}}
+\newcommand{\Quiz}[1]{{\Large\textbf{\color{question}{#1}}}}
 
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp Linear Functions \\}}
 
 \author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
-\date{\center{Friday, 7 August 2026}}
+\date{\center{August 2026}}
 \maketitle
+
+\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+    We write $f: \mathbb{R}^n \rightarrow \mathbb{R}$ to mean that the
+    function $f$ maps real $n$-vectors to real numbers.
+
+    \vsp
+
+    Function $f$ is a scalar-valued function of $n$-vectors.
+
+    \vsp
+    \textbf{Example}\snl
+    $$
+        f(\Vector{x}:\mathbb{R}^n) = \Vector{1}_n^{\mathrm{T}} \, \Vector{x}
+    $$
+\end{frame}
 
 
 \begin{frame}\FrameTitle{Linear Functions}{Unit 1}
     Consider the vector inner product function
     \[
-        f(x) = a^{\textrm{T}} x = a_1x_1 + \cdots + a_nx_n
+        f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n
     \]
-    where $a$ is a fixed $n$-vector, and $x$ is a variable $n$-vector.
+    where $\Vector{a}$ is a fixed $n$-vector, and $\Vector{x}$ is a variable $n$-vector.
 
-    \snl The function $f$ is called a \emph{linear function} of $x$.
+    \snl The function $f$ is called a \emph{linear function} of $\Vector{x}$.
 
-    \snl The vector $a$ is called the \emph{coefficient vector} of the linear function $f$.
+    \snl The vector $\Vector{a}$ is called the \emph{coefficient vector} of the linear function $f$.
 
-    \snl $a$ is also called the \emph{weight vector} of the linear function $f$.
+    \snl $\Vector{a}$ is also called the \emph{weight vector} of the linear function $f$.
 \end{frame}
 
 \begin{frame}\FrameTitle{Linear Functions}{Unit 1}
     A linear function satisfies the following two properties:
     \begin{itemize}
-        \item \emph{Additivity}. $f(x + y) = f(x) + f(y)$ for all $n$-vectors $x$ and $y$.
-        \item \emph{Homogeneity}. $f(\alpha x) = \alpha\, f(x)$ for all $n$-vectors $x$ and all scalars $\alpha$.
+        \item \emph{Additivity}. $f(\Vector{x} + \Vector{y}) = f(\Vector{x}) + f(\Vector{y})$ for all $n$-vectors $\Vector{x}$ and $\Vector{y}$.
+        \item \emph{Homogeneity}. $f(\alpha \Vector{x}) = \alpha\, f(\Vector{x})$ for all $n$-vectors $\Vector{x}$ and all scalars $\alpha$.
     \end{itemize}
 
     \vsp The vector inner product function
     \[
-        f(x) = a^{\textrm{T}} x = a_1x_1 + \cdots + a_nx_n, \ \ \  a: \mathbb{R}^n, \ \ x: \mathbb{R}^n
+        f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n, \ \ \  \Vector{a}: \mathbb{R}^n, \ \ \Vector{x}: \mathbb{R}^n
     \]
     is linear.
 \end{frame}
@@ -92,25 +110,23 @@
     \begin{definition}
         A function $f$ is \emph{linear} if it satisfies the \emph{superposition principle}:
         \[
-            f(\alpha \, x + \beta \, y) = \alpha \, f(x) + \beta \,f(y)
+            f(\alpha \, \Vector{x} + \beta \, \Vector{y}) = \alpha \, f(\Vector{x}) + \beta \,f(\Vector{y})
         \]
-        for all $n$-vectors $x$ and $y$, and all scalars $\alpha$ and $\beta$.
+        for all $n$-vectors $\Vector{x}$ and $\Vector{y}$, and all scalars $\alpha$ and $\beta$.
     \end{definition}
 
     \vsp
-    Given the inner product function $f(x) = a^{\textrm{T}} x$, we can verify that it is linear:
+    Given the inner product function $f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x}$, we can verify that it is linear:
     \[
         \begin{array}{rll}
-        f(\alpha \, x + \beta \, y) & = & a^{\textrm{T}} (\alpha \, x + \beta \, y) \\
-                                      & = & a^{\textrm{T}} (\alpha \, x) + a^{\textrm{T}} (\beta \, y) \\
-                                      & = & \alpha (a^{\textrm{T}} \, x) + \beta (a^{\textrm{T}} \, y) \\
-                                      & = & \alpha f(x) + \beta f(y)
+        f(\alpha \, \Vector{x} + \beta \, \Vector{y}) & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x} + \beta \, \Vector{y}) \\
+                                      & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x}) + \Vector{a}^{\textrm{T}} (\beta \, \Vector{y}) \\
+                                      & = & \alpha (\Vector{a}^{\textrm{T}} \, \Vector{x}) + \beta (\Vector{a}^{\textrm{T}} \, \Vector{y}) \\
+                                      & = & \alpha f(\Vector{x}) + \beta f(\Vector{y})
         \end{array}
     \]
 \end{frame}
 
-\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
-\end{frame}
 
 \begin{frame}\FrameTitle{Linear Functions}{Unit 1}
 \end{frame}
