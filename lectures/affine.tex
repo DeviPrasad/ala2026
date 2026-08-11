@@ -1,0 +1,696 @@
+\documentclass[12pt]{article}
+
+% ============================================================
+% Packages
+% ============================================================
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{tikz}
+\usepackage{nicematrix}
+\usepackage{unicode-math}
+
+% ============================================================
+% Page layout and fonts
+% ============================================================
+
+\geometry{
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.5cm,
+    right=2.5cm
+}
+
+\setlength{\droptitle}{-3cm}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmonofont{DejaVu Sans Mono}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\usetikzlibrary{fit}
+
+% ============================================================
+% Custom commands
+% ============================================================
+
+\newcommand{\Matrix}[1]{\mathbf{#1}}
+\newcommand{\Vector}[1]{\mathbf{#1}}
+\newcommand{\Scalar}[1]{#1}
+
+\newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\snl}{\vspace*{2pt}}
+
+% ============================================================
+% Title
+% ============================================================
+
+\title{\textbf{Affine Functions}}
+\author{Devi Prasad M}
+\date{August 2026}
+
+% ============================================================
+% Document
+% ============================================================
+
+\begin{document}
+
+\maketitle
+
+% ============================================================
+\section{Affine Functions and Affine Combinations}
+% ============================================================
+
+An \emph{affine function} is a linear function followed by a
+translation. It can be written as
+
+\[
+    f(\Vector{v}) = L(\Vector{v}) + \Vector{b},
+\]
+
+where
+
+\begin{itemize}
+    \item $L$ is a linear function, and
+    \item $\Vector{b}$ is a fixed translation vector.
+\end{itemize}
+
+The linearity of $L$ means that
+
+\[
+L\left(
+    \sum_{i=1}^{k} c_i\Vector{v}_i
+\right)
+=
+\sum_{i=1}^{k} c_iL(\Vector{v}_i).
+\]
+
+A natural question is:
+
+\begin{quote}
+\emph{Does an affine function preserve linear combinations in the
+same way that a linear function does?}
+\end{quote}
+
+The answer is almost the same, but with one important restriction:
+
+\[
+\boxed{
+\text{An affine function preserves affine combinations.}
+}
+\]
+
+An \emph{affine combination} is a weighted combination whose
+coefficients sum to $1$.
+
+% ============================================================
+\subsection{Why Must the Coefficients Sum to 1?}
+% ============================================================
+
+Consider a weighted combination of vectors
+
+\[
+    \Vector{v}
+    =
+    \sum_{i=1}^{k} c_i\Vector{v}_i.
+\]
+
+Applying the affine function gives
+
+\begin{align*}
+f\left(
+    \sum_{i=1}^{k} c_i\Vector{v}_i
+\right)
+&=
+L\left(
+    \sum_{i=1}^{k} c_i\Vector{v}_i
+\right)
++
+\Vector{b}
+\\[4pt]
+&=
+\sum_{i=1}^{k} c_iL(\Vector{v}_i)
++
+\Vector{b}.
+\end{align*}
+
+Now consider the same weighted combination of the outputs:
+
+\begin{align*}
+\sum_{i=1}^{k} c_i f(\Vector{v}_i)
+&=
+\sum_{i=1}^{k}
+c_i\left(
+    L(\Vector{v}_i)+\Vector{b}
+\right)
+\\[4pt]
+&=
+\sum_{i=1}^{k}c_iL(\Vector{v}_i)
++
+\left(
+    \sum_{i=1}^{k}c_i
+\right)\Vector{b}.
+\end{align*}
+
+For the two expressions to be equal, we require
+
+\[
+\Vector{b}
+=
+\left(
+    \sum_{i=1}^{k}c_i
+\right)\Vector{b}.
+\]
+
+For an arbitrary translation vector $\Vector{b}$, this requires
+
+\[
+\boxed{
+\sum_{i=1}^{k}c_i=1.
+}
+\]
+
+Therefore,
+
+\[
+\boxed{
+f\left(
+    \sum_{i=1}^{k}c_i\Vector{v}_i
+\right)
+=
+\sum_{i=1}^{k}c_i f(\Vector{v}_i)
+\qquad
+\text{whenever}
+\qquad
+\sum_{i=1}^{k}c_i=1.
+}
+\]
+
+This is the fundamental preservation property of an affine function.
+
+% ============================================================
+\subsection{Linear Combination vs.\ Affine Combination}
+% ============================================================
+
+It is important to distinguish between a linear combination and an
+affine combination.
+
+A \emph{linear combination} has the form
+
+\[
+    \sum_{i=1}^{k}c_i\Vector{v}_i,
+\]
+
+with no restriction on the coefficients.
+
+An \emph{affine combination} has the additional constraint
+
+\[
+    \boxed{
+    \sum_{i=1}^{k}c_i=1.
+    }
+\]
+
+The coefficients may be positive, zero, or negative.
+
+For example,
+
+\[
+    0.4\Vector{v}_1+0.6\Vector{v}_2
+\]
+
+is an affine combination because
+
+\[
+    0.4+0.6=1.
+\]
+
+On the other hand,
+
+\[
+    2\Vector{v}_1+3\Vector{v}_2
+\]
+
+is a linear combination, but not an affine combination, because
+
+\[
+    2+3=5\neq1.
+\]
+
+If, in addition,
+
+\[
+    c_i\geq0
+    \qquad\text{for all }i,
+\]
+
+then the affine combination is called a
+\emph{convex combination}.
+
+For example,
+
+\[
+    0.4\Vector{v}_1+0.6\Vector{v}_2
+\]
+
+is both an affine combination and a convex combination.
+
+% ============================================================
+\section{A Concrete 2D Example}
+% ============================================================
+
+Consider the affine function
+
+\[
+    f(\Vector{v})
+    =
+    \Matrix{L}\Vector{v}+\Vector{b},
+\]
+
+where
+
+\[
+\Matrix{L}
+=
+\begin{bmatrix}
+2 & 0\\
+0 & 3
+\end{bmatrix},
+\qquad
+\Vector{b}
+=
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}.
+\]
+
+The matrix $\Matrix{L}$ doubles the first coordinate and triples
+the second coordinate.
+
+The vector $\Vector{b}$ then translates the result by
+
+\[
+4 \text{ units in the }x\text{-direction}
+\]
+
+and
+
+\[
+-1 \text{ unit in the }y\text{-direction}.
+\]
+
+Let
+
+\[
+\Vector{v}_1
+=
+\begin{bmatrix}
+1\\
+2
+\end{bmatrix},
+\qquad
+\Vector{v}_2
+=
+\begin{bmatrix}
+3\\
+6
+\end{bmatrix}.
+\]
+
+We choose the coefficients
+
+\[
+    c_1=0.4,
+    \qquad
+    c_2=0.6.
+\]
+
+Notice that
+
+\[
+    c_1+c_2=0.4+0.6=1.
+\]
+
+Therefore,
+
+\[
+    0.4\Vector{v}_1+0.6\Vector{v}_2
+\]
+
+is an affine combination.
+
+Geometrically, it lies on the line segment joining
+$\Vector{v}_1$ and $\Vector{v}_2$.
+
+% ============================================================
+\subsection{Method 1: Combine the Inputs First}
+% ============================================================
+
+First construct the affine combination:
+
+\begin{align*}
+\Vector{v}_3
+&=
+0.4\Vector{v}_1+0.6\Vector{v}_2
+\\[4pt]
+&=
+0.4
+\begin{bmatrix}
+1\\
+2
+\end{bmatrix}
++
+0.6
+\begin{bmatrix}
+3\\
+6
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+0.4\\
+0.8
+\end{bmatrix}
++
+\begin{bmatrix}
+1.8\\
+3.6
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+2.2\\
+4.4
+\end{bmatrix}.
+\end{align*}
+
+Now apply the affine function:
+
+\begin{align*}
+f(\Vector{v}_3)
+&=
+\begin{bmatrix}
+2 & 0\\
+0 & 3
+\end{bmatrix}
+\begin{bmatrix}
+2.2\\
+4.4
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+4.4\\
+13.2
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\boxed{
+\begin{bmatrix}
+8.4\\
+12.2
+\end{bmatrix}
+}.
+\end{align*}
+
+% ============================================================
+\subsection{Method 2: Transform the Inputs First}
+% ============================================================
+
+Now let us reverse the order.
+
+First transform $\Vector{v}_1$:
+
+\begin{align*}
+f(\Vector{v}_1)
+&=
+\begin{bmatrix}
+2 & 0\\
+0 & 3
+\end{bmatrix}
+\begin{bmatrix}
+1\\
+2
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+2\\
+6
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+6\\
+5
+\end{bmatrix}.
+\end{align*}
+
+Similarly,
+
+\begin{align*}
+f(\Vector{v}_2)
+&=
+\begin{bmatrix}
+2 & 0\\
+0 & 3
+\end{bmatrix}
+\begin{bmatrix}
+3\\
+6
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+6\\
+18
+\end{bmatrix}
++
+\begin{bmatrix}
+4\\
+-1
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+10\\
+17
+\end{bmatrix}.
+\end{align*}
+
+Now form the same affine combination of the outputs:
+
+\begin{align*}
+0.4f(\Vector{v}_1)+0.6f(\Vector{v}_2)
+&=
+0.4
+\begin{bmatrix}
+6\\
+5
+\end{bmatrix}
++
+0.6
+\begin{bmatrix}
+10\\
+17
+\end{bmatrix}
+\\[6pt]
+&=
+\begin{bmatrix}
+2.4\\
+2.0
+\end{bmatrix}
++
+\begin{bmatrix}
+6.0\\
+10.2
+\end{bmatrix}
+\\[6pt]
+&=
+\boxed{
+\begin{bmatrix}
+8.4\\
+12.2
+\end{bmatrix}
+}.
+\end{align*}
+
+Thus,
+
+\[
+\boxed{
+f(0.4\Vector{v}_1+0.6\Vector{v}_2)
+=
+0.4f(\Vector{v}_1)+0.6f(\Vector{v}_2)
+}.
+\]
+
+The two paths produce exactly the same result.
+
+% ============================================================
+\section{Why Does This Work?}
+% ============================================================
+
+The equality is not a coincidence arising from our particular
+numerical example.
+
+Consider the general case
+
+\[
+    f(\Vector{v})=L(\Vector{v})+\Vector{b}.
+\]
+
+Then
+
+\begin{align*}
+f(c_1\Vector{v}_1+c_2\Vector{v}_2)
+&=
+L(c_1\Vector{v}_1+c_2\Vector{v}_2)+\Vector{b}
+\\
+&=
+c_1L(\Vector{v}_1)
++
+c_2L(\Vector{v}_2)
++
+\Vector{b}.
+\end{align*}
+
+On the other hand,
+
+\begin{align*}
+c_1f(\Vector{v}_1)+c_2f(\Vector{v}_2)
+&=
+c_1
+\left(
+L(\Vector{v}_1)+\Vector{b}
+\right)
++
+c_2
+\left(
+L(\Vector{v}_2)+\Vector{b}
+\right)
+\\
+&=
+c_1L(\Vector{v}_1)
++
+c_2L(\Vector{v}_2)
++
+(c_1+c_2)\Vector{b}.
+\end{align*}
+
+Therefore, the two expressions are equal exactly when
+
+\[
+    c_1+c_2=1.
+\]
+
+The crucial point is that the translation vector $\Vector{b}$ appears
+
+\[
+\textbf{once}
+\]
+
+when we first combine the inputs, but it appears
+
+\[
+(c_1+c_2)\textbf{ times}
+\]
+
+when we first transform the inputs and then combine the outputs.
+
+The condition
+
+\[
+    c_1+c_2=1
+\]
+
+makes these two quantities identical.
+
+
+% ============================================================
+\section{The Key Idea}
+% ============================================================
+
+The difference between linear and affine functions can be summarized
+in two equations.
+
+For a linear function,
+
+\[
+\boxed{
+L\left(
+    \sum_i c_i\Vector{v}_i
+\right)
+=
+\sum_i c_iL(\Vector{v}_i)
+}
+\]
+
+with no restriction on the coefficients.
+
+For an affine function,
+
+\[
+\boxed{
+f\left(
+    \sum_i c_i\Vector{v}_i
+\right)
+=
+\sum_i c_if(\Vector{v}_i)
+\qquad
+\text{provided}
+\qquad
+\sum_i c_i=1.
+}
+\]
+
+The underlying idea is:
+
+\[
+\boxed{
+\text{Linear maps preserve the origin;
+affine maps preserve affine relationships.}
+}
+\]
+
+The condition
+
+\[
+    \boxed{\sum_i c_i=1}
+\]
+
+ensures that the translation component is counted exactly once.
+
+\end{document}
