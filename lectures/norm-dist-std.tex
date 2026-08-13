@@ -1,0 +1,232 @@
+\documentclass[12pt]{beamer}
+% \usetheme{umbc4}
+\usetheme{moloch}
+
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{nicematrix}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+\setmonofont{DejaVu Sans Mono}
+
+% Set the title bar to black background with white text
+\setbeamercolor{frametitle}{bg=black, fg=white}
+
+% Ensure other structural elements (bullets, etc.) are visible
+\setbeamercolor{structure}{fg=white}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmonofont{DejaVu Sans Mono}
+\setmathfont{STIXTwoMath-Regular.otf}
+%\setmathfont{STIX Two Math}
+
+
+% Define colors for syntax highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{question}{rgb}{1.0,0.75,0.1}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{4pt}\\}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+
+\newcommand{\Quiz}[1]{{\large\textbf{\color{question}{#1}}}}
+\newcommand{\QuizQuestion}[1]{{\Large\textbf{\color{question}{#1}}}}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\MMat}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
+\newcommand{\NormConst}[1]{\lVert #1 \rVert}
+\newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
+\newcommand{\abs}[1]{\lvert {#1} \rvert}
+
+\begin{document}
+\title{\center{Applied Linear Algebra \\\vsp Norm and Distance \\}}
+
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
+\date{\center{August 2026}}
+\maketitle
+
+\begin{frame}\FrameTitle{Euclidean Norm}{Unit 1}
+The \emph{Euclidean norm} of an $n$-vector $\MVec{x}$, denoted $\Norm{x}$,
+is the squareroot of the sum of the squares of its elements,
+
+\begin{align*}
+    \Norm{x} & = \sqrt{x^2_1 + x^2_2 + \cdots + x^2_n} \\[8pt]
+             & = \sqrt{\MVec{x}^{\Trans} \MVec{x}} \\[8pt]
+             & = \Norm{x}_2
+\end{align*}
+
+This is also called as the \emph{magnitude} of a vector.\snl
+
+\vspace*{2pt}
+We will avoid calling it the \emph{length} of a vector.
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Norm}{Unit 1}
+    \begin{align*}
+        \Norm{\MVec{0}} & = 0 \\[4pt]
+        \Norm{e_i} & = 1 \\[4pt]
+        \NormConst{[c]} & = c \\[4pt]
+        \Norm{\MVec{1_n}} & = \sqrt{n} \\[4pt]
+    \end{align*}
+
+    we use terms such as a \emph{small} norm and \emph{large} norm
+    when we want to compare the magnitudes of vectors.
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Properties of Euclidean Norm}{Unit 1}
+    \begin{itemize}
+        \item Nonnegative homogeneity. $\NormBeta{x}  = \abs{\beta}\Norm{x}$
+        \item Nonnegativity. $\Norm{x} \ge 0$
+        \item Definiteness. $\Norm{x} = \MVec{0}$ only if $\MVec{x} = \MVec{0}$.
+        \item Triangle inequality. $\Norm{x+y} \le \Norm{x} + \Norm{y}$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Properties of Euclidean Norm}{Unit 1}
+    \begin{itemize}
+        \item Nonnegative homogeneity. $\NormBeta{x}  = \abs{\beta}\Norm{x}$
+        \item Nonnegativity. $\Norm{x} \ge 0$
+        \item Definiteness. $\Norm{x} = \MVec{0}$ only if $\MVec{x} = \MVec{0}$.
+        \item Triangle inequality. $\Norm{x+y} \le \Norm{x} + \Norm{y}$.
+    \end{itemize}
+
+    \vspace*{2em}
+    \hspace*{1.2em}\Quiz{Quiz:}\snl
+    \vspace*{2pt}
+    \hspace*{1.2em}{\QuizQuestion{Example for triangle inequality?}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Norm - Wikipedia}{Unit 1}
+    \emph{a norm is a function from a real or complex vector space
+    to the non-negative real numbers that behaves in certain ways like
+    the distance from the origin: it commutes with scaling, obeys a form
+    of the triangle inequality, and is zero only at the origin.}
+\end{frame}
+
+
+\begin{frame}\FrameTitle{1-\emph{norm} and $\infty$-\emph{norm}}{Unit 1}
+    \begin{definition}{General Norm}
+        A \emph{general norm} is any real-valued function of an $n$-vector
+        that satisfies the four properties listed above.
+    \end{definition}
+
+    \vspace*{1em}
+
+    Two examples of general norms:
+    \[
+    \begin{array}{rll}
+        \textbf{1-norm}        &  \lVert x \rVert_1      &= \lvert x_1 \rvert + \cdots + \lvert x_n \rvert \\[4pt]
+        \textbf{Infinity-norm} &  \lVert x \rVert_{\infty} &= \max \{\lvert x_1 \rvert, \ldots, \lvert x_n \rvert \
+    \end{array}
+    \]
+
+    \vspace*{2em}
+    Infinity norm $\Norm{\cdot}_{\infty}$ is exrensively used in
+    ML-DSA, NIST's PQC signature scheme.
+\end{frame}
+
+\begin{frame}\FrameTitle{Root Mean Square Value}{Unit 1}
+The norm is related to the root-mean-square (RMS) value of an $n$-vector x:
+\begin{align*}
+    \mathbf{rms}(\MVec{x}) &= \sqrt{\frac{x^2_1 + \cdots + x^2_n}{n}} \\[4pt]
+                    &= \frac{\Norm{x}}{\sqrt{n}}
+\end{align*}
+
+The RMS value of a vector $\MVec{x}$ is useful when comparing norms of vectors
+with different dimensions.
+
+\vspace*{4pt}
+The RMS value tells us what a 'typical' value of $\abs{x_i}$ is.
+
+\vspace*{4pt}
+If all the entries of a vector are close to $\alpha$, then the RMS
+value of the vector is $\abs{\alpha}$.
+\end{frame}
+
+\begin{frame}\FrameTitle{Root Mean Square Value}{Unit 1}
+    \begin{itemize}
+        \item[--] 1805 — Adrien-Marie Legendre. His criterion was
+        to make the sum of the squares of the errors as small as possible.
+        \item[--] Karl Pearson is generally credited with introducing the
+        term “root-mean-square” in 1895, although the underlying
+        mathematical quantity, and even root-mean-square deviation,
+        predates the terminology.
+        \item[--] Pearson's important contribution was to name and
+        formalize terminology around it.
+        \item[--] In his 1893 lectures, he introduced
+        \emph{standard deviation} as a replacement for the older
+        \emph{root mean square} error.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance}{Unit 1}
+    If $\MVec{a}$ and $\MVec{b}$ are $n$-vectors,
+
+    \[
+        {\textbf{dist}}(\MVec{a}, \MVec{b}) = \Norm{\MVec{a} - \MVec{b}}
+    \]
+
+    \vspace*{1em}
+    The \emph{RMS deviation} between vectors $\MVec{a}$ and $\MVec{b}$ is
+    \[
+        \begin{array}{rll}
+            \textrm{RMSD} & = & \sqrt{\frac{1}{n}\sum\limits_{i=1}^{n}(a_{i}-b_{i})^{2}} \vspace*{12pt}\\
+                 & = & \dfrac{\textbf{dist}(\MVec{a}, \MVec{b})}{\sqrt{n}}
+        \end{array}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+For most choices of \Vector{b}, however, there is no $n$-vector
+\Vector{x} for which $\MMat{A} \MVec{x} = \MVec{b}$. As a
+compromise, we seek an $x$ for which $\MVec{r} = \MMat{A} \MVec{x} - \MVec{b}$,
+which we call the \emph{residual} (for the equations $\MMat{A} \MVec{x} - \MVec{b}$),
+is as small as possible.
+
+\vsp
+
+We should choose $\MVec{x}$ so as to minimize the norm of the
+residual, $\MMat{A} \MVec{x} - \MVec{b}.$
+
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+Minimizing the norm of the residual and its square are the same, so we can just
+as well minimize
+\[
+    \lVert \MMat{A} \MVec{x} - \MVec{b} \rVert^2 = \lVert r \rVert^2 = r^2_1 + \cdots + r^2_m,
+\]
+the sum of squares of the residuals.
+
+\end{frame}
+
+\end{document}
