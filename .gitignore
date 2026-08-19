@@ -3,6 +3,10 @@ temp/
 .idea/
 .vscode/
 lectures/_minted/
+bin/
+include/
+lib/
+share/
 
 *.minted
 *.aux

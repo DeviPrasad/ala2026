@@ -5,16 +5,8 @@
 \usepackage{amsmath,amscd}
 \usepackage{fontspec}
 \usepackage{unicode-math}
-\usepackage{pifont}
-\usepackage{xcolor}
 \usepackage[dvipsnames]{xcolor}
-\usepackage{listings}
-\usepackage{minted}
-\usepackage{tikz}
-\usepackage{twemojis}
 \usepackage{nicematrix}
-
-\usetikzlibrary{fit}
 
 \setmonofont{DejaVu Sans Mono}
 
@@ -34,6 +26,7 @@
 \definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
 \definecolor{question}{rgb}{1.0,0.75,0.1}
 \definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
 \definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
 \definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
 \definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
@@ -44,10 +37,15 @@
 \setbeamercolor{background canvas}{bg=black}
 \setbeamercolor{normal text}{fg=white}
 
+\hypersetup{
+    colorlinks=true,
+    urlcolor=lightblue
+}
+
 
 \newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
 \newcommand{\ThreePtVspace}{\vspace*{3pt}}
-\newcommand{\snl}{\vspace*{8pt}}
+\newcommand{\SixPtVspace}{\vspace*{6pt}}
 \newcommand{\nl}{\vspace*{1em}\\}
 \newcommand{\vsp}{\vspace*{1em}}
 
@@ -64,7 +62,7 @@
 \date{\center{August 2026}}
 \maketitle
 
-\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+\begin{frame}\FrameTitle{Functions}{Unit 1}
     We write $f: \mathbb{R}^n \rightarrow \mathbb{R}$ to mean that the
     function $f$ maps real $n$-vectors to real numbers.
 
@@ -73,7 +71,7 @@
     Function $f$ is a scalar-valued function of $n$-vectors.
 
     \vsp
-    \textbf{Example}\snl
+    \textbf{Example}\SixPtVspace
     $$
         f(\Vector{x}:\mathbb{R}^n) = \Vector{1}_n^{\mathrm{T}} \, \Vector{x}
     $$
@@ -132,11 +130,11 @@
     \]
     where $\Vector{a}$ is a fixed $n$-vector, and $\Vector{x}$ is a variable $n$-vector.
 
-    \snl The function $f$ is called a {\emph{\color{yellow}{linear function}}} of $\Vector{x}$.
+    \SixPtVspace The function $f$ is called a {\emph{\color{yellow}{linear function}}} of $\Vector{x}$.
 
-    \snl The vector $\Vector{a}$ is called the \emph{coefficient vector} of the linear function $f$.
+    \SixPtVspace The vector $\Vector{a}$ is called the \emph{coefficient vector} of the linear function $f$.
 
-    \snl $\Vector{a}$ is also called the \emph{weight vector} of the linear function $f$.
+    \SixPtVspace $\Vector{a}$ is also called the \emph{weight vector} of the linear function $f$.
 \end{frame}
 
 \begin{frame}\FrameTitle{Vector Inner Product Function}{Unit 1}
@@ -189,7 +187,7 @@
     \end{definition}
 \end{frame}
 
-\begin{frame}\FrameTitle{Linear Independece}{Unit 1}
+\begin{frame}\FrameTitle{Linear Independece and Span}{Unit 1}
     \begin{definition}[Linear Independence]\ThreePtVspace
          A set of vectors where no single vector can be written
          as a linear combination of the others.
@@ -201,6 +199,83 @@
         The complete set of all possible  vectors one can reach by
         changing the scalar values in a linear combination.
     \end{definition}
+\end{frame}
+
+\begin{frame}\FrameTitle{Geometric Linearity}{Unit 1}
+    \begin{definition}[]
+        If a plane $\mathbf{P}$ contains two points
+        $A$ and $B$, then it also contains the line $\overrightarrow{AB}$.
+    \end{definition}
+
+    \ThreePtVspace
+    This expresses the intuitive notion of ``flatness''.
+
+    \ThreePtVspace\ThreePtVspace
+
+    Non-planar surfaces do not satisfy this property.
+
+    \vsp
+    \begin{definition}[Geometric Linearity]
+        A subset $S$ of $\mathbb{R}^n$ is geometrically linear if $S$
+        contains all of the lines through the points of $S$.
+    \end{definition}
+\end{frame}
+
+\begin{frame}\FrameTitle{Algebraic Linearity}{Unit 1}
+    \begin{definition}[]
+        A a multivariable polynomial function is called
+        algebraically linear if every term has degree 1.
+    \end{definition}
+
+    \vsp\vsp
+    This is a ``strict'' definition. We may also include
+    constants, i.e., terms of degree 0, in which it becomes
+    an \emph{affine} function.
+\end{frame}
+
+\begin{frame}\FrameTitle{Affine Functions}{Unit 1}
+    \begin{definition}[Affine Function]
+        An \emph{affine function} is a linear function followed by a
+        translation. It can be written as
+        \[
+            f(\Vector{v}) = \Matrix{L}(\Vector{v}) + \Vector{b}
+        \]
+        where
+        \begin{itemize}
+            \item $\Matrix{L}$ is a linear function, and
+            \item $\Vector{b}$ is a fixed translation vector.
+        \end{itemize}
+    \end{definition}
+\end{frame}
+
+\begin{frame}\FrameTitle{Affine Function - An Example}{Unit 1}
+    Given the general definition of an affine function
+    \[
+        f(\Vector{v}) = \Matrix{L}(\Vector{v}) + \Vector{b},
+    \]
+    and the values of the variables,
+
+    \[
+        \Matrix{L} =
+            \begin{bmatrix}
+                2 & 0\\
+                0 & 3
+            \end{bmatrix},
+        \qquad
+        \Vector{v} =
+            \begin{bmatrix}
+            1\\
+            2
+            \end{bmatrix},
+        \qquad
+        \Vector{b} =
+            \begin{bmatrix}
+                4\\
+                -1
+            \end{bmatrix}.
+        \]
+
+        \color{question}{caculate the value of the function $f$.}
 \end{frame}
 
 
@@ -238,10 +313,8 @@ In addition, if
 then the affine combination is called a \emph{convex combination}.
 \end{frame}
 
-
-
-\begin{frame}\FrameTitle{Regression model}{Unit 1}
-    An $n$-vector \Vector{x} is a \emph{feature vector} of $n$ features.
+\begin{frame}\FrameTitle{Regression Model}{Unit 1}
+    An $n$-vector \Vector{x} is a \emph{feature vector} of $n$ \emph{features}.\SixPtVspace
 
     A \emph{regression model} is the affine function of \Vector{x} given by
 
@@ -251,33 +324,34 @@ then the affine combination is called a \emph{convex combination}.
 
     where $\beta$ is an $n$-vector and \Vector{v} is an $n$-vector.\vsp
 
-    The entries of \Vector{x} are called the \emph{regressors}.\vsp
+    The entries of \Vector{x} are also called the \textbf{regressors} or \textbf{predictors}.\vsp
 
-    $\widehat{\Vector{y}}$ is called the \emph{prediction}.\vsp
+    \SixPtVspace
+        \textbf{regressors} literally mean ``the things that cause the \emph{prediction} or \emph{regression}.''
+
+    \vsp
+    $\widehat{\Vector{y}}$ is called the \emph{prediction}.
 \end{frame}
-
-\begin{frame}\FrameTitle{Regression model}{Unit 1}
-\end{frame}
-
 
 \begin{frame}\FrameTitle{Applied Linear Regression}{Unit 1}
 
-Prediction of Intensive Care Unit Length of Stay in the MIMIC-IV Dataset
-https://www.mdpi.com/2076-3417/13/12/6930
+Prediction of Intensive Care Unit Length of Stay (LOS)
+in the \href{https://www.mdpi.com/2076-3417/13/12/6930}{\emph{MIMIC-IV Dataset}}
 
-"Four different classification and regression models for predicting LOS in the ICU are
-utilized and their performances are compared. The first is the common logistic/linear
-regression model (for classification/regression problems), which incorporates a linear
-combination of all features in modeling. ..."
+\emph{``... four different classification and regression models for predicting LOS in the ICU are
+utilized... The first is the common logistic/linear
+regression model, which incorporates a linear
+combination of all features in modeling...''}
 
-features:
-body temperature,
-chloride,
-creatinine,
-heart rate,
-mean corpuscular volume (MCV),
-O2 saturation, and
-respiratory rate
+\begin{itemize}
+    \item[--] body temperature
+    \item[--] chloride
+    \item[--] creatinine
+    \item[--] heart rate
+    \item[--] mean corpuscular volume (MCV)
+    \item[--] O2 saturation, and
+    \item[--] respiratory rate
+\end{itemize}
 \end{frame}
 
 \end{document}
