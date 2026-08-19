@@ -2,6 +2,11 @@ intro:
 	xelatex --shell-escape intro.tex
 	open intro.pdf
 
+affine:
+	xelatex --shell-escape affine.tex
+	open affine.pdf
+
+vec-questions:
 vec-questions:
 	xelatex --shell-escape vec-questions.tex
 	open vec-questions.pdf

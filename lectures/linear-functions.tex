@@ -46,6 +46,7 @@
 
 
 \newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\ThreePtVspace}{\vspace*{3pt}}
 \newcommand{\snl}{\vspace*{8pt}}
 \newcommand{\nl}{\vspace*{1em}\\}
 \newcommand{\vsp}{\vspace*{1em}}
@@ -54,6 +55,7 @@
 \newcommand{\Vector}[1]{\textbf{#1}}
 \newcommand{\Scalar}[1]{\textnormal{#1}}
 \newcommand{\Quiz}[1]{{\Large\textbf{\color{question}{#1}}}}
+\newcommand{\Sketch}[1]{{\Large\textbf{\color{codecoffee}{#1}}}}
 
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp Linear Functions \\}}
@@ -79,35 +81,33 @@
 
 
 \begin{frame}\FrameTitle{Linear Functions}{Unit 1}
-    Consider the vector inner product function
-    \[
-        f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n
-    \]
-    where $\Vector{a}$ is a fixed $n$-vector, and $\Vector{x}$ is a variable $n$-vector.
-
-    \snl The function $f$ is called a \emph{linear function} of $\Vector{x}$.
-
-    \snl The vector $\Vector{a}$ is called the \emph{coefficient vector} of the linear function $f$.
-
-    \snl $\Vector{a}$ is also called the \emph{weight vector} of the linear function $f$.
-\end{frame}
-
-\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
-    A linear function satisfies the following two properties:
+    A linear function satisfies the following two properties:\ThreePtVspace
     \begin{itemize}
         \item \emph{Additivity}. $f(\Vector{x} + \Vector{y}) = f(\Vector{x}) + f(\Vector{y})$ for all $n$-vectors $\Vector{x}$ and $\Vector{y}$.
+        \vspace*{4pt}
         \item \emph{Homogeneity}. $f(\alpha \Vector{x}) = \alpha\, f(\Vector{x})$ for all $n$-vectors $\Vector{x}$ and all scalars $\alpha$.
     \end{itemize}
-
-    \vsp The vector inner product function
-    \[
-        f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n, \ \ \  \Vector{a}: \mathbb{R}^n, \ \ \Vector{x}: \mathbb{R}^n
-    \]
-    is linear.
 \end{frame}
 
 \begin{frame}\FrameTitle{Superposition and Linearity}{Unit 1}
+    \vsp
+    {\Quiz{Prove the following}}
+    \vsp
     \begin{definition}
+        \ThreePtVspace
+        A function $f$ is \emph{linear} if it satisfies the \emph{superposition principle}:
+        \[
+            f(\alpha \, \Vector{x} + \beta \, \Vector{y}) = \alpha \, f(\Vector{x}) + \beta \,f(\Vector{y})
+        \]
+        for all $n$-vectors $\Vector{x}$ and $\Vector{y}$, and all scalars $\alpha$ and $\beta$.
+    \end{definition}
+\end{frame}
+
+\begin{frame}\FrameTitle{Superposition and Linearity}{Unit 1}
+    {\Quiz{Prove the following}}
+    \vspace*{4pt}
+    \begin{definition}
+        \ThreePtVspace
         A function $f$ is \emph{linear} if it satisfies the \emph{superposition principle}:
         \[
             f(\alpha \, \Vector{x} + \beta \, \Vector{y}) = \alpha \, f(\Vector{x}) + \beta \,f(\Vector{y})
@@ -116,20 +116,128 @@
     \end{definition}
 
     \vsp
+    \Sketch{Hint}
+    \vspace*{4pt}
+    \begin{itemize}
+        \item[--] Substitute $\alpha \Vector{x}$ with $\Vector{u}$ and $\beta \Vector{y}$ with $\Vector{v}$.
+        \vspace*{4pt}
+        \item[--] Apply \emph{addivity} and \emph{homegeneity} to arrive at the result.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Inner Product Function}{Unit 1}
+    Consider the vector inner product function
+    \[
+        f(\Vector{x}):\mathbb{R} = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n
+    \]
+    where $\Vector{a}$ is a fixed $n$-vector, and $\Vector{x}$ is a variable $n$-vector.
+
+    \snl The function $f$ is called a {\emph{\color{yellow}{linear function}}} of $\Vector{x}$.
+
+    \snl The vector $\Vector{a}$ is called the \emph{coefficient vector} of the linear function $f$.
+
+    \snl $\Vector{a}$ is also called the \emph{weight vector} of the linear function $f$.
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Inner Product Function}{Unit 1}
+    \vsp
+    {\Quiz{Prove the following}}\vsp\\
+
+    The vector inner product function
+    \[
+        f(\Vector{x}):\mathbb{R} = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n, \ \ \  \Vector{a}: \mathbb{R}^n, \ \ \Vector{x}: \mathbb{R}^n
+    \]
+    is linear.
+\end{frame}
+
+\begin{frame}\FrameTitle{Vector Inner Product Function}{Unit 1}
+    The vector inner product function
+    \[
+        f(\Vector{x}):\mathbb{R} = \Vector{a}^{\textrm{T}} \Vector{x} = a_1x_1 + \cdots + a_nx_n, \ \ \  \Vector{a}: \mathbb{R}^n, \ \ \Vector{x}: \mathbb{R}^n
+    \]
+    is linear.
+
+    \vsp
+    \vsp
+    {\Quiz{Proof}}\ThreePtVspace\\
     Given the inner product function $f(\Vector{x}) = \Vector{a}^{\textrm{T}} \Vector{x}$, we can verify that it is linear:
     \[
         \begin{array}{rll}
-        f(\alpha \, \Vector{x} + \beta \, \Vector{y}) & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x} + \beta \, \Vector{y}) \\
-                                      & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x}) + \Vector{a}^{\textrm{T}} (\beta \, \Vector{y}) \\
-                                      & = & \alpha (\Vector{a}^{\textrm{T}} \, \Vector{x}) + \beta (\Vector{a}^{\textrm{T}} \, \Vector{y}) \\
+        f(\alpha \, \Vector{x} + \beta \, \Vector{y}) & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x} + \beta \, \Vector{y}) \ThreePtVspace\\
+                                      & = & \Vector{a}^{\textrm{T}} (\alpha \, \Vector{x}) + \Vector{a}^{\textrm{T}} (\beta \, \Vector{y}) \ThreePtVspace\\
+                                      & = & \alpha (\Vector{a}^{\textrm{T}} \, \Vector{x}) + \beta (\Vector{a}^{\textrm{T}} \, \Vector{y}) \ThreePtVspace\\
                                       & = & \alpha f(\Vector{x}) + \beta f(\Vector{y})
         \end{array}
     \]
 \end{frame}
 
+\begin{frame}\FrameTitle{Linear Combination of Vectors}{Unit 1}
+    \begin{definition}
+        The linear combination of the vectors
+        $\Vector{v}_1, \Vector{v}_2, \ldots, \Vector{v}_n$
+        with scalars $\Scalar{c}_1, \Scalar{c}_2, \ldots, \Scalar{c}_n$
+        is the vector
+        \[
+            \Scalar{c}_1 \Vector{v}_1 + \Scalar{c}_2 \Vector{v}_2 +
+                \cdots + \Scalar{c}_n \Vector{v}_n =
+                \sum_{i=1}^{n} \Scalar{c}_{i} \Vector{v}_{i}
+        \]
+    The scalars are called the \emph{weights} of the linear combination.
 
-\begin{frame}\FrameTitle{Linear Functions}{Unit 1}
+    \vsp
+    By definition, a linear combination involves only finitely many vectors.
+    \end{definition}
 \end{frame}
+
+\begin{frame}\FrameTitle{Linear Independece}{Unit 1}
+    \begin{definition}[Linear Independence]\ThreePtVspace
+         A set of vectors where no single vector can be written
+         as a linear combination of the others.
+    \end{definition}
+
+    \vsp
+
+    \begin{definition}[Span]\ThreePtVspace
+        The complete set of all possible  vectors one can reach by
+        changing the scalar values in a linear combination.
+    \end{definition}
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Affine Combination}{Unit 1}
+A \emph{linear combination} has the form
+
+\[
+    \sum_{i=1}^{k}\Scalar{c}_i\Vector{v}_i,
+\]
+
+with no restriction on the coefficients.
+
+\vsp
+
+An \emph{affine combination} has the additional constraint
+
+\[
+    \sum_{i=1}^{k}\Scalar{c}_i = 1.
+\]
+
+The coefficients may be positive, zero, or negative.
+\end{frame}
+
+\begin{frame}\FrameTitle{Convex Combinations}{Unit 1}
+In an \emph{affine combination} $\sum_{i=1}^{k}\Scalar{c}_i = 1$,
+the coefficients may be positive, zero, or negative.
+
+\vsp\vsp
+
+In addition, if
+\[
+    \Scalar{c}_i \geq 0 \qquad\text{for all }i,
+\]
+
+then the affine combination is called a \emph{convex combination}.
+\end{frame}
+
 
 
 \begin{frame}\FrameTitle{Regression model}{Unit 1}

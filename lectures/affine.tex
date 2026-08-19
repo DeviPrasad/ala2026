@@ -1,23 +1,11 @@
 \documentclass[12pt]{article}
-
-% ============================================================
-% Packages
-% ============================================================
-
 \usepackage{geometry}
 \usepackage{titling}
 \usepackage{amsmath,amssymb}
 \usepackage{fontspec}
 \usepackage{xcolor}
-\usepackage{listings}
-\usepackage{minted}
-\usepackage{tikz}
 \usepackage{nicematrix}
 \usepackage{unicode-math}
-
-% ============================================================
-% Page layout and fonts
-% ============================================================
 
 \geometry{
     a4paper,
@@ -34,12 +22,6 @@
 \setmonofont{DejaVu Sans Mono}
 \setmathfont{STIXTwoMath-Regular.otf}
 
-\usetikzlibrary{fit}
-
-% ============================================================
-% Custom commands
-% ============================================================
-
 \newcommand{\Matrix}[1]{\mathbf{#1}}
 \newcommand{\Vector}[1]{\mathbf{#1}}
 \newcommand{\Scalar}[1]{#1}
@@ -47,26 +29,14 @@
 \newcommand{\vsp}{\vspace*{1em}}
 \newcommand{\snl}{\vspace*{2pt}}
 
-% ============================================================
-% Title
-% ============================================================
-
 \title{\textbf{Affine Functions}}
 \author{Devi Prasad M}
 \date{August 2026}
 
-% ============================================================
-% Document
-% ============================================================
-
 \begin{document}
-
 \maketitle
 
-% ============================================================
 \section{Affine Functions and Affine Combinations}
-% ============================================================
-
 An \emph{affine function} is a linear function followed by a
 translation. It can be written as
 
@@ -109,9 +79,7 @@ The answer is almost the same, but with one important restriction:
 An \emph{affine combination} is a weighted combination whose
 coefficients sum to $1$.
 
-% ============================================================
 \subsection{Why Must the Coefficients Sum to 1?}
-% ============================================================
 
 Consider a weighted combination of vectors
 
@@ -194,9 +162,7 @@ f\left(
 
 This is the fundamental preservation property of an affine function.
 
-% ============================================================
 \subsection{Linear Combination vs.\ Affine Combination}
-% ============================================================
 
 It is important to distinguish between a linear combination and an
 affine combination.
