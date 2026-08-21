@@ -1,13 +1,10 @@
 \documentclass[12pt]{beamer}
-% \usetheme{umbc4}
 \usetheme{moloch}
 
 \usepackage{amsmath,amscd}
 \usepackage{fontspec}
 \usepackage{unicode-math}
-\usepackage{xcolor}
 \usepackage[dvipsnames]{xcolor}
-\usepackage{nicematrix}
 
 \setbeamercolor{background canvas}{bg=black}
 \setbeamercolor{normal text}{fg=white}
@@ -157,12 +154,28 @@ The RMS value of a vector $\MVec{x}$ is useful when comparing norms of vectors
 with different dimensions.
 
 \vspace*{4pt}
-The RMS value tells us what a 'typical' value of $\abs{x_i}$ is.
-
-\vspace*{4pt}
 If all the entries of a vector are close to $\alpha$, then the RMS
 value of the vector is $\abs{\alpha}$.
 \end{frame}
+
+\begin{frame}\FrameTitle{Root Mean Square Value}{Unit 1}
+{\color{blue!40}The RMS value tells us what a 'typical' value of $\abs{x_i}$ is.}
+
+\vsp
+The norm of $\MVec{1}_n$, the $n$-vector of all ones, is $\sqrt{n}$, but its RMS value is 1,
+\emph{independent} of $n$.
+
+\vsp
+A couple of \emph{norm identities}
+\[
+    \begin{array}{rll}
+    \Norm{x + y} &=& \sqrt{\Norm{x}^2 + 2 \MVec{x}^{\Trans} \MVec{y} + \Norm{y}^2}\vspace*{6pt}\\
+    (\MVec{x} + \MVec{y})^\Trans (\MVec{x} - \MVec{y}) &=& \Norm{x}^2 - \Norm{y}^2
+    \end{array}
+\]
+
+\end{frame}
+
 
 \begin{frame}\FrameTitle{Root Mean Square Value}{Unit 1}
     \begin{itemize}
@@ -188,7 +201,8 @@ value of the vector is $\abs{\alpha}$.
     \]
 
     \vspace*{1em}
-    The \emph{RMS deviation} between vectors $\MVec{a}$ and $\MVec{b}$ is
+    The RMS value of the vector difference,
+    \emph{RMS deviation} between vectors $\MVec{a}$ and $\MVec{b}$ is
     \[
         \begin{array}{rll}
             \textrm{RMSD} & = & \sqrt{\frac{1}{n}\sum\limits_{i=1}^{n}(a_{i}-b_{i})^{2}} \vspace*{12pt}\\
@@ -197,10 +211,41 @@ value of the vector is $\abs{\alpha}$.
     \]
 \end{frame}
 
-\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+\begin{frame}\FrameTitle{Euclidean Distance - Example}{Unit 1}
+    Given three vectors
+    \begin{align*}
+    \MVec{u} &= [1.5, -2.5, 1.5, -1.5] \\
+    \MVec{v} &= [0.5, -1.5, 3.5, -0.5] \\
+    \MVec{w} &= [-1.5, 1.5, 2.5, -2.5]
+    \end{align*}
+
+    And the formula
+    \[
+        \mathbf{dist}(\MVec{x}, \MVec{y}) = \sqrt{(x_1 - y_1)^2 + (x_2 - y_2)^2 + (x_3 - y_3)^2 + (x_4 - y_4)^2}
+    \]
+
+    \begin{align*}
+        \MVec{u} - \MVec{v} &= [1.0, -1.0, -2.0, -1.0] \\
+        \mathbf{dist}(\MVec{u}, \MVec{v}) &= \sqrt{(1.0)^2 + (-1.0)^2 + (-2.0)^2 + (-1.0)^2} \\
+                                          &= \sqrt{1.0 + 1.0 + 4.0 + 1.0} \\
+                                          &= \sqrt{7} \approx 2.65
+    \end{align*}
 \end{frame}
 
-\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+\begin{frame}\FrameTitle{Euclidean Distance - Example}{Unit 1}
+    \begin{align*}
+        \MVec{v} - \MVec{w} &= [2.0, -3.0, 1.0, 2.0] \\
+        \mathbf{dist}(\MVec{v}, \MVec{w}) &= \sqrt{(2.0)^2 + (-3.0)^2 + (1.0)^2 + (2.0)^2} \\
+                            &= \sqrt{4.0 + 9.0 + 1.0 + 4.0} \\
+                            &= \sqrt{18} \approx 4.24
+    \end{align*}
+
+    \begin{align*}
+        \MVec{u} - \MVec{w} &= [3.0, -4.0, -1.0, 1.0] \\
+        \mathbf{dist}(\MVec{u}, \MVec{w}) &= \sqrt{(3.0)^2 + (-4.0)^2 + (-1.0)^2 + (1.0)^2} \\
+                            &= \sqrt{9.0 + 16.0 + 1.0 + 1.0} \\
+                            &= \sqrt{27} \approx 5.20
+    \end{align*}
 \end{frame}
 
 

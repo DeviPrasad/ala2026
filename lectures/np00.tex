@@ -1,18 +1,9 @@
 \documentclass[12pt]{beamer}
-% \usetheme{umbc4}
 \usetheme{moloch}
 
-\usepackage{amsmath,amscd}
-\usepackage{fontspec}
 \usepackage{unicode-math}
-\usepackage{pifont}
-\usepackage{xcolor}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{listings}
-\usepackage{minted}
-\usepackage{tikz}
-
-\setmonofont{DejaVu Sans Mono}
 
 % Set the title bar to black background with white text
 \setbeamercolor{frametitle}{bg=black, fg=white}
@@ -20,9 +11,11 @@
 % Ensure other structural elements (bullets, etc.) are visible
 \setbeamercolor{structure}{fg=white}
 
+\setmonofont{DejaVu Sans Mono}
 \setmainfont{Libertinus Serif}
 \setsansfont{Libertinus Sans}
-\setmathfont{STIX Two Math}
+\setmathfont{STIXTwoMath-Regular.otf}
+% \setmathfont{STIX Two Math}
 
 % Define colors for syntax highlighting
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -70,30 +63,6 @@
     emphstyle=[2]\color{funcColor},
 }
 \lstset{style=mypystyle}
-
-\setminted{
-    style=mymintstyle,    % High contrast light theme
-    fontsize=\ttfamily\scriptsize, % Slightly smaller to fit more code, but still readable
-    breaklines,           % Prevents code from running off the slide
-    baselinestretch=1.2,  % Increases line height by 25%
-    framesep=0mm,         % Padding inside the frame
-    % frame=lines,        % Optional: adds top/bottom lines for definition
-    bgcolor=black,
-    mathescape,
-    breaklines=true,
-    tabsize=2,
-    xleftmargin=1mm,
-    linenos,              % Enable line numbers
-    %linenosstyle=bold,   % Optional: make them bold for visibility
-    numbersep=2mm,        % Space between number and code
-}
-
-% Define your custom line number style
-\renewcommand{\theFancyVerbLine}{%
-  \sffamily\textcolor{gray}{\scriptsize\arabic{FancyVerbLine}}
-}
-
-\usemintedstyle{mymint}
 
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp NumPy and PyTorch \\}}
