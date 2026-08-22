@@ -1,0 +1,164 @@
+
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\newcommand{\MVec}[1]{\mathbf{#1}}
+
+\title{Application of Euclidean Distance \\ in \\ K-Nearest Neighbor Regression}
+\author{Devi Prasad M}
+\date{August 2026}
+
+\begin{document}
+\pagecolor{yellow!30!brown!40}
+
+\maketitle
+
+\section*{Euclidean Distance -- An Application: KNN Regression}
+
+\subsection*{A 4D Example: Predicting House Prices}
+Consider a 4-dimensional feature space where we want to predict the sale price of a house based on its characteristics. Our features are:
+\begin{itemize}
+    \item $x^{(1)}$: Living Area (in $1,000$ sq ft) -- \textit{Continuous}
+    \item $x^{(2)}$: Distance to City Center (kms) -- \textit{Continuous}
+    \item $x^{(3)}$: Age of Property (years) -- \textit{Integer}
+    \item $x^{(4)}$: Number of Bedrooms -- \textit{Integer}
+\end{itemize}
+Our target $y$ is the \textbf{Sale Price (in INR Crores)}.
+
+\vspace{0.5cm}
+\noindent Suppose a new house comes on the market. Our query point is a $2,000$ sq ft home, $1.0$ km from the center, $10$ years old, with $3$ bedrooms:
+\[
+\MVec{x}_q = (2.0, 1.0, 10, 3)
+\]
+
+\noindent Suppose our historical training dataset contains the following $12$ recent sales:
+\[
+\begin{array}{c|cccc|c}
+\text{Property} & x^{(1)} \text{ (Area)} & x^{(2)} \text{ (Dist)} & x^{(3)} \text{ (Age)} & x^{(4)} \text{ (Beds)} & y_i \text{ (Price)} \\ \hline
+\MVec{x}_1 & 1.5 & 1.5 & 12 & 3 & 3.5 \\
+\MVec{x}_2 & 2.2 & 0.5 & 8  & 4 & 5.2 \\
+\MVec{x}_3 & 2.0 & 1.0 & 9  & 3 & 4.8 \\
+\MVec{x}_4 & 1.8 & 1.2 & 10 & 3 & 4.6 \\
+\MVec{x}_5 & 2.5 & 2.0 & 5  & 4 & 6.0 \\
+\MVec{x}_6 & 1.2 & 3.0 & 20 & 2 & 2.5 \\
+\MVec{x}_7 & 2.1 & 0.8 & 11 & 3 & 4.9 \\
+\MVec{x}_8 & 3.0 & 5.0 & 2  & 5 & 7.0 \\
+\MVec{x}_9 & 1.9 & 1.5 & 10 & 2 & 4.1 \\
+\MVec{x}_{10} & 2.0 & 0.5 & 15 & 3 & 4.3 \\
+\MVec{x}_{11} & 2.3 & 1.1 & 10 & 4 & 5.4 \\
+\MVec{x}_{12} & 1.7 & 1.0 & 8  & 3 & 4.4
+\end{array}
+\]
+We choose $K=3$.
+
+\subsection*{Step 1: Measure the Distance to Every Point}
+The 4-dimensional Euclidean distance to any training point $\MVec{x}_i$ is:
+\[
+\mathbf{dist}(\MVec{x}_q,\MVec{x}_i)
+=
+\sqrt{
+(2.0-x_i^{(1)})^2+
+(1.0-x_i^{(2)})^2+
+(10-x_i^{(3)})^2+
+(3-x_i^{(4)})^2
+}
+\]
+We calculate this geometric distance to \textit{every} one of the $12$ properties:
+\[
+\begin{array}{c|c|c@{\qquad}c|c|c}
+\text{Property} & y_i \text{ (Price)} & \text{Distance}
+& \text{Property} & y_i \text{ (Price)} & \text{Distance} \\ \hline
+\MVec{x}_1 & 3.5 & 2.12 & \MVec{x}_7 & 4.9 & 1.02 \\
+\MVec{x}_2 & 5.2 & 2.30 & \MVec{x}_8 & 7.0 & 9.22 \\
+\MVec{x}_3 & 4.8 & 1.00 & \MVec{x}_9 & 4.1 & 1.12 \\
+\MVec{x}_4 & 4.6 & 0.28 & \MVec{x}_{10} & 4.3 & 5.02 \\
+\MVec{x}_5 & 6.0 & 5.22 & \MVec{x}_{11} & 5.4 & 1.05 \\
+\MVec{x}_6 & 2.5 & 10.28 & \MVec{x}_{12} & 4.4 & 2.02
+\end{array}
+\]
+\[
+\boxed{
+\text{Measure: Every training point is compared with the query.}
+}
+\]
+
+\subsection*{Step 2: Select the $K$ Nearest Neighbors}
+Since $K=3$, we select the three properties with the smallest Euclidean distances:
+\[
+\begin{array}{c|c|c}
+\text{Neighbor} & \text{Target } y_i & \mathbf{dist}(\MVec{x}_q,\MVec{x}_i) \\ \hline
+\MVec{x}_4=(1.8, 1.2, 10, 3) & 4.6 & 0.28 \\
+\MVec{x}_3=(2.0, 1.0, 9, 3) & 4.8 & 1.00 \\
+\MVec{x}_7=(2.1, 0.8, 11, 3) & 4.9 & 1.02
+\end{array}
+\]
+Therefore, our nearest neighborhood is:
+\[
+N_3(\MVec{x}_q)
+=
+\left\{
+(\MVec{x}_4, 4.6),
+(\MVec{x}_3, 4.8),
+(\MVec{x}_7, 4.9)
+\right\}.
+\]
+
+\subsection*{Step 3: Predict}
+The KNN regression prediction is the arithmetic mean of the target prices of these three most similar houses:
+\[
+\hat{y}(\MVec{x}_q)
+=
+\frac{4.6 + 4.8 + 4.9}{3}
+=
+\frac{14.3}{3}
+\approx
+4.77.
+\]
+The KNN estimate for the unknown market value of our query house is:
+\[
+\boxed{
+\text{Estimated Price } \approx \text{INR } 4.77 \text{ Crores}
+}
+\]
+
+\newpage
+
+\subsection*{A Critical Flaw: The Need for Feature Scaling}
+While the example above perfectly demonstrates the \textit{mechanics} of KNN, there is a hidden mathematical flaw in applying Euclidean distance directly to raw, unscaled real-world data.
+
+Consider the differences in scale among our features:
+\begin{itemize}
+    \item A difference of $5$ years in \textbf{Age} contributes $(5)^2 = 25$ to the distance sum.
+    \item A difference of $2$ kms in \textbf{Distance} contributes only $(2)^2 = 4$ to the distance sum.
+\end{itemize}
+
+Even if distance to the city center has a more massive impact on actual property value, the \textbf{Age} feature mathematically dominates the Euclidean distance simply because its numerical values are larger. In effect, we are comparing apples to oranges.
+
+\vspace{0.3cm}
+\noindent\textbf{The Solution: Standardization} \\
+To prevent variables with larger scales from biasing the distance metric, distance-based algorithms require data preprocessing. We must normalize or standardize the features so they contribute equally to the geometry.
+
+A standard approach is \textit{Z-score standardization}, which transforms every feature to have a mean of $0$ and a standard deviation of $1$:
+\[
+x^{(j)}_{\text{scaled}} = \frac{x^{(j)} - \mu_j}{\sigma_j}
+\]
+where $\mu_j$ is the mean and $\sigma_j$ is the standard deviation of feature $j$.
+
+\end{document}

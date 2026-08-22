@@ -1,0 +1,184 @@
+
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+% Define the custom vector command used in the document
+\newcommand{\MVec}[1]{\mathbf{#1}}
+
+\title{Application of Euclidean Distance \vspace*{4pt}\\ in \vspace*{4pt}\\K-Nearest Neighbor Regression}
+\author{Devi Prasad M}
+\date{August 2026}
+
+\begin{document}
+\pagecolor{yellow!25!brown!30}
+
+\maketitle
+
+\section*{An Example: Finding the K-Nearest Neighbors}
+Consider a two-dimensional feature space and the query point:
+\[
+\MVec{x}_q = (5,5).
+\]
+Suppose our training dataset contains the following $12$ points:
+\[
+\begin{array}{c|c|c}
+\text{Point} & \MVec{x}_i & y_i \\ \hline
+\MVec{x}_1 & (1,2) & 10 \\
+\MVec{x}_2 & (2,8) & 16 \\
+\MVec{x}_3 & (3,4) & 12 \\
+\MVec{x}_4 & (4,6) & 14 \\
+\MVec{x}_5 & (5,3) & 11 \\
+\MVec{x}_6 & (6,5) & 15 \\
+\MVec{x}_7 & (7,7) & 17 \\
+\MVec{x}_8 & (8,4) & 18 \\
+\MVec{x}_9 & (9,6) & 20 \\
+\MVec{x}_{10} & (2,3) & 9 \\
+\MVec{x}_{11} & (7,3) & 16 \\
+\MVec{x}_{12} & (4,3) & 13
+\end{array}
+\]
+We choose:
+\[
+K=3.
+\]
+
+\subsection*{Step 1: Measure the Distance to Every Point}
+For the query $\MVec{x}_q=(5,5)$,
+\[
+\mathbf{dist}(\MVec{x}_q,\MVec{x}_i)
+=
+\sqrt{
+(5-x_i^{(1)})^2+
+(5-x_i^{(2)})^2
+}.
+\]
+We calculate the distance to \textit{every} one of the $12$ training points:
+\[
+\begin{array}{c|c|c@{\qquad}c|c|c}
+\text{Point} & y_i & \text{Distance}
+& \text{Point} & y_i & \text{Distance} \\ \hline
+\MVec{x}_1 & 10 & 5.00 & \MVec{x}_7 & 17 & 2.83 \\
+\MVec{x}_2 & 16 & 4.24 & \MVec{x}_8 & 18 & 3.16 \\
+\MVec{x}_3 & 12 & 2.24 & \MVec{x}_9 & 20 & 4.12 \\
+\MVec{x}_4 & 14 & 1.41 & \MVec{x}_{10} & 9 & 3.61 \\
+\MVec{x}_5 & 11 & 2.00 & \MVec{x}_{11} & 16 & 2.83 \\
+\MVec{x}_6 & 15 & 1.00 & \MVec{x}_{12} & 13 & 2.24
+\end{array}
+\]
+\[
+\boxed{
+\text{Measure: Every training point is compared with the query.}
+}
+\]
+
+\subsection*{Step 2: Select the $K$ Nearest Neighbors}
+Since $K=3$, select the three training points having the smallest Euclidean distances:
+\[
+\begin{array}{c|c|c}
+\text{Neighbor} & \text{Target } y_i & \mathbf{dist}(\MVec{x}_q,\MVec{x}_i) \\ \hline
+\MVec{x}_6=(6,5) & 15 & 1.00 \\
+\MVec{x}_4=(4,6) & 14 & 1.41 \\
+\MVec{x}_5=(5,3) & 11 & 2.00
+\end{array}
+\]
+Therefore,
+\[
+N_3(\MVec{x}_q)
+=
+\left\{
+(\MVec{x}_6,15),
+(\MVec{x}_4,14),
+(\MVec{x}_5,11)
+\right\}.
+\]
+
+\subsection*{Step 3: Predict}
+The KNN regression prediction is the arithmetic mean of the target values of the three nearest neighbors:
+\[
+\hat{y}(\MVec{x}_q)
+=
+\frac{15+14+11}{3}
+=
+\frac{40}{3}
+\approx
+13.33.
+\]
+Thus the KNN estimate for the unknown target at $\MVec{x}_q=(5,5)$ is:
+\[
+\boxed{
+\hat{y}(\MVec{x}_q)\approx 13.33
+}
+\]
+
+\subsection*{The Essential Idea}
+The example illustrates the three stages of KNN regression:
+\[
+\boxed{
+\begin{array}{c}
+\text{Measure}\\
+\text{Euclidean distance}
+\end{array}
+}
+\quad
+\longrightarrow
+\quad
+\boxed{
+\begin{array}{c}
+\text{Select}\\
+K\text{ nearest neighbors}
+\end{array}
+}
+\quad
+\longrightarrow
+\quad
+\boxed{
+\begin{array}{c}
+\text{Predict}\\
+\text{average their target values}
+\end{array}
+}
+\]
+
+Euclidean distance provides a geometric notion of proximity
+based on the inner product. KNN uses this geometry to construct a
+local estimate of an unknown function, based on the assumption
+that nearby points tend to have similar target values.
+
+\[
+    \boxed{\text{Inner Product}}
+    \
+    \longrightarrow
+    \
+    \boxed{\text{Norm}}
+    \
+    \longrightarrow
+    \
+    \boxed{\text{Distance}}
+    \
+    \longrightarrow
+    \
+    \boxed{\text{Nearest Neighbor}}
+    \
+    \longrightarrow
+    \
+    \boxed{\text{Prediction}}
+\]
+
+\end{document}

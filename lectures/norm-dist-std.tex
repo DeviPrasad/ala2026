@@ -41,6 +41,7 @@
 \newcommand{\snl}{\vspace*{4pt}\\}
 \newcommand{\nl}{\vspace*{1em}\\}
 \newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\SixPtVspace}{\vspace*{6pt}}
 
 \newcommand{\Quiz}[1]{{\large\textbf{\color{question}{#1}}}}
 \newcommand{\QuizQuestion}[1]{{\Large\textbf{\color{question}{#1}}}}
@@ -197,7 +198,7 @@ A couple of \emph{norm identities}
     If $\MVec{a}$ and $\MVec{b}$ are $n$-vectors,
 
     \[
-        {\textbf{dist}}(\MVec{a}, \MVec{b}) = \Norm{\MVec{a} - \MVec{b}}
+        {\mathbf{dist}}(\MVec{a}, \MVec{b}) = \Norm{\MVec{a} - \MVec{b}}
     \]
 
     \vspace*{1em}
@@ -206,7 +207,7 @@ A couple of \emph{norm identities}
     \[
         \begin{array}{rll}
             \textrm{RMSD} & = & \sqrt{\frac{1}{n}\sum\limits_{i=1}^{n}(a_{i}-b_{i})^{2}} \vspace*{12pt}\\
-                 & = & \dfrac{\textbf{dist}(\MVec{a}, \MVec{b})}{\sqrt{n}}
+                 & = & \dfrac{\mathbf{dist}(\MVec{a}, \MVec{b})}{\sqrt{n}}
         \end{array}
     \]
 \end{frame}
@@ -246,6 +247,91 @@ A couple of \emph{norm identities}
                             &= \sqrt{9.0 + 16.0 + 1.0 + 1.0} \\
                             &= \sqrt{27} \approx 5.20
     \end{align*}
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance - An Application(KNN)}{Unit 1}
+    \textbf{For Regression (Predicting a Number) - Find the Mean}.\vsp
+    \begin{itemize}
+        \item \textbf{Measure:} Calculate the Euclidean distance
+            between the new query point and \textit{every} point
+            in the training dataset.
+        \item \textbf{Select:} Identify the $K$ training points
+            with the smallest distances (the nearest neighbors).
+        \item \textbf{Predict:} Average the \textit{target values}
+            (not the distances!) of these $K$ neighbors to
+            approximate the query's unknown value.
+    \end{itemize}
+
+    \vsp
+    Note: Measure and Select are both exhuastive operations.
+    \vfill
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance - KNN}{Unit 1}
+    \noindent\textbf{1. The Distance Between Query and Data Point}\vsp\\
+
+    Let $\MVec{x}_q$ be a new query data point, and $\MVec{x}_i$ be a
+    training data point in an $n$-dimensional feature space.
+
+    \SixPtVspace
+    The Euclidean distance between these two points is:
+    \vspace*{3pt}
+    \begin{equation*}
+        \mathbf{dist}(\MVec{x}_q, \MVec{x}_i) = \sqrt{\sum_{j=1}^{n} (x_q^{(j)} - x_i^{(j)})^2}
+    \end{equation*}
+
+    \vsp
+    Let $\mathbf{D} = \{(\MVec{x}_1, y_1), (\MVec{x}_2, y_2), \dots, (\MVec{x}_M, y_M)\}$
+    be the training dataset, where $y_i$ is the \emph{known scalar target value}.
+
+    \vsp
+    For a given query point $\MVec{x}_q$, let $N_K(\MVec{x}_q) \subset \mathbf{D}$
+    represent the subset containing its $K$-closest neighbors.
+
+    \vfill
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance - KNN}{Unit 1}
+    \noindent\textbf{2. The K-NN Regression Prediction Formula} \vsp\\
+    Recall $\mathbf{D}$ is the training dataset and $N_K(\MVec{x}_q)$ is the set of $K$-nearest neighbors.
+
+    \vsp
+    The predicted value $\hat{y}(\MVec{x}_q)$ is computed as the
+    arithmetic mean of the target values of those neighbors:
+    \begin{equation*}
+        \hat{y}(\MVec{x}_q) = \frac{1}{K} \ \sum_{(\MVec{x}_i, y_i) \in N_K(\MVec{x}_q)} \hspace*{-1.6em}y_i
+    \end{equation*}
+
+    \vsp
+    \textit{Note: $\hat{y}$ is an approximation of the true unknown value, subject to the neighborhood definition:}
+    \begin{equation*}
+        N_K(\MVec{x}_q) = \arg\min_{\substack{\vspace*{2pt}\\S \subset \mathbf{D} \vspace*{2pt}\\ |S| = K}} \ \, \sum_{(\MVec{x}_i, y_i) \in S} \hspace*{-0.7em} \mathbf{dist}(\MVec{x}_q, \MVec{x}_i)
+    \end{equation*}
+    \vfill
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance - KNN}{Unit 1}
+    $N_K(\MVec{x}_q)$ is the set of $K$ training samples nearest to $\MVec{x_q}$.\\
+
+    \[
+        N_K(\MVec{x}_q) = \{ \MVec{x}_1, \MVec{x}_2, \ldots, \MVec{x}_K \}
+    \]
+    where $\mathbf{dist}(\MVec{x}_q, \MVec{x}_1)
+        \le \cdots
+        \le \mathbf{dist}(\MVec{x}_q, \MVec{x}_K)
+        \le \mathbf{dist}(\MVec{x}_q, \MVec{x}_{K+1})$
+
+    \vspace*{2em}
+    Euclidean distance is the linear-algebraic notion of similarity.
+    KNN turns this idea of geometric proximity into an estimate of
+    an unknown function assuming that nearby points tend to have
+    similar target values.
+
+    \SixPtVspace
+    Linear algebra supplies the geometry, and machine learning supplies
+    the statistical assumption that \emph{nearby points or neighbors
+    behave similarly}.
+
 \end{frame}
 
 
