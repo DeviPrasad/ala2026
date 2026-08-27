@@ -23,6 +23,10 @@ norm-dist:
 	xelatex --shell-escape norm-dist-std.tex
 	open norm-dist-std.pdf
 
+matrix-vec:
+	xelatex --shell-escape matrix-vec-linear.tex
+	open matrix-vec-linear.pdf
+
 np:
 	xelatex --shell-escape np00.tex
 	open np00.pdf

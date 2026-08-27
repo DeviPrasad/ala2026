@@ -1,0 +1,206 @@
+
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=1.5cm, right=1.5cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\definecolor{question}{rgb}{0,0.1,1.0}
+
+\newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\QuizQuestion}[1]{{\texts\textbf{\color{question}{#1}}}}
+
+\title{Linear Functions - Matrix-Vector Multiplication}
+\author{Devi Prasad M}
+\date{August 2026}
+
+\begin{document}
+\pagecolor{yellow!10}
+
+\maketitle
+
+\section{Matrix-Vector Multiplication}
+
+
+Let $\mathbf{A} \in \mathbb{R}^{m \times n}$ be a matrix,
+$\mathbf{u}, \mathbf{v} \in \mathbb{R}^n$ be vectors,
+and $c \in \mathbb{R}$, a scalar.
+
+\vsp
+
+\noindent Matrix-vector multiplication is linear because which satisfies
+\begin{enumerate}
+    \item \textbf{Additivity:}
+    \[
+        \mathbf{A}(\mathbf{u} + \mathbf{v}) = \mathbf{A} \mathbf{u} + \mathbf{A} \mathbf{v}.
+    \]
+
+    \item \textbf{Homogeneity:}
+    \[
+        \mathbf{A}(c\mathbf{u}) = c(\mathbf{A} \mathbf{u}).
+    \]
+\end{enumerate}
+
+\noindent Both properties follow directly from the definition of matrix multiplication and the distributive and associative properties of real numbers.
+Hence, the function $\mathbf{x} \mapsto \mathbf{A}\mathbf{x}$ is linear.
+
+\vsp
+
+\noindent Let us assume representative values for $\mathbf{A}$, $\mathbf{u}$, and $\mathbf{v}$:
+
+\[
+    \mathbf{A} = \begin{bmatrix}
+        w_{11} & w_{12} & w_{13} \\
+        w_{21} & w_{22} & w_{23} \\
+        w_{31} & w_{32} & w_{33} \\
+        w_{41} & w_{42} & w_{43}
+    \end{bmatrix}
+    ,\ \ \
+    \mathbf{u} = \begin{bmatrix}
+        u_1 \\
+        u_2 \\
+        u_3 \\
+    \end{bmatrix}
+    ,\ \, \mathrm{and} \ \ \
+    \mathbf{v} = \begin{bmatrix}
+        v_1 \\
+        v_2 \\
+        v_3 \\
+    \end{bmatrix}
+\]
+
+\subsection{Additivity}
+
+\subsubsection*{\noindent Compute $\mathbf{A} (\mathbf{u} + \mathbf{v})$:}
+
+\[
+    \begin{bmatrix}
+        w_{11} & w_{12} & w_{13} \\
+        w_{21} & w_{22} & w_{23} \\
+        w_{31} & w_{32} & w_{33} \\
+        w_{41} & w_{42} & w_{43}
+    \end{bmatrix}
+    \,
+    \begin{bmatrix}
+        (u_1 + v_1) \\
+        (u_2 + v_2) \\
+        (u_3 + v_3) \\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        w_{11} (u_1 + v_1)  + w_{12} (u_2 + v_2) + w_{13} (u_3 + v_3) \\
+        w_{21} (u_1 + v_1)  + w_{22} (u_2 + v_2) + w_{23} (u_3 + v_3) \\
+        w_{31} (u_1 + v_1)  + w_{32} (u_2 + v_2) + w_{33} (u_3 + v_3) \\
+        w_{41} (u_1 + v_1)  + w_{42} (u_2 + v_2) + w_{43} (u_3 + v_3)
+    \end{bmatrix}
+\]
+
+\vsp
+
+\subsubsection*{Compute $\mathbf{A} \mathbf{u}$:}
+
+\[
+    \begin{bmatrix}
+        w_{11} & w_{12} & w_{13} \\
+        w_{21} & w_{22} & w_{23} \\
+        w_{31} & w_{32} & w_{33} \\
+        w_{41} & w_{42} & w_{43}
+    \end{bmatrix}
+    \,
+    \begin{bmatrix}
+        u_1 \\
+        u_2 \\
+        u_3
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        w_{11} u_1  + w_{12} u_2 + w_{13} u_3 \\
+        w_{21} u_1  + w_{22} u_2 + w_{23} u_3 \\
+        w_{31} u_1  + w_{32} u_2 + w_{33} u_3 \\
+        w_{41} u_1  + w_{42} u_2 + w_{43} u_3
+    \end{bmatrix}
+\]
+
+\vsp
+
+\subsubsection*{\noindent Compute $\mathbf{A} \mathbf{v}$:}
+
+\[
+    \begin{bmatrix}
+        w_{11} & w_{12} & w_{13} \\
+        w_{21} & w_{22} & w_{23} \\
+        w_{31} & w_{32} & w_{33} \\
+        w_{41} & w_{42} & w_{43}
+    \end{bmatrix}
+    \,
+    \begin{bmatrix}
+        v_1 \\
+        v_2 \\
+        v_3
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        w_{11} v_1  + w_{12} v_2 + w_{13} v_3 \\
+        w_{21} v_1  + w_{22} v_2 + w_{23} v_3 \\
+        w_{31} v_1  + w_{32} v_2 + w_{33} v_3 \\
+        w_{41} v_1  + w_{42} v_2 + w_{43} v_3
+    \end{bmatrix}
+\]
+
+
+\vsp
+
+\noindent Compute $\mathbf{A} \mathbf{u} + \mathbf{A} \mathbf{v}$:
+\[
+    \begin{bmatrix}
+        w_{11} u_1  + w_{12} u_2 + w_{13} u_3 \\
+        w_{21} u_1  + w_{22} u_2 + w_{23} u_3 \\
+        w_{31} u_1  + w_{32} u_2 + w_{33} u_3 \\
+        w_{41} u_1  + w_{42} u_2 + w_{43} u_3
+    \end{bmatrix}
+    + \,
+    \begin{bmatrix}
+        w_{11} v_1  + w_{12} v_2 + w_{13} v_3 \\
+        w_{21} v_1  + w_{22} v_2 + w_{23} v_3 \\
+        w_{31} v_1  + w_{32} v_2 + w_{33} v_3 \\
+        w_{41} v_1  + w_{42} v_2 + w_{43} v_3
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        w_{11} (u_1 + v_1)  + w_{12} (u_2 + v_2) + w_{13} (u_3 + v_3) \\
+        w_{21} (u_1 + v_1)  + w_{22} (u_2 + v_2) + w_{23} (u_3 + v_3) \\
+        w_{31} (u_1 + v_1)  + w_{32} (u_2 + v_2) + w_{33} (u_3 + v_3) \\
+        w_{41} (u_1 + v_1)  + w_{42} (u_2 + v_2) + w_{43} (u_3 + v_3)
+    \end{bmatrix}
+\]
+
+\noindent Note that $\mathbf{A}(\mathbf{u} + \mathbf{v}) = \mathbf{A} \mathbf{u} + \mathbf{A} \mathbf{v}$.
+Thus \textbf{Additivity} holds for general matrix-vector multiplication.
+
+\newpage
+\pagecolor{yellow!30}
+\subsection{Homogeneity}
+
+\begin{center}
+\vfill
+
+{\fontsize{50pt}{100pt}\selectfont {\color{blue}\textbf{Prove Homogeneity!}}}
+\end{center}
+
+\vfill
+
+\end{document}
