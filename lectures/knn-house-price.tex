@@ -33,7 +33,9 @@
 \section*{Euclidean Distance -- An Application: KNN Regression}
 
 \subsection*{A 4D Example: Predicting House Prices}
-Consider a 4-dimensional feature space where we want to predict the sale price of a house based on its characteristics. Our features are:
+Consider a 4-dimensional feature space where we want to predict
+the sale price of a house based on its characteristics.
+Our features are:
 \begin{itemize}
     \item $x^{(1)}$: Living Area (in $1,000$ sq ft) -- \textit{Continuous}
     \item $x^{(2)}$: Distance to City Center (kms) -- \textit{Continuous}
@@ -43,12 +45,15 @@ Consider a 4-dimensional feature space where we want to predict the sale price o
 Our target $y$ is the \textbf{Sale Price (in INR Crores)}.
 
 \vspace{0.5cm}
-\noindent Suppose a new house comes on the market. Our query point is a $2,000$ sq ft home, $1.0$ km from the center, $10$ years old, with $3$ bedrooms:
+\noindent Suppose a new house comes on the market. Our query point
+is a $2,000$ sq ft home, $1.0$ km from the center, $10$ years old,
+with $3$ bedrooms:
 \[
-\MVec{x}_q = (2.0, 1.0, 10, 3)
+    \MVec{x}_q = (2.0, 1.0, 10, 3)
 \]
 
-\noindent Suppose our historical training dataset contains the following $12$ recent sales:
+\noindent Suppose our historical training dataset contains the
+following $12$ recent sales:
 \[
 \begin{array}{c|cccc|c}
 \text{Property} & x^{(1)} \text{ (Area)} & x^{(2)} \text{ (Dist)} & x^{(3)} \text{ (Age)} & x^{(4)} \text{ (Beds)} & y_i \text{ (Price)} \\ \hline
@@ -69,7 +74,8 @@ Our target $y$ is the \textbf{Sale Price (in INR Crores)}.
 We choose $K=3$.
 
 \subsection*{Step 1: Measure the Distance to Every Point}
-The 4-dimensional Euclidean distance to any training point $\MVec{x}_i$ is:
+The 4-dimensional Euclidean distance to any training
+point $\MVec{x}_i$ is:
 \[
 \mathbf{dist}(\MVec{x}_q,\MVec{x}_i)
 =
@@ -100,7 +106,8 @@ We calculate this geometric distance to \textit{every} one of the $12$ propertie
 \]
 
 \subsection*{Step 2: Select the $K$ Nearest Neighbors}
-Since $K=3$, we select the three properties with the smallest Euclidean distances:
+Since $K=3$, we select the three properties with the smallest
+Euclidean distances:
 \[
 \begin{array}{c|c|c}
 \text{Neighbor} & \text{Target } y_i & \mathbf{dist}(\MVec{x}_q,\MVec{x}_i) \\ \hline
@@ -121,7 +128,8 @@ N_3(\MVec{x}_q)
 \]
 
 \subsection*{Step 3: Predict}
-The KNN regression prediction is the arithmetic mean of the target prices of these three most similar houses:
+The KNN regression prediction is the arithmetic mean of the target
+prices of these three most similar houses:
 \[
 \hat{y}(\MVec{x}_q)
 =
@@ -131,7 +139,8 @@ The KNN regression prediction is the arithmetic mean of the target prices of the
 \approx
 4.77.
 \]
-The KNN estimate for the unknown market value of our query house is:
+The KNN estimate for the unknown market value of our
+query house is:
 \[
 \boxed{
 \text{Estimated Price } \approx \text{INR } 4.77 \text{ Crores}
@@ -141,23 +150,36 @@ The KNN estimate for the unknown market value of our query house is:
 \newpage
 
 \subsection*{A Critical Flaw: The Need for Feature Scaling}
-While the example above perfectly demonstrates the \textit{mechanics} of KNN, there is a hidden mathematical flaw in applying Euclidean distance directly to raw, unscaled real-world data.
+While the example above perfectly demonstrates the mechanics of KNN,
+there is a hidden mathematical flaw in applying Euclidean distance
+directly to raw, unscaled real-world data.
 
 Consider the differences in scale among our features:
 \begin{itemize}
-    \item A difference of $5$ years in \textbf{Age} contributes $(5)^2 = 25$ to the distance sum.
-    \item A difference of $2$ kms in \textbf{Distance} contributes only $(2)^2 = 4$ to the distance sum.
+    \item A difference of $5$ years in \textbf{Age}
+          contributes $(5)^2 = 25$ to the distance sum.
+    \item A difference of $2$ kms in \textbf{Distance}
+          contributes only $(2)^2 = 4$ to the distance sum.
 \end{itemize}
 
-Even if distance to the city center has a more massive impact on actual property value, the \textbf{Age} feature mathematically dominates the Euclidean distance simply because its numerical values are larger. In effect, we are comparing apples to oranges.
+Even if distance to the city center has a more massive impact on
+actual property value, the \textbf{Age} feature mathematically
+dominates the Euclidean distance simply because its numerical
+values are larger. In effect, we are comparing apples to oranges.
 
 \vspace{0.3cm}
 \noindent\textbf{The Solution: Standardization} \\
-To prevent variables with larger scales from biasing the distance metric, distance-based algorithms require data preprocessing. We must normalize or standardize the features so they contribute equally to the geometry.
+To prevent variables with larger scales from biasing the distance
+metric, distance-based algorithms require data preprocessing.
+We must normalize or standardize the features so they
+contribute equally to the geometry.
 
-A standard approach is \textit{Z-score standardization}, which transforms every feature to have a mean of $0$ and a standard deviation of $1$:
+A standard approach is \textit{standardization} or
+\textit{Z-score normalization},
+which transforms every feature to have a mean of $0$ and a
+standard deviation of $1$:
 \[
-x^{(j)}_{\text{scaled}} = \frac{x^{(j)} - \mu_j}{\sigma_j}
+    x^{(j)}_{\text{scaled}} = \frac{x^{(j)} - \mu_j}{\sigma_j}
 \]
 where $\mu_j$ is the mean and $\sigma_j$ is the standard deviation of feature $j$.
 

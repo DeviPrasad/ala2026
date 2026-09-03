@@ -83,7 +83,7 @@ We will avoid calling it the \emph{length} of a vector.
     \begin{align*}
         \Norm{\MVec{0}} & = 0 \\[4pt]
         \Norm{e_i} & = 1 \\[4pt]
-        \NormConst{[c]} & = c \\[4pt]
+        \NormConst{[c]} & = \abs{c} \\[4pt]
         \Norm{\MVec{1_n}} & = \sqrt{n} \\[4pt]
     \end{align*}
 
@@ -268,6 +268,19 @@ A couple of \emph{norm identities}
 \end{frame}
 
 \begin{frame}\FrameTitle{Euclidean Distance - KNN}{Unit 1}
+    Euclidean distance is the linear-algebraic notion of similarity.
+    KNN turns this idea of geometric proximity into an estimate of
+    an unknown function assuming that nearby points tend to have
+    similar target values.
+
+    \vspace*{1em}
+    Linear algebra supplies the geometry, and machine learning supplies
+    the statistical assumption that \emph{nearby points or neighbors
+    behave similarly}.
+    \vspace*{1em}\vfill
+\end{frame}
+
+\begin{frame}\FrameTitle{Euclidean Distance - KNN}{Unit 1}
     \noindent\textbf{1. The Distance Between Query and Data Point}\vsp\\
 
     Let $\MVec{x}_q$ be a new query data point, and $\MVec{x}_i$ be a
@@ -331,7 +344,6 @@ A couple of \emph{norm identities}
     Linear algebra supplies the geometry, and machine learning supplies
     the statistical assumption that \emph{nearby points or neighbors
     behave similarly}.
-
 \end{frame}
 
 
