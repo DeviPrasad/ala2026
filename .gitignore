@@ -18,6 +18,9 @@ share/
 *.vrb
 *.swp
 *.tmp
+*.fls
+*.xdv
+*.fdb_latexmk
 .DS_Store
 src/linalg/bin
 src/linalg/lib

@@ -54,5 +54,5 @@ mint-style:
 	sudo python -m pygments.cmdline -S mymint -f latex
 
 clean:
-	@rm -f *.aux *.log *.snm *.out *.toc *.nav *.vrb
+	@rm -f *.aux *.log *.snm *.out *.toc *.nav *.vrb *.fls *.xdv *.fdb_latexmk
 	@rm -rf _minted *.message.minted
