@@ -1,39 +1,47 @@
 intro:
-	xelatex --shell-escape intro.tex
+	latexmk -xelatex --shell-escape intro.tex
 	open intro.pdf
 
 affine:
-	xelatex --shell-escape affine.tex
+	latexmk -xelatex --shell-escape affine.tex
 	open affine.pdf
 
+vec-angle-proof:
+	latexmk -xelatex vector-angle-proof.tex
+	open vector-angle-proof.pdf
+
 vec-questions:
-vec-questions:
-	xelatex --shell-escape vec-questions.tex
+	latexmk -xelatex --shell-escape vec-questions.tex
 	open vec-questions.pdf
 
 vector-spaces:
-	xelatex --shell-escape vec-spaces.tex
+	latexmk -xelatex --shell-escape vec-spaces.tex
 	open vec-spaces.pdf
 
 linear-functions:
-	xelatex --shell-escape linear-functions.tex
+	latexmk -xelatex --shell-escape linear-functions.tex
 	open linear-functions.pdf
 
 norm-dist:
-	xelatex --shell-escape norm-dist-std.tex
+	latexmk -xelatex --shell-escape norm-dist-std.tex
 	open norm-dist-std.pdf
 
 matrix-vec:
-	xelatex --shell-escape matrix-vec-linear.tex
+	latexmk -xelatex --shell-escape matrix-vec-linear.tex
 	open matrix-vec-linear.pdf
 
 np:
-	xelatex --shell-escape np00.tex
+	latexmk -xelatex --shell-escape np00.tex
 	open np00.pdf
 
 ndarray:
-	xelatex --shell-escape ndarray.tex
+	latexmk -xelatex --shell-escape ndarray.tex
 	open ndarray.pdf
+
+knn:
+	latexmk -xelatex knn-example.tex
+	latexmk -xelatex knn-house-price.tex
+	open knn-house-price.pdf
 
 all: numpy
 	echo "Done!"

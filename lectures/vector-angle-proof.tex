@@ -1,0 +1,233 @@
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usetikzlibrary{calc, angles, quotes}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+\setlength{\droptitle}{-3cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\vsp}{\vspace*{1em}}
+
+\title{The Law of Cosines \vspace*{2pt}\\ and \vspace*{2pt}\\ the Angle Between Two Vectors}
+\author{Devi Prasad M}
+\date{September 2026}
+
+\begin{document}
+\pagecolor{yellow!25!brown!30}
+
+\maketitle
+
+
+\section{The Law of Cosines}
+Consider a triangle with side lengths $a$, $b$, and $c$, and
+an angle $\theta$ opposite to side $c$:
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (5,0);
+    \coordinate (C) at (2,3);
+
+    % The triangle
+    \draw[thick] (A) -- (B) node[midway, below=2pt] {$b$} -- (C) node[midway, above right] {$c$} -- cycle node[midway, above left] {$a$};
+
+    % Angle theta
+    \pic [draw, angle radius=0.6cm, "$\theta$", angle eccentricity=1.4] {angle = B--A--C};
+
+    % Vertex labels
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[above] at (C) {$C$};
+\end{tikzpicture}
+\caption{A Generic Triangle.}
+\label{fig:triangle_diagram}
+\end{figure}
+
+\noindent In such a triangle, the following relationship holds:
+\begin{equation}
+c^2 = a^2 + b^2 - 2ab \cos\theta
+\end{equation}
+
+\subsection{The Geometric Construction}
+
+Consider the triangle shown in Figure \ref{fig:triangle_diagram}.
+We drop a height (altitude) $h$ perpendicular to base $b$
+from the top vertex, dividing base $b$ into two parts of lengths
+$x$ and $b - x$.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (5,0);
+    \coordinate (C) at (2,3);
+    \coordinate (D) at (2,0);
+
+    \draw[thick] (A) -- (B) node[midway, below=12pt] {$b$} -- (C) node[midway, above right] {$c$} -- cycle node[midway, above left] {$a$};
+
+    \draw[dashed, blue, thick] (C) -- (D) node[midway, right] {$h$};
+
+    % Right angle symbol
+    \draw (2,0.25) -- (2.25,0.25) -- (2.25,0);
+
+    \pic [draw, angle radius=0.6cm, "$\theta$", angle eccentricity=1.4] {angle = B--A--C};
+
+    % Segment markings (fixed)
+    \draw (A) -- (D) node[midway, below] {$x$};
+    \draw (D) -- (B) node[midway, below] {$b-x$};
+
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[above] at (C) {$C$};
+    \node[below] at (D) {$D$};
+\end{tikzpicture}
+\caption{The $\triangle \, ABC$ with perpendicular$h$ from vertex $C$ to base $AB$.}
+\label{fig:vector_triangle}
+\end{figure}
+
+\section{Proof of the Law of Cosines}
+
+\subsection*{Step 1: Express $x$ and $h$ using Trigonometry}
+Using the right-angled triangle $\triangle \, ADC$:
+\begin{align}
+    \cos\theta &= \frac{x}{a} \implies x = a \cos\theta \\
+    \sin\theta &= \frac{h}{a} \implies h = a \sin\theta
+\end{align}
+
+\subsection*{Step 2: Apply Pythagorean Theorem}
+Applying the Pythagorean theorem to the right-angled triangle \, $\triangle BDC$:
+\begin{equation}
+    c^2 = h^2 + (b - x)^2
+\end{equation}
+
+\subsection*{Step 3: Substitute and Simplify}
+Substitute $x = a \cos\theta$ and $h = a \sin\theta$ into equation (4):
+\begin{align*}
+    c^2 &= (a \sin\theta)^2 + (b - a \cos\theta)^2 \\
+        &= a^2 \sin^2\theta + \left(b^2 - 2ab \cos\theta + a^2 \cos^2\theta\right) \\
+        &= a^2 \left(\sin^2\theta + \cos^2\theta\right) + b^2 - 2ab \cos\theta
+\end{align*}
+
+\noindent Using the identity $\sin^2\theta + \cos^2\theta = 1$:
+\begin{equation}
+    c^2 = a^2 + b^2 - 2ab \cos\theta \quad \blacksquare
+\end{equation}
+
+\newpage
+\section{From the Law of Cosines to the Inner Product}
+
+\subsection*{Setting up the correspondence}
+Let $\MVec{x}$ and $\MVec{y}$ be vectors based at the origin $A$, with
+$\MVec{x}$ pointing to $C$ and $\MVec{y}$ pointing to $B$, so that
+\[
+    a = |\MVec{x}|, \qquad b = |\MVec{y}|,
+\]
+and $\theta$ is the angle between them, exactly as in
+Figure~\ref{fig:triangle_diagram}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    \coordinate (A) at (0,0);
+    \coordinate (B) at (5,0);
+    \coordinate (C) at (2,3);
+
+    % The triangle, with AB and AC drawn as vectors
+    \draw[thick, ->] (A) -- (B) node[midway, below=2pt] {$\MVec{y}$};
+    \draw[thick, ->] (A) -- (C) node[midway, above left] {$\MVec{x}$};
+    \draw[thick] (B) -- (C) node[midway, above right] {$\MVec{x}-\MVec{y}$};
+
+    % Angle theta
+    \pic [draw, angle radius=0.6cm, "$\theta$", angle eccentricity=1.4] {angle = B--A--C};
+
+    % Vertex labels
+    \node[left] at (A) {$A$};
+    \node[right] at (B) {$B$};
+    \node[above] at (C) {$C$};
+\end{tikzpicture}
+\caption{The vectors $\MVec{x}$ and $\MVec{y}$, with angle $\theta$ between them.}
+\label{fig:vector_triangle}
+\end{figure}
+
+The third side of the triangle is the
+segment $BC$, which as a vector is $\MVec{x} - \MVec{y}$. Its length is
+precisely the side $c$:
+\begin{equation}
+    c = |\MVec{x} - \MVec{y}|.
+\end{equation}
+
+\subsection*{Step 4: Expand $c^2$ algebraically}
+We use the \emph{algebraic} definition of the inner product,
+$\MVec{u}\cdot\MVec{v} = \sum_i u_i v_i$, together with the identity
+$|\MVec{u}|^2 = \MVec{u}\cdot\MVec{u}$. Expanding by bilinearity:
+
+\begin{align}
+    c^2 = |\MVec{x}-\MVec{y}|^2
+        &= (\MVec{x}-\MVec{y})\cdot(\MVec{x}-\MVec{y}) \notag\\
+        &= \MVec{x}\cdot\MVec{x} - 2\,\MVec{x}\cdot\MVec{y} + \MVec{y}\cdot\MVec{y} \notag\\
+        &= a^2 - 2\,\MVec{x}\cdot\MVec{y} + b^2.
+        \label{eq:algebraic-c2}
+\end{align}
+
+This is a purely algebraic expression for $c^2$ — no angle appears in it.
+
+\subsection*{Step 5: Equate to the Law of Cosines}
+Equation (5) gave us a purely \emph{geometric} expression for the same
+quantity $c^2$:
+
+\begin{equation}
+    c^2 = a^2 + b^2 - 2ab\cos\theta.
+    \label{eq:geometric-c2}
+\end{equation}
+
+Since \eqref{eq:algebraic-c2} and \eqref{eq:geometric-c2} both equal $c^2$,
+we may set them equal to each other:
+\[
+    a^2 - 2\,\MVec{x}\cdot\MVec{y} + b^2 = a^2 + b^2 - 2ab\cos\theta.
+\]
+
+\subsection*{Step 6: Cancel and solve}
+The terms $a^2$ and $b^2$ appear on both sides and cancel:
+\[
+    -2\,\MVec{x}\cdot\MVec{y} = -2ab\cos\theta.
+\]
+Dividing both sides by $-2$:
+
+\begin{equation}
+    \MVec{x}\cdot\MVec{y} = ab\cos\theta = |\MVec{x}|\,|\MVec{y}|\cos\theta.
+    \quad\blacksquare
+\end{equation}
+
+\subsection*{Remark}
+The Law of Cosines was proved purely from Pythagoras, with no reference to
+inner products.
+
+\vsp
+
+\noindent Equation \eqref{eq:algebraic-c2} was proved purely from the
+algebraic (coordinate) definition of the inner product, with no reference
+to angles.
+
+\vsp
+
+\noindent The bridge between algebra and geometry is the single quantity
+$c = |\MVec{x}-\MVec{y}|$: one formula for $c^2$ comes from coordinates,
+the other from Pythagoras, and equating them is precisely what encodes
+$\cos\theta$ inside the inner product.
+
+\end{document}
