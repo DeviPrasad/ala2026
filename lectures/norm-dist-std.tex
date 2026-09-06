@@ -55,6 +55,8 @@
 \newcommand{\NormConst}[1]{\lVert #1 \rVert}
 \newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
 \newcommand{\abs}[1]{\lvert {#1} \rvert}
+\newcommand{\Avg}[1]{\mathbf{avg}(\MVec{#1})}
+\newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
 
 \begin{document}
 \title{\center{Applied Linear Algebra \\\vsp Norm and Distance \\}}
@@ -344,6 +346,63 @@ A couple of \emph{norm identities}
     Linear algebra supplies the geometry, and machine learning supplies
     the statistical assumption that \emph{nearby points or neighbors
     behave similarly}.
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Euclidean Distance - Deviation}{Unit 1}
+    \begin{itemize}
+        \item When the entries of a vector represent different types of quantities,
+            we should carefully choose the units used to represent the numerical
+            values of the entries.
+        \item  Different components/entries should have approximately equal
+                status in determining the vector distance.
+        \item The numerical values should be approximately of the same magnitude.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{De-meaned Vector}{Unit 1}
+    For any vector $\MVec{x} \in \mathbb{R}^n$, the \emph{mean} of its entries is
+    \[
+        \Avg{x} = \frac{1}{n}\sum_{i=1}^{n} x_i
+    \]
+    and the associated \emph{de-meaned} vector is
+    \[
+        \overline{\MVec{x}} = \MVec{x} - \Avg{x}\MVec{1}_n
+    \]
+
+    Notice $\Avg{\overline{\MVec{x}}} = 0$, that is, the mean
+    value of the entries of $\overline{\MVec{x}}$ is zero.
+\end{frame}
+
+\begin{frame}\FrameTitle{De-meaned Vector}{Unit 1}
+    \QuizQuestion{What is $\overline{\MVec{x}}$ if all entries of $\MVec{x}$ are equal?}
+\end{frame}
+
+\begin{frame}\FrameTitle{Standard Deviation}{Unit 1}
+    The \emph{standard deviation} of an $n$-vector $\MVec{x}$
+    is defined as the RMS value of the de-meaned vector $\MVec{x} - \Avg{x}\MVec{1}_n$:
+
+    \[
+        \begin{array}{rll}
+            \Std{\MVec{x}} &=& \sqrt{\dfrac{1}{n}\sum_{i=1}^{n} (x_i - \Avg{x})^2} \\[1.5em]
+            &=& \sqrt{\dfrac{(x_1-\Avg{x})^2 + \cdots + (x_n-\Avg{x})^2}{n}} \\[1.5em]
+            &=& \dfrac{\Norm{\overline{\MVec{x}}}}{\sqrt{n}} \\[1.5em]
+            &=& \dfrac{\lVert\,\MVec{x} - (\MVec{1}^{\Trans} \, \MVec{x}/{n}) \, \MVec{1}\,\rVert}{\sqrt{n}}
+        \end{array}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Standard Deviation}{Unit 1}
+    \begin{itemize}
+    \item The standard deviation of a vector is \textbf{zero} only
+            when all its entries are equal.
+    \item The standard deviation of a vector is \emph{small} when the
+            entries of the vector are nearly the same.
+    \end{itemize}
+
+    \vspace*{2em}
+    The standard deviation of a vector $\MVec{x}$ tells us the typical
+    amount by which its entries deviate from their average value.
 \end{frame}
 
 

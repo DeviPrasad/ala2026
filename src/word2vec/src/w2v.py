@@ -1,3 +1,4 @@
+from builtins import Exception
 import os
 import numpy as np
 from gensim.models import KeyedVectors
