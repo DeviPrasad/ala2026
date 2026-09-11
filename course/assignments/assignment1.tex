@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage[dvipsnames]{xcolor}
+
+%\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+%\pretitle{\begin{center}\LARGE\bfseries}
+%\posttitle{\end{center}\vspace{-1.5em}}
+%\preauthor{\begin{center}\large}
+%\postauthor{\end{center}\vspace{-1.0em}}
+%\predate{\begin{center}\vspace{-0.8em}\large}
+%\postdate{\par\end{center}\vspace{-0.5em}}
+\setlength{\droptitle}{-2.8cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\MMat}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
+\newcommand{\NormConst}[1]{\lVert #1 \rVert}
+% \newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
+\newcommand{\abs}[1]{\lvert {#1} \rvert}
+\newcommand{\Avg}[1]{\mathbf{avg}(\MVec{#1})}
+\newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
+
+\title{Manipal School of Information Sciences\\AME 5151 - Applied Linear Algebra Lab\vspace*{1em}\\Assignment 1\\}
+
+\author{Academic Year: 2026-2027, Semester: 1}
+
+\date{Friday, 11 September, 2026}
+
+\begin{document}
+\pagecolor{white!2}
+
+\maketitle
+
+\vspace*{-1em}\noindent{\color{black!70}{\rule{\textwidth}{0.8pt}}}
+
+{\color{black!70}{
+    \noindent This assignment maps to the lab course outcome \textbf{CO1}:\vspace*{2pt}\\
+    \hspace*{1em}\textbf{Apply Python's legacy libraries for coding vector and matrix-related operations.}
+}}
+
+\vspace*{1.5em}
+\noindent\hfill {\textbf{Total Marks}: \textbf{5}}
+\vspace*{-4pt}\\
+\noindent{\color{black!70}{\rule{\textwidth}{0.8pt}}}\\
+
+
+\noindent Use your implementation of the {\color{blue}{Vector}} class.
+Implement the following methods and write unit tests for them
+in a separate file named \textbf{test\_vector.py}.
+
+\begin{enumerate}
+    \item \textbf{(1 point)} \\
+        {\color{blue!80}{\emph{mean}}} method
+        that returns the mean of the vector entries.
+        The mean is computed as the sum of all entries divided by
+        the number of entries.
+
+    \item \textbf{(1 point)} \\
+        {\color{blue!80}{\emph{demean}}} method that
+        returns a new vector representing the de-meaned version
+        of the original vector ({\color{black!80}\textbf{\textit{self}}}).
+        The de-meaned vector is obtained by subtracting the mean
+        of the original vector from each of its entries.
+
+    \item \textbf{(1 points)} \\
+        {\color{blue!80}{\emph{std}}} method
+        that returns the standard deviation of the vector entries.
+
+        The standard deviation is computed as the square root of the
+        average of the squared deviations from the mean.
+        Use the {\color{blue!80}{\emph{demean}}} method to help
+        with this computation.
+
+    \item \textbf{(2 point)} \\
+         Write meaningful unit tests for your implementation of
+         the above methods.
+         The unit tests must cover properties of the mean, de-meaned vector,
+         and standard deviation mentioned in the lectures.
+         You can refer to the lecture notes/slides for guidance on
+         what properties to test.
+
+\end{enumerate}
+
+\end{document}

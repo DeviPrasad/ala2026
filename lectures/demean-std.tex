@@ -197,32 +197,23 @@ case, MAD looks like a better measure of the typical deviation compared
 to $\mathbf{Std}$.
 \end{frame}
 
-\begin{frame}\FrameTitle{}{Unit 1}
-\end{frame}
-
-
-\begin{frame}\FrameTitle{Least Squares}{Unit 1}
-For most choices of \Vector{b}, however, there is no $n$-vector
-\Vector{x} for which $\MMat{A} \MVec{x} = \MVec{b}$. As a
-compromise, we seek an $x$ for which $\MVec{r} = \MMat{A} \MVec{x} - \MVec{b}$,
-which we call the \emph{residual} (for the equations $\MMat{A} \MVec{x} - \MVec{b}$),
-is as small as possible.
+\begin{frame}\FrameTitle{Standardization}{Unit 1}
+The \emph{standardization} of a vector $\MVec{x}$ is the vector
+\[
+    \MVec{z} = \dfrac{\MVec{x} - \Avg{\MVec{x}}\MVec{1}_n}{\Std{\MVec{x}}}
+\]
 
 \vsp
+$\MVec{z}$ is the \emph{standardized} version of $\MVec{x}$, and has the following properties:
+\begin{itemize}
+    \item $\Avg{\MVec{z}} = 0$
+    \item $\Std{\MVec{z}} = 1$
+\end{itemize}
 
-We should choose $\MVec{x}$ so as to minimize the norm of the
-residual, $\MMat{A} \MVec{x} - \MVec{b}.$
+\vsp
+The entries of $\MVec{z}$ are called the $z$-scores associated with the
+original entries of $\MVec{x}$.
 
-\end{frame}
-
-
-\begin{frame}\FrameTitle{Least Squares}{Unit 1}
-Minimizing the norm of the residual and its square are the same, so we can just
-as well minimize
-\[
-    \lVert \MMat{A} \MVec{x} - \MVec{b} \rVert^2 = \lVert r \rVert^2 = r^2_1 + \cdots + r^2_m,
-\]
-the sum of squares of the residuals.
 \end{frame}
 
 \end{document}
