@@ -1,0 +1,914 @@
+\documentclass[12pt]{article}
+
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{amsmath,amssymb}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{array}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+
+%\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
+%\pretitle{\begin{center}\LARGE\bfseries}
+%\posttitle{\end{center}\vspace{-1.5em}}
+%\preauthor{\begin{center}\large}
+%\postauthor{\end{center}\vspace{-1.0em}}
+%\predate{\begin{center}\vspace{-0.8em}\large}
+%\postdate{\par\end{center}\vspace{-0.5em}}
+\setlength{\droptitle}{-2.8cm}
+
+\setmonofont{DejaVu Sans Mono}
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmathfont{STIXTwoMath-Regular.otf}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\MMat}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
+\newcommand{\NormConst}[1]{\lVert #1 \rVert}
+% \newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
+\newcommand{\abs}[1]{\lvert {#1} \rvert}
+\newcommand{\Avg}[1]{\mathbf{avg}(\MVec{#1})}
+\newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
+
+\definecolor{lightyellow}{rgb}{1, 1, 0.8} % Define a subtle highlight color
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+\definecolor{darkgold}{HTML}{8F3F0F}
+\definecolor{amber}{RGB}{255, 191, 0}
+\definecolor{brickred}{RGB}{205, 92, 92}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    columns=fullflexible,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\newcommand{\srccodesize}{\fontsize{9pt}{10pt}\selectfont}
+
+\lstdefinestyle{mypystyle}{
+    aboveskip=2pt,
+    belowskip=2pt,
+    frame=single,
+    framerule=0pt, % disable the frame rules
+    framextopmargin=2pt,
+    framexbottommargin=2pt,
+    lineskip=3pt,
+    % expand the margins to pull everything inside the box
+    framexleftmargin=4.4mm,     % Makes the left side of the black box wider
+    xleftmargin=5.8mm,
+    xrightmargin=4pt,
+    commentstyle=\color{codecomment},
+    keywordstyle=\color{lightblue},
+    numberstyle=\srccodesize\color{white!40},
+    stringstyle=\color{codecoffee},
+    basicstyle=\ttfamily\srccodesize\color{codepy},
+    breakatwhitespace=false,
+    breaklines=true,
+    % captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=0pt,
+    firstnumber=1,  % Forces reset to 1 for EVERY listing
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python,
+    backgroundcolor=\color{black!80},
+    emph=[2]{__init__, calculate},
+    emphstyle=[2]\color{funcColor},
+}
+\lstset{style=mypystyle}
+
+\title{Manipal School of Information Sciences\\AME 5151 - Applied Linear Algebra Lab\vspace*{1em}\\Assignment 2\\}
+
+\author{Academic Year: 2026-2027, Semester: 1}
+
+\date{Tuesday, 15 September, 2026}
+
+\begin{document}
+\pagecolor{white!2}
+
+\maketitle
+
+\vspace*{-1em}\noindent{\color{black!70}{\rule{\textwidth}{0.8pt}}}
+
+{\color{black!70}{
+    \noindent This assignment maps to the lab course outcome \textbf{CO2}:\vspace*{2pt}\\
+    \noindent \textbf{Implement models for real-life applications using linear algebra principles
+                         and analyze the results from a practical perspective.}
+}}
+
+\vspace*{1.5em}
+\noindent\hfill {\textbf{Total Points}: \textbf{50}}
+\vspace*{-4pt}\\
+\noindent{\color{black!70}{\rule{\textwidth}{0.8pt}}}\\
+
+\section*{Semantic Tagging with GloVe and NumPy}
+
+You have already built a {\color{blue}{Vector}} class using tuples for
+storage and have implemented operations such as
+{\color{blue}{add}}, {\color{blue}{scale}}, {\color{blue}{dot}}, {\color{blue}{norm}}, and
+{\color{blue}{cosine\_similarity}}.
+
+In this lab, you will apply the same vector operations to
+word embeddings. We will use the pretrained GloVe model
+glove-wiki-gigaword-50. Each word represented by this model is
+associated with a vector in $\mathbb{R}^{50}$.
+
+The main objective of this lab is to move from computing cosine
+similarity between one pair of vectors to computing cosine similarities
+between two collections of vectors.
+
+Suppose that, after preprocessing, the input text contains \(n\) words
+that are present in the model vocabulary. Arrange their embedding
+vectors as the rows of a matrix $W \in \mathbb{R}^{n \times 50}$.
+
+Similarly, arrange the vectors corresponding to 20 predefined tags as
+the rows of a matrix $T \in \mathbb{R}^{20 \times 50}$.
+
+After normalizing every row of \(W\) and \(T\) to have Euclidean norm
+one, define
+
+\[
+    \widehat{W} \in \mathbb{R}^{n \times 50},
+    \qquad
+    \widehat{T} \in \mathbb{R}^{20 \times 50}.
+\]
+
+The matrix $S = \widehat{W}\widehat{T}^{\,T}$ has dimensions
+$S \in \mathbb{R}^{n \times 20}$.
+
+Its entries satisfy
+
+\[
+    S_{ij} = \widehat{W}_{i,:} \, \widehat{T}_{j,:}^{\,T} = \cos(W_{i,:},T_{j,:}).
+\]
+
+Thus, \(S_{ij}\) is the cosine similarity between the \(i\)-th word
+in the processed text and the \(j\)-th tag.
+
+This is the central linear-algebra operation in the lab.
+
+\section*{Learning Objectives}
+
+By the end of this lab, you should be able to:
+
+\begin{enumerate}
+    \item Represent a fixed vocabulary of 20 tags as a matrix
+    \[
+    T \in \mathbb{R}^{20 \times 50}.
+    \]
+
+    \item Preprocess an input text and represent its in-vocabulary words
+    as a matrix
+    \[
+    W \in \mathbb{R}^{n \times 50}.
+    \]
+
+    \item Compute cosine similarity between every in-vocabulary text
+    word and every tag.
+
+    \item Construct the complete similarity matrix
+    \[
+    S \in \mathbb{R}^{n \times 20}.
+    \]
+
+    \item Compute the same similarity matrix in two ways:
+    \begin{enumerate}[label=(\alph*)]
+        \item using your own {\color{blue}{Vector}} class and Python loops;
+        \item using NumPy matrix operations.
+    \end{enumerate}
+
+    \item Verify numerically that the two implementations compute the
+    same cosine-similarity values, up to normal floating-point error.
+
+    \item Use the similarity matrix to rank the 20 tags according to
+    their relevance to the input text.
+\end{enumerate}
+
+\section*{Given Input and Required Components}
+Use the pretrained embedding model glove-wiki-gigaword-50.
+The model associates every word in its vocabulary with a
+50-dimensional NumPy vector.
+
+You must implement:
+\begin{enumerate}
+    \item a vocabulary of exactly 20 tags.
+    \item a preprocessing pipeline for the input text.
+    \item construction of the tag matrix \(T\).
+    \item construction of the text matrix \(W\).
+    \item construction of the similarity matrix using your
+          {\color{blue}{Vector}} class.
+    \item construction of the similarity matrix using NumPy.
+    \item numerical verification of the two results.
+    \item tag ranking using max pooling.
+\end{enumerate}
+
+\noindent{\color{red}{\textbf{Do not use a library function that directly computes the complete cosine-similarity matrix}}}.
+
+\section*{Part A --- Choose 20 Tags}
+
+Choose exactly 20 tags that you consider appropriate for describing
+activities associated with a research university.
+
+Each tag must represent an academic, research, educational,
+professional, institutional, or campus-related concept.
+
+A possible starting vocabulary is:
+\emph{research},
+\emph{innovation},
+\emph{education},
+\emph{university},
+\emph{students},
+\emph{faculty},
+\emph{campus},
+\emph{engineering},
+\emph{medicine},
+\emph{technology},
+\emph{curriculum},
+\emph{collaboration},
+\emph{publication},
+\emph{laboratory},
+\emph{scholarship},
+\emph{mentorship},
+\emph{internship},
+\emph{entrepreneurship},
+\emph{accreditation},
+\emph{alumni}.
+
+You may use this list or construct your own list.
+
+In your documentation, briefly justify your choice of tag vocabulary.
+
+\subsection*{Single-word tags}
+
+If a tag consists of a single word \(t\), its tag vector is
+
+\[
+\mathbf{v}_t = \texttt{model[t]}.
+\]
+
+Every single-word tag must be present in the model vocabulary.
+
+For example:
+
+\begin{lstlisting}
+    if tag not in model.key_to_index:
+        raise ValueError(f"Tag not in vocabulary: {tag}")
+\end{lstlisting}
+
+\subsection*{Multi-word tags}
+
+You may use a multi-word tag such as
+
+\begin{center}
+\texttt{higher education}.
+\end{center}
+
+Suppose a tag consists of \(k\) words
+
+\[
+t_1,t_2,\ldots,t_k.
+\]
+
+Represent the tag by the arithmetic mean of the individual word
+vectors:
+
+\[
+\mathbf{v}_{\mathrm{tag}}
+=
+\frac{1}{k}
+\sum_{r=1}^{k}
+\mathbf{v}_{t_r}.
+\]
+
+Every component word of a multi-word tag must be present in the model
+vocabulary. If any component word is absent, choose a different tag.
+
+Document all multi-word tags used in your vocabulary.
+
+\section*{Part B --- Build the Input Text}
+
+Collect at most 400 words of real text concerning Manipal University
+from LinkedIn posts.
+
+Cite the source of every excerpt used.
+
+Save the collected material in a plain-text file with extension
+\texttt{.txt}.
+
+The text may contain:
+
+\begin{itemize}
+    \item punctuation;
+    \item names;
+    \item numbers;
+    \item hashtags;
+    \item repeated words;
+    \item words that do not occur in the embedding vocabulary.
+\end{itemize}
+
+Your program must handle such input without assuming that every token
+has a corresponding embedding vector.
+
+\section*{Part C --- Preprocess the Text}
+
+Apply the following preprocessing steps in the stated order:
+
+\begin{enumerate}
+    \item convert the text to lowercase;
+    \item remove punctuation;
+    \item split the resulting text into tokens;
+    \item remove stopwords using a small stopword set that you define;
+    \item remove tokens whose length is less than or equal to 2;
+    \item determine which remaining tokens occur in the embedding
+          vocabulary.
+\end{enumerate}
+
+Do not use an external stopword library. Define a small stopword set
+yourself.
+
+For example:
+
+\begin{lstlisting}
+    STOPWORDS = {
+        "the", "a", "an", "and", "or", "of", "to",
+        "in", "on", "for", "is", "are", "was", "were",
+        "with", "at", "by", "from"
+    }
+\end{lstlisting}
+
+This starter set is deliberately incomplete. Real LinkedIn text will
+also contain pronouns, demonstratives, and other function words
+(\texttt{it}, \texttt{this}, \texttt{that}, \texttt{our}, \texttt{we},
+and similar). Expand the set as needed for your own text and note in
+your documentation what you added.
+
+Let
+
+\[
+x_1,x_2,\ldots,x_m
+\]
+
+denote the tokens remaining after the first five preprocessing steps.
+
+Some of these tokens may not be present in the model vocabulary.
+
+Define the in-vocabulary token sequence as
+
+\[
+w_1,w_2,\ldots,w_n,
+\qquad n \leq m,
+\]
+
+where each \(w_i\) is present in the model vocabulary.
+
+Your program must report:
+
+\begin{itemize}
+    \item the number of tokens before preprocessing;
+    \item the number of tokens after preprocessing;
+    \item the number of in-vocabulary tokens;
+    \item the number of out-of-vocabulary tokens;
+    \item the distinct out-of-vocabulary tokens.
+\end{itemize}
+
+Repeated in-vocabulary words must \emph{not} be removed. If a word
+appears several times in the processed text, its vector must appear
+the same number of times in the text matrix.
+
+\newpage
+\section*{Part D --- Build the Tag and Text Matrices}
+
+Implement the following functions.
+
+\begin{lstlisting}
+    def build_tag_matrix(model, tags):
+        """
+        Construct the tag matrix.
+
+        Returns:
+            tag_names:
+                list[str] containing exactly 20 tag names.
+
+            T:
+                NumPy array with shape (20, 50).
+
+        For a single-word tag:
+            the corresponding row of T is model[tag].
+
+        For a multi-word tag:
+            the corresponding row is the arithmetic mean
+            of the vectors of all component words.
+
+        Every word used in a tag must occur in the model
+        vocabulary. Otherwise, raise an error.
+        """
+
+        def build_text_matrix(model, tokens):
+        """
+        Construct the text matrix.
+
+        Parameters:
+            tokens:
+                preprocessed tokens obtained after lowercasing,
+                punctuation removal, stopword removal, and the
+                length filter.
+
+        Returns:
+            in_vocab_tokens:
+                tokens that occur in the model vocabulary,
+                preserving their original order and repetitions.
+
+            oov_tokens:
+                tokens that do not occur in the model vocabulary.
+
+            W:
+                NumPy array with shape (n, 50), where n is the
+                number of in-vocabulary tokens.
+
+        Row i of W is the embedding vector of
+        in_vocab_tokens[i].
+        """
+\end{lstlisting}
+
+If
+
+\[
+w_1,w_2,\ldots,w_n
+\]
+
+are the in-vocabulary tokens, then
+
+\[
+W =
+\begin{bmatrix}
+\text{---} & \mathbf{w}_1^T & \text{---}\\
+\text{---} & \mathbf{w}_2^T & \text{---}\\
+    & \vdots          &    \\
+\text{---} & \mathbf{w}_n^T & \text{---}
+\end{bmatrix}
+\in \mathbb{R}^{n\times 50}.
+\]
+
+Similarly,
+
+\[
+T =
+\begin{bmatrix}
+\text{---} & \mathbf{t}_1^T & \text{---}\\
+\text{---} & \mathbf{t}_2^T & \text{---}\\
+    & \vdots          &    \\
+\text{---} & \mathbf{t}_{20}^T & \text{---}
+\end{bmatrix}
+\in \mathbb{R}^{20\times 50}.
+\]
+
+\subsection*{Checkpoint}
+
+Print:
+\begin{lstlisting}
+    print(T.shape)
+    print(W.shape)
+\end{lstlisting}
+
+Verify that
+
+\[
+T.\mathrm{shape}=(20,50)
+\]
+
+and
+
+\[
+W.\mathrm{shape}=(n,50).
+\]
+
+If \(n=0\), the input contains no usable words and the program must
+terminate with an explanatory error message rather than attempting
+the similarity computation.
+
+\section*{Part E --- Cosine Similarity Using Your Vector Class}
+
+Recall that for nonzero vectors
+\(\mathbf{u},\mathbf{v}\in\mathbb{R}^{50}\),
+
+\[
+\cos(\mathbf{u},\mathbf{v})
+=
+\frac{\mathbf{u}\cdot\mathbf{v}}
+{\|\mathbf{u}\|_2\|\mathbf{v}\|_2}.
+\]
+
+First compute the complete similarity matrix using your own
+\texttt{Vector} class.
+
+Implement:
+
+\begin{lstlisting}
+    def similarity_matrix_vector_class(W, T):
+        """
+        Compute the complete cosine-similarity matrix using
+        the previously implemented Vector class.
+
+        Every entry MUST be computed by constructing two
+        Vector instances and calling their cosine_similarity
+        method -- not by calling NumPy's dot/norm functions
+        directly on the rows of W and T.
+
+        Returns:
+            S with shape (n_words, 20), where
+
+            S[i, j] = Vector(W[i]).cosine_similarity(Vector(T[j])).
+
+        This implementation may use Python loops.
+        NumPy matrix multiplication must not be used to
+        compute the similarities in this function.
+        """
+\end{lstlisting}
+
+For every \(i\) and \(j\),
+
+\[
+S_{ij}
+=
+\frac{
+W_{i,:}\,T_{j,:}^{\,T}
+}{
+\|W_{i,:}\|_2
+\|T_{j,:}\|_2
+}.
+\]
+
+The resulting matrix must have dimensions
+
+\[
+S_{\mathrm{Vector}}
+\in
+\mathbb{R}^{n\times20}.
+\]
+
+This implementation serves as the reference computation using the
+vector operations that you implemented earlier in the course.
+
+\section*{Part F --- Cosine Similarity Using NumPy}
+
+Now compute the same matrix without using a Python-level double loop
+over all text-word/tag pairs.
+
+First normalize every row of \(W\):
+
+\[
+\widehat{W}_{i,:}
+=
+\frac{W_{i,:}}{\|W_{i,:}\|_2}.
+\]
+
+Similarly, normalize every row of \(T\):
+
+\[
+\widehat{T}_{j,:}
+=
+\frac{T_{j,:}}{\|T_{j,:}\|_2}.
+\]
+
+Then compute
+
+\[
+\boxed{
+S_{\mathrm{NumPy}}
+=
+\widehat{W}\widehat{T}^{\,T}
+}
+\]
+
+using NumPy matrix multiplication.
+
+The matrix dimensions are
+
+\[
+\underbrace{
+\widehat{W}
+}_{n\times50}
+\;
+\underbrace{
+\widehat{T}^{\,T}
+}_{50\times20}
+=
+\underbrace{
+S_{\mathrm{NumPy}}
+}_{n\times20}.
+\]
+
+Implement:
+
+\begin{lstlisting}
+    def similarity_matrix_numpy(W, T):
+        """
+        Compute all text-word/tag cosine similarities using
+        NumPy row normalization and matrix multiplication.
+
+        Returns:
+            S with shape (n_words, 20).
+        """
+\end{lstlisting}
+
+A suitable implementation has the following mathematical structure:
+
+\begin{lstlisting}
+    W_norm = np.linalg.norm(W, axis=1, keepdims=True)
+    T_norm = np.linalg.norm(T, axis=1, keepdims=True)
+
+    W_hat = W / W_norm
+    T_hat = T / T_norm
+
+    S = W_hat @ T_hat.T
+\end{lstlisting}
+
+Before division, verify that the row norms are nonzero.
+
+Do not call a library cosine-similarity function for this computation.
+
+\section*{Part G --- Verify the Two Implementations}
+
+The two similarity matrices must represent the same mathematical
+quantities.
+
+Before comparing them, convert \(S_{\mathrm{Vector}}\) to a NumPy
+array (e.g.\ \texttt{S\_vector = np.array(S\_vector)}) if your
+\texttt{Vector}-class implementation returned a nested list.
+
+Compare them using
+
+\begin{lstlisting}
+    np.allclose(S_vector, S_numpy)
+\end{lstlisting}
+
+with an appropriate floating-point tolerance.
+
+The result should be \texttt{True}.
+
+Because floating-point arithmetic is approximate, do not require the
+corresponding entries to be bit-for-bit identical.
+
+Also report
+
+\begin{lstlisting}
+    np.max(np.abs(S_vector - S_numpy))
+\end{lstlisting}
+
+to show the largest absolute numerical difference between the two
+implementations.
+
+\section*{Part H --- Rank Tags Using Max Pooling}
+
+The \(j\)-th column of \(S\) contains the similarities between tag
+\(j\) and every in-vocabulary word in the text:
+
+\[
+S_{1j},S_{2j},\ldots,S_{nj}.
+\]
+
+Define the max-pool score for tag \(j\) as
+
+\[
+r_j
+=
+\max_{1\leq i\leq n}S_{ij}.
+\]
+
+Thus,
+
+\[
+\boxed{
+r_j=\max_i S_{ij}
+}
+\]
+
+is the similarity between tag \(j\) and the single text word having
+the highest cosine similarity to that tag.
+
+Implement:
+
+\begin{lstlisting}
+    def rank_tags(tag_names, S, in_vocab_tokens):
+        """
+        For each tag j:
+
+            score[j] = max_i S[i, j]
+
+        Return the tags sorted in descending order of score.
+
+        For each tag, also return the text token that produced
+        the maximum score.
+        """
+\end{lstlisting}
+
+For each of the top eight tags, display:
+
+\begin{itemize}
+    \item the rank;
+    \item the tag;
+    \item its max-pool similarity score;
+    \item the text word that produced that score.
+\end{itemize}
+
+For example, the output format may be:
+
+\begin{verbatim}
+Rank   Tag             Score      Best-matching text word
+----------------------------------------------------------
+1      research        0.91       research
+2      innovation      0.84       innovative
+3      technology      0.79       digital
+...
+\end{verbatim}
+
+Your numerical values will depend on the text and the selected tag
+vocabulary.
+
+\subsection*{Interpretation of Max Pooling}
+
+Max pooling answers the following precise question:
+
+\begin{quote}
+For this tag, which single word in the document has the highest
+cosine similarity to the tag?
+\end{quote}
+
+A high max-pool score does \emph{not} imply that the corresponding
+topic dominates the document. A tag can receive a high score because
+of a single strongly related word.
+
+If a text word is identical to a tag (e.g.\ the word ``research''
+appears verbatim and ``research'' is one of your tags), that pair
+gets a similarity of exactly 1, since cosine similarity of a vector
+with itself is 1. On real text this will happen often, and such exact
+matches will tend to dominate the top of your ranking ahead of tags
+that are only captured through a genuinely different, semantically
+related word. Note in your output which top-ranked tags were matched
+by an identical word versus a different one.
+
+Therefore, max-pool ranking measures the presence of strong local
+semantic evidence for a tag; it does not measure how frequently or
+how extensively the corresponding topic occurs throughout the text.
+
+\section*{Required Unit Tests}
+
+Write unit tests for at least the following cases.
+
+\begin{enumerate}
+    \item Verify that
+    \[
+    T.\mathrm{shape}=(20,50).
+    \]
+
+    \item Verify that if the text contains \(n\) in-vocabulary tokens,
+    then
+    \[
+    W.\mathrm{shape}=(n,50).
+    \]
+
+    \item Verify that
+    \[
+    S.\mathrm{shape}=(n,20).
+    \]
+
+    \item Select at least one pair consisting of a text word and a tag.
+    Compute its cosine similarity using your \texttt{Vector} class and
+    verify that it agrees with the corresponding entry of the NumPy
+    similarity matrix.
+
+    \item Verify that
+    \begin{lstlisting}
+        np.allclose(S_vector, S_numpy)
+    \end{lstlisting}
+    returns \texttt{True}.
+
+    \item Verify that an out-of-vocabulary text token is excluded from
+    \(W\) and is reported as out-of-vocabulary.
+
+    \item Verify that a tag vocabulary containing an out-of-vocabulary
+    component causes \texttt{build\_tag\_matrix} to raise an error
+    (it must not silently drop the offending tag and proceed with the
+    remaining 19).
+
+\end{enumerate}
+
+\section*{Questions for the Lab Report}
+
+Answer the following questions precisely.
+
+\begin{enumerate}
+
+    \item If there are \(n\) in-vocabulary words in the processed text,
+    give the dimensions of:
+    \begin{enumerate}
+        \item one word vector;
+        \item \(W\);
+        \item \(T\);
+        \item \(T^T\);
+        \item \(S\).
+    \end{enumerate}
+
+    \item Explain why, after row normalization,
+    \[
+    \widehat{W}_{i,:}
+    \widehat{T}_{j,:}^{\,T}
+    \]
+    is equal to the cosine similarity between the corresponding
+    original vectors.
+
+    \item Explain why
+    \[
+    \widehat{W}\widehat{T}^{\,T}
+    \]
+    computes all \(20n\) pairwise text-word/tag cosine similarities
+    in one matrix multiplication.
+
+    \item Suppose a single word in the document has very high
+    similarity to the tag \texttt{medicine}, while all other words
+    have low similarity to that tag. Explain how max pooling treats
+    this situation.
+
+    \item Does a high max-pool score imply that the corresponding tag
+    describes the dominant topic of the document? Explain.
+
+    \item For your own top-eight ranking, identify which tags were
+    matched by a text word identical to the tag itself, and which
+    were matched by a genuinely different word. What does the
+    difference tell you about what cosine similarity over word
+    embeddings is, and is not, capturing?
+
+    \item If a concept is not represented by any of the 20 chosen
+    tags, can the ranking algorithm introduce a new tag for that
+    concept? Explain.
+
+    \item Why are out-of-vocabulary tokens excluded from \(W\)?
+
+    \item Explain the mathematical relationship between your
+    pair-by-pair \texttt{Vector.cosine\_similarity} computation and
+    the NumPy matrix multiplication used to construct \(S\).
+
+\end{enumerate}
+
+\section*{Submission Requirements}
+
+Submit:
+
+\begin{enumerate}
+    \item the source text file containing at most 400 words;
+    \item citations for all LinkedIn excerpts used;
+    \item your Python source code;
+    \item your unit tests;
+    \item program output showing:
+    \begin{itemize}
+        \item token statistics;
+        \item \(T.\mathrm{shape}\);
+        \item \(W.\mathrm{shape}\);
+        \item verification using \texttt{np.allclose};
+        \item the maximum numerical difference between the two
+              similarity matrices;
+        \item the top eight ranked tags and their best-matching
+              text words;
+    \end{itemize}
+    \item answers to the lab-report questions.
+\end{enumerate}
+
+\section*{Rubric --- 50 Points}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+\textbf{Component} & \textbf{Points}\\
+\midrule
+Tag vocabulary and tag-matrix construction        & 8\\
+Text preprocessing and OOV handling               & 7\\
+Similarity matrix using the \texttt{Vector} class & 8\\
+Vectorized NumPy similarity matrix                 & 10\\
+Max-pool tag ranking                               & 6\\
+Unit tests and numerical verification              & 7\\
+Documentation and lab-report answers               & 4\\
+\midrule
+\textbf{Total}                                     & \textbf{50}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
