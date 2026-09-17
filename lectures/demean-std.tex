@@ -214,6 +214,7 @@ $\Std{\MVec{x}}$,
 The \emph{standardization} of a vector $\MVec{x}$ is the vector
 \[
     \MVec{z} = \dfrac{\MVec{x} - \Avg{\MVec{x}}\MVec{1}_n}{\Std{\MVec{x}}}
+             = \dfrac{\DemeanedVec{x}}{\Std{\MVec{x}}}
 \]
 
 \vsp
@@ -228,60 +229,64 @@ The entries of $\MVec{z}$ are called the $z$-scores associated with the
 original entries of $\MVec{x}$.
 \end{frame}
 
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+    Let $\MVec{a}$ and $\MVec{b}$ be two $n$-vectors, with the
+    associated de-meaned vectors $\DemeanedVec{a}$ and $\DemeanedVec{b}$.
+    \[
+        \DemeanedVec{a} = \MVec{a} - \Avg{a}\mathbf{1},
+        \qquad\qquad
+        \DemeanedVec{b} = \MVec{b} - \Avg{b}\mathbf{1}
+    \]
+
+    The \emph{correlation coeficient} of $\DemeanedVec{a}$ and
+    $\DemeanedVec{b}$ is defined as
+    \[
+        \rho = \dfrac{\DemeanedVec{a}^{\Trans} \DemeanedVec{b}}
+        {\Norm{\DemeanedVec{a}} \Norm{\DemeanedVec{b}}}
+    \]
+    assuming that the de-meaned vectors are not $\mathbf{0}$.
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+    It is clear from the definition of $\rho$ that it is
+    cos $\theta$, the angle between $\DemeanedVec{a}$ and
+    $\DemeanedVec{b}$.
+    \[
+        \rho = \angle (\DemeanedVec{a}, \DemeanedVec{b})
+    \]
+\end{frame}
+
+
 \begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
     \begin{itemize}
-    \item The correlation coefficient, $\rho$, tells us how the
-            entries in the two vectors vary together.
-    \item $\rho \in [0. 1]$
-    \item If $\rho = 0$, the vectors are $uncorrelated$.
-    \item A vector with all entries equal is said to be
-            \emph{uncorrelated} with any vector.
-\end{itemize}
+        \item The correlation coefficient, $\rho$, tells us how the
+                entries in the two vectors vary together.
+        \item $-1 \le \rho \le 1$
+        \item If $\rho = 0$, the vectors are $uncorrelated$.
+        \item A vector with all entries equal is said to be
+                \emph{uncorrelated} with any vector.
+    \end{itemize}
 \end{frame}
+
 
 \begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
-\end{frame}
-
-\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
-\end{frame}
-
-\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
-\end{frame}
-
-\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
-\end{frame}
-
-\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
-\end{frame}
-
-\begin{frame}\FrameTitle{Mean Absolute Deviation - Intro}{Unit 1}
-Consider the following 8-vector that has a mean of 0 and a standard deviation of 1:
+    Define the standardized versions of $\MVec{a}$ and $\MVec{b}$.
     \[
-        \MVec{x} = (-0.46, -0.51,-0.29, 0.18, 1.22, -0.79, -1.27, 1.92)
+        u = \DemeanedVec{a} / \Std{a}, \ and \ v = \DemeanedVec{b}/\Std{b}
     \]
-    \begin{align*}
-        \sum_{i=1}^{8} x_i &= 0, \hspace*{2em} \Avg{x} = 0\\[4pt]
-        \sum_{i=1}^{8} x_i^2 &= 8, \hspace*{2em} \Norm{\MVec{x}} = \sqrt{8} \\[4pt]
-        \Std{\MVec{x}} &= \Norm{\MVec{x}}/\sqrt{8} \\[4pt]
-                    &= 1
-    \end{align*}
+
+    Then,
+    \[
+        \rho = {u^{\Trans} v}/{n}
+    \]
 \end{frame}
 
-\begin{frame}\FrameTitle{Mean Absolute Deviation}{Unit 1}
-The Mean Absolute Deviation (MAD) of a vector $\MVec{x}$ is
-\[
-    \text{MAD}(\MVec{x}) = \dfrac{1}{n}\sum_{i=1}^{n} \abs{x_i - \Avg{x}}
-\]
-
-\begin{align*}
-    \text{MAD}(\MVec{x}) &= \dfrac{0.46 + 0.51 + 0.29 + 0.18 + 1.22 + 0.79 + 1.27 + 1.92}{8}\\[2pt]
-    &= \dfrac{6.64}{8}\\[2pt]
-    & \approx 0.83
-\end{align*}
-
-Notice that the MAD is smaller than $\mathbf{Std}$, and in this
-case, MAD looks like a better measure of the typical deviation compared
-to $\mathbf{Std}$.
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
 \end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
+
 
 \end{document}
