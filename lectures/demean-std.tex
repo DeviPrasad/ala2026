@@ -50,12 +50,15 @@
 \newcommand{\Vector}[1]{\textbf{#1}}
 \newcommand{\MMat}[1]{\mathbf{#1}}
 \newcommand{\MVec}[1]{\mathbf{#1}}
-\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\Norm}[1]{\lVert {{#1}} \rVert}
 \newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
 \newcommand{\NormConst}[1]{\lVert #1 \rVert}
 \newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
 \newcommand{\abs}[1]{\lvert {#1} \rvert}
-\newcommand{\Avg}[1]{\mathbf{avg}(\MVec{#1})}
+\newcommand{\Avg}[1]{\mathbf{avg}{(\MVec{#1})}}
+\newcommand{\AvgVec}[1]{\mathbf{avg}{(\MVec{#1})}}
+\newcommand{\AvgDemeanedVec}[1]{\mathbf{avg}{(\tilde\MVec{#1})}}
+\newcommand{\DemeanedVec}[1]{\tilde\MVec{#1}}
 \newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
 
 \begin{document}
@@ -68,15 +71,15 @@
 \begin{frame}\FrameTitle{De-meaned Vector}{Unit 1}
     For any vector $\MVec{x} \in \mathbb{R}^n$, the \emph{mean} of its entries is
     \[
-        \Avg{x} = \frac{1}{n}\sum_{i=1}^{n} x_i
+        \mathbf{avg}(\MVec{x}) = \frac{1}{n}\sum_{i=1}^{n} x_i
     \]
     and the associated \emph{de-meaned} vector is
     \[
-        \overline{\MVec{x}} = \MVec{x} - \Avg{x}\MVec{1}_n
+        \DemeanedVec{x} = \MVec{x} - \AvgVec{x}\MVec{1}_n
     \]
 
-    Notice $\Avg{\overline{\MVec{x}}} = 0$, that is, the mean
-    value of the entries of $\overline{\MVec{x}}$ is zero.
+    Notice $\AvgDemeanedVec{x} = 0$, that is, the mean
+    value of the entries of $\tilde{\MVec{x}}$ is zero.
 \end{frame}
 
 \begin{frame}\FrameTitle{De-meaned Vector}{Unit 1}
@@ -85,17 +88,17 @@
     \vsp
     Then $\Avg{x} = 20$ and the de-meaned vector is
     \begin{align*}
-        \overline{\MVec{x}} &= \MVec{(10, -2, 8, 23, 6, 75)} - \MVec{(20, 20, 20, 20, 20, 20)}\\[4pt]
+        \tilde{\MVec{x}} &= \MVec{(10, -2, 8, 23, 6, 75)} - \MVec{(20, 20, 20, 20, 20, 20)}\\[4pt]
                             &=(10-20, -2-20, 8-20, 23-20, 6-20, 75-20)\\[4pt]
                             &= (-10, -22, -12, 3, -14, 55)
     \end{align*}
 
     \vsp
-    The mean of the entries of $\overline{\MVec{x}}$ is zero.
+    The mean of the entries of $\tilde{\MVec{x}}$ is zero.
 \end{frame}
 
 \begin{frame}\FrameTitle{De-meaned Vector}{Unit 1}
-    \QuizQuestion{What is $\overline{\MVec{x}}$ if all entries of $\MVec{x}$ are equal?}
+    \QuizQuestion{What is $\tilde{\MVec{x}}$ if all entries of $\MVec{x}$ are equal?}
 \end{frame}
 
 \begin{frame}\FrameTitle{Norm of a De-meaned Vector}{Unit 1}
@@ -104,13 +107,13 @@
 
     \noindent\rule{\textwidth}{0.4pt}
     \begin{align*}
-    \overline{\MVec{x}} &= \MVec{(10, -2, 8, 23, 6, 75)} - \MVec{(20, 20, 20, 20, 20, 20)}\\[2pt]
+    \tilde{\MVec{x}} &= \MVec{(10, -2, 8, 23, 6, 75)} - \MVec{(20, 20, 20, 20, 20, 20)}\\[2pt]
                             &= (-10, -22, -12, 3, -14, 55)
     \end{align*}
 
-    Norm of the de-meaned vector $\overline{\MVec{x}}$ is
+    Norm of the de-meaned vector $\tilde{\MVec{x}}$ is
     \begin{align*}
-        \Norm{\overline{\MVec{x}}} &= \sqrt{(-10)^2 + (-22)^2 + (-12)^2 + 3^2 + (-14)^2 + 55^2} \\[2pt]
+        \Norm{\tilde{\MVec{x}}} &= \sqrt{(-10)^2 + (-22)^2 + (-12)^2 + 3^2 + (-14)^2 + 55^2} \\[2pt]
                         &= \sqrt{10^2 + 22^2 + 12^2 + 3^2 + 14^2 + 55^2}\\[2pt]
                         &= \sqrt{100 + 484 + 144 + 9 + 196 + 3025} \\[2pt]
                         &= \sqrt{3958} \\[2pt]
@@ -126,7 +129,7 @@
         \begin{array}{rll}
             \Std{\MVec{x}} &=& \sqrt{\dfrac{1}{n}\sum_{i=1}^{n} (x_i - \Avg{x})^2} \\[1.5em]
             &=& \sqrt{\dfrac{(x_1-\Avg{x})^2 + \cdots + (x_n-\Avg{x})^2}{n}} \\[1.5em]
-            &=& \dfrac{\Norm{\overline{\MVec{x}}}}{\sqrt{n}} \\[1.5em]
+            &=& \dfrac{\Norm{\tilde{\MVec{x}}}}{\sqrt{n}} \\[1.5em]
             &=& \dfrac{\lVert\,\MVec{x} - ((\MVec{1}_n^{\Trans}\,\MVec{x})/{n}) \, \MVec{1}_n \,\rVert}{\sqrt{n}}
         \end{array}
     \]
@@ -138,16 +141,29 @@ Consider our example
     \MVec{x} &= (10, -2, 8, 23, 6, 75)\\[4pt]
     n &= 6\\[4pt]
     \Avg{x} &= 20\\[4pt]
-    \overline{\MVec{x}} &= (-10, -22, -12, 3, -14, 55)\\[4pt]
-    \Norm{\overline{\MVec{x}}} &\approx 62.9126
+    \tilde{\MVec{x}} &= (-10, -22, -12, 3, -14, 55)\\[4pt]
+    \Norm{\tilde{\MVec{x}}} &\approx 62.9126
 \end{align*}
 
 Now we can compute the standard deviation of $\MVec{x}$:
 \begin{align*}
-    \Std{\MVec{x}} &= \Norm{\overline{\MVec{x}}}/\sqrt{n} \\[4pt]
+    \Std{\MVec{x}} &= \Norm{\tilde{\MVec{x}}}/\sqrt{n} \\[4pt]
                    &= 62.9126/\sqrt{6} \\[4pt]
                    &\approx 25.686
 \end{align*}
+\end{frame}
+
+\begin{frame}\FrameTitle{Standard Deviation}{Unit 1}
+Given two vectors $\MVec{x}$ and $\MVec{y}$,
+where the value of each entry of $\MVec{y}$ is
+$\Std{\MVec{x}}$,
+
+\begin{align*}
+    \MVec{x} &= (-10, -22, -12, 3, -14, 55), \ and \\[4pt]
+    \MVec{y} &= (25.686, 25.686, 25.686, 25.686, 25.686, 25.686),
+\end{align*}
+
+\QuizQuestion{what is $\Norm{\MVec{x}}$ and $\Norm{\MVec{y}}$?}
 \end{frame}
 
 \begin{frame}\FrameTitle{Standard Deviation - A ``Good'' Sample}{Unit 1}
@@ -158,8 +174,8 @@ Now we can compute the standard deviation of $\MVec{x}$:
         \Avg{x} &= 10 \\[3pt]
         \Norm{\MVec{x}} &= \sqrt{100 + 4 + 81 + 324 + 36 + 225 + 144 + 49 + 121} \\[3pt]
                         &= \sqrt{1084} \approx 32.9242 \\[3pt]
-        \overline{\MVec{x}} &= (0, -8, -1, 8, -4, 5, 2, -3, 1) \\[3pt]
-        \Norm{\overline{\MVec{x}}} &= \sqrt{0+64+1+64+16+25+4+9+1}\\[3pt]
+        \tilde{\MVec{x}} &= (0, -8, -1, 8, -4, 5, 2, -3, 1) \\[3pt]
+        \Norm{\tilde{\MVec{x}}} &= \sqrt{0+64+1+64+16+25+4+9+1}\\[3pt]
                                    &= \sqrt{184} \approx 13.5647\\[3pt]
         \Std{\MVec{x}} &= \dfrac{13.5647}{\sqrt{9}} = 4.522
     \end{align*}
@@ -210,9 +226,33 @@ $\MVec{z}$ is the \emph{standardized} version of $\MVec{x}$, and has the followi
 \vsp
 The entries of $\MVec{z}$ are called the $z$-scores associated with the
 original entries of $\MVec{x}$.
-
 \end{frame}
 
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+    \begin{itemize}
+    \item The correlation coefficient, $\rho$, tells us how the
+            entries in the two vectors vary together.
+    \item $\rho \in [0. 1]$
+    \item If $\rho = 0$, the vectors are $uncorrelated$.
+    \item A vector with all entries equal is said to be
+            \emph{uncorrelated} with any vector.
+\end{itemize}
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
+
+\begin{frame}\FrameTitle{Correlation Coefficient}{Unit 1}
+\end{frame}
 
 \begin{frame}\FrameTitle{Mean Absolute Deviation - Intro}{Unit 1}
 Consider the following 8-vector that has a mean of 0 and a standard deviation of 1:

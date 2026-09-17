@@ -34,10 +34,8 @@
 Standard deviation is often introduced as ``the typical amount by
 which entries differ from their average.'' That phrasing is
 intuitive but can be misleading --- it makes one to compare
-$\mathbf{std}(\MVec{x})$ against something like the
-average deviation size. These two things don't
-generally agree. Therefore, it is more accurate to describe
-it in geometric terms, rather than using a naive language.
+$\mathbf{std}(\MVec{x})$ with average deviation. It is more
+accurate to describe it in geometric terms.
 
 \begin{quote}
 \textbf{std($\MVec{x}$) is the unique uniform magnitude that,
@@ -52,7 +50,7 @@ sensitive to entries that deviate the most.
 
 Consider the vector
 \[
-x = (-0.46,\ -0.51,\ -0.29,\ 0.18,\ 1.22,\ -0.79,\ -1.27,\ 1.92),
+    x = (-0.46,\ -0.51,\ -0.29,\ 0.18,\ 1.22,\ -0.79,\ -1.27,\ 1.92),
 \]
 which has $\mathbf{avg}(\MVec{x}) = 0$ and
 \begin{align*}
@@ -63,17 +61,18 @@ which has $\mathbf{avg}(\MVec{x}) = 0$ and
 \end{align*}
 exactly.
 
-\noindent The simple exercise of averaging the absolute
-deviations, gives Mean Absolute Deviation (MAD):
+\vspace*{1em}
+\noindent If we simply average the absolute
+deviations, we get Mean Absolute Deviation (MAD):
 \[
     \mathbf{MAD} = \dfrac{0.46+0.51+0.29+0.18+1.22+0.79+1.27+1.92}{8} = 0.83,
 \]
 not $1$. The gap exists because one entry, $1.92$,
-contributes $1.92^2 = 3.69$ to the sum of squares ---
-almost half the total --- while the other seven together
+contributes $1.92^2 \approx 3.696$ to the sum of squares ---
+almost half the total, while the other seven values together
 contribute the rest. Squaring inflates the influence of large
-deviations, so $\mathbf{std}$ ends up pulled above the ``typical'' value
-one would eyeball from the data.
+deviations, so $\mathbf{std}$ ends up pulled above the
+``typical'' value one would gather from the data.
 
 \section*{What $\mathbf{std}$ Actually Means}
 
@@ -83,73 +82,83 @@ is the de-meaned vector, then
 \mathbf{std}(\MVec{x}) = \dfrac{\|\overline{\MVec{x}}\|}{\sqrt n}
 \]
 is the value $r$ such that a vector with every entry equal
-to $r$ in magnitude has the same Euclidean length as $\overline{\MVec{x}}$.
+to $r$ has the same magnitude as $\overline{\MVec{x}}$.
 It does \textbf{not} claim that individual entries
-resemble $r$ --- only that total squared deviation is conserved.
+resemble $r$ --- only that the total squared deviation is conserved.
 
 \subsection*{Finance analogy}
-A \textbf{fixed deposit} has $\mathbf{std} = 0$ (no fluctuation, ever).
-A \textbf{real stock} fluctuates unevenly --- big swings some periods,
-small ones others. The idea of $\mathbf{std}$ answers the question:
+A \textbf{fixed deposit} scheme has $\mathbf{std} = 0$
+(no fluctuation, ever). A \textbf{real stock} fluctuates
+unevenly --- big swings some periods, small ones others.
+The idea of $\mathbf{std}$ answers the question:
 
 \begin{quote}
-\emph{If the same total risk (or Euclidean length)
+\emph{If the same total risk (or the magnitude)
 were spread perfectly evenly instead of lumped unevenly,
-what size would each period's swing have to be?}
+what size should each period's swing have to be?}
 \end{quote}
 
 If $\mathbf{std} = 10$ (in percentage points) around a mean
 return of $X\%$, the equivalent perfectly regular ``seesaw''
-alternates between $X+10$ and $X-10$ every period --- not because
+alternates between $X+10$ and $X-10$ every period, not because
 the real stock actually moves that predictably, but because that
-regular seesaw is the flat instrument carrying identical total risk.
+regular seesaw is the flat instrument (fixed deposit scheme)
+carrying identical total risk.
 
 \section*{Conclusion}
 It is important to understand that $\mathbf{std}$ is not
 ``how much things usually differ'' --- it is ``the flat,
-constant-swing version of your data that has the same total squared
+constant-swing version of data that has the same total squared
 spread.''
 
 When deviations are roughly equal in size (like the seesaw),
-that flat version matches intuition well. When one or two entries
-dominate (like $1.92$ in the example above), $\mathbf{std}$
-still measures the real total spread correctly --- it
-no longer looks like an ``average-sized'' deviation,
-because it isn't one.
+the flat version nicely matches our intuition. When one or
+two entries dominate (like $1.92$ in the example above),
+$\mathbf{std}$ still measures the real total spread correctly,
+however, it no longer looks like an ``average-sized'' deviation.
+Actually, it isn't one.
 
 When we say a dataset has a standard deviation of $r$,
 \begin{itemize}
     \item it does not mean most entries are equal to $r$.
     \item It does not mean $r$ is the simple average of the distances.
     \item It means that if all fluctuations were smoothed out
-          into an equal-sized, regular heartbeat of $\pm r$,
-          the total combined impact (variance) would remain identical.
+          into regular and equal-sized deviations of
+          magnitude $\pm r$, the total combined impact
+          (variance) would remain identical.
 \end{itemize}
 
 When we say $\mathbf{std}(x) = 1.0$ is ``typical,"
 we actually mean:
 \begin{quote}
     If we replaced all these varying deviations with a single
-    uniform magnitude that preserves the total Euclidean length
-    of the vector, that magnitude would be $1.0$.
+    uniform magnitude that preserves the total magnitude
+    of the vector, that uniform magnitude would be $1.0$.
 \end{quote}
 
-\section*{Additional Notes}
+\section*{The Mathematical Reasoning}
 \noindent If $\mathbf{std}(\MVec{x})$ is the constant $r \ge 0$
 such that a vector $v \in \mathbb{R}^n$ with all entries
 of magnitude $r$ (i.e.\ $|v_i| = r$ for every $i$, signs arbitrary),
 it has the same norm as the de-meaned vector $\overline{\MVec{x}}$.
 
-Check it: $\|v\|^2 = \sum_i v_i^2 = \sum_i r^2 = n r^2$,
-so $\|v\| = r\sqrt{n}$. Setting $\|v\| = \|\overline{\MVec{x}}\|$:
+\[
+    \|v\|^2 = \sum_i v_i^2 = \sum_i r^2 = n r^2
+\]
+and therefore,
+
+\[
+    \|v\| = r\sqrt{n}
+\]
+
+\noindent Setting $\|v\| = \|\overline{\MVec{x}}\|$,
 \[
     r\sqrt{n} = \|\overline{\MVec{x}}\|
         \quad\Longrightarrow\quad r
         = \frac{\|\overline{\MVec{x}}\|}{\sqrt{n}}
-        = \mathbf{std}(\MVec{x}).
+        = \mathbf{std}(\MVec{x})
 \]
-
-$\mathbf{std}(\MVec{x})$ is the unique uniform magnitude
+\noindent $\mathbf{std}(\MVec{x})$ is the unique uniform magnitude
 that reproduces $\|\overline{\MVec{x}}\|$ across $n$ coordinates.
 
 \end{document}
