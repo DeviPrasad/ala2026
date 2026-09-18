@@ -1,0 +1,73 @@
+\documentclass[tikz, border=10pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta}
+
+\begin{document}
+
+% Layer sizes: input, hidden1, hidden2, output
+\def\nInput{3}
+\def\nHiddenOne{5}
+\def\nHiddenTwo{5}
+\def\nOutput{3}
+
+\begin{tikzpicture}[
+    x=2.6cm, y=1.05cm,
+    every node/.style={font=\small},
+    neuron/.style={circle, draw=black, thick, minimum size=0.8cm, inner sep=0pt},
+    input neuron/.style={neuron, fill=green!30},
+    hidden neuron/.style={neuron, fill=cyan!30},
+    output neuron/.style={neuron, fill=orange!30},
+    conn/.style={-{Latex[length=2mm]}, draw=gray, opacity=0.6},
+    layer label/.style={font=\small\bfseries, align=center}
+]
+
+% ----- Input layer -----
+\foreach \i in {1,...,\nInput}{
+    \node[input neuron] (I-\i) at (0, -\i + 0.5*\nInput + 0.5) {};
+}
+
+% ----- Hidden layer 1 -----
+\foreach \i in {1,...,\nHiddenOne}{
+    \node[hidden neuron] (H1-\i) at (1, -\i + 0.5*\nHiddenOne + 0.5) {};
+}
+
+% ----- Hidden layer 2 -----
+\foreach \i in {1,...,\nHiddenTwo}{
+    \node[hidden neuron] (H2-\i) at (2, -\i + 0.5*\nHiddenTwo + 0.5) {};
+}
+
+% ----- Output layer -----
+\foreach \i in {1,...,\nOutput}{
+    \node[output neuron] (O-\i) at (3, -\i + 0.5*\nOutput + 0.5) {};
+}
+
+% ----- Connections: input -> hidden1 -----
+\foreach \i in {1,...,\nInput}{
+    \foreach \j in {1,...,\nHiddenOne}{
+        \draw[conn] (I-\i) -- (H1-\j);
+    }
+}
+
+% ----- Connections: hidden1 -> hidden2 -----
+\foreach \i in {1,...,\nHiddenOne}{
+    \foreach \j in {1,...,\nHiddenTwo}{
+        \draw[conn] (H1-\i) -- (H2-\j);
+    }
+}
+
+% ----- Connections: hidden2 -> output -----
+\foreach \i in {1,...,\nHiddenTwo}{
+    \foreach \j in {1,...,\nOutput}{
+        \draw[conn] (H2-\i) -- (O-\j);
+    }
+}
+
+% ----- Layer labels -----
+\node[layer label, above=0.6cm of I-1] {Input\\[-2pt](3 nodes)};
+\node[layer label, above=0.6cm of H1-1] {Hidden 1\\[-2pt](5 nodes)};
+\node[layer label, above=0.6cm of H2-1] {Hidden 2\\[-2pt](5 nodes)};
+\node[layer label, above=0.6cm of O-1] {Output\\[-2pt](3 nodes)};
+
+\end{tikzpicture}
+
+\end{document}

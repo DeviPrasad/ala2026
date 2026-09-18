@@ -14,10 +14,10 @@
 %\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.6cm, right=2.5cm}
 \setlength{\droptitle}{-2cm}
 
-\setmonofont{DejaVu Sans Mono}
+\setmonofont{DejaVu Sans Mono}[Scale=1.2]
 \setmainfont{Libertinus Serif}[Scale=1.2]
-\setsansfont{Libertinus Sans}[Scale=1.19]
-\setmathfont{STIXTwoMath-Regular.otf}[Scale=1.2]
+\setsansfont{Libertinus Sans}[Scale=1.6]
+\setmathfont{STIXTwoMath-Regular.otf}[Scale=1.5]
 
 \newcommand{\Matrix}[1]{\textbf{#1}}
 \newcommand{\Vector}[1]{\textbf{#1}}
@@ -54,11 +54,26 @@ Therefore, the vector $\MVec{z}$, the
 \end{align*}
 
 Since $\MVec{z}$ is a positive scalar multiple of $\DemeanedVec{x}$,
-and scaling preserves the average,
+and scaling preserves the average.
 
+\vspace*{6pt}\noindent{\color{black}{\rule{\textwidth}{1pt}}}
+It is easy to see why scaling preserves the average:
 \begin{align*}
-    \Avg{z} &= \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \, \AvgDemeanedVec{x}
-             = 0 \qquad\qquad \because \, \AvgDemeanedVec{x} = 0
+    \MVec{x} &= (x_1, x_2, \ldots, x_n) \\[4pt]
+    \Avg{x} &= \dfrac{x_1 + x_2 + \cdots + x_n}{n} \\[4pt]
+    \\
+    \alpha \MVec{x} &= (\alpha x_1, \alpha x_2, \ldots, \alpha x_n) \\[4pt]
+    \mathbf{avg}(\alpha \MVec{x})  &= \dfrac{\alpha x_1 + \alpha x_2 + \cdots + \alpha x_n}{n} \\[4pt]
+                    &= \dfrac{\alpha \, (x_1 + x_2 + \cdots + x_n)}{n} \\[4pt]
+                    &= \alpha\,\Avg{x}\\[-2em]
+\end{align*}
+\noindent{\color{black}{\rule{\textwidth}{1pt}}}\\
+
+Therefore,
+\begin{align*}
+    \Avg{z} &= \mathbf{avg} \left(\dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \ \ \DemeanedVec{x}\right) \\[4pt]
+            &=\left(\,\dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}}\,\right) \, \AvgDemeanedVec{x} \\[4pt]
+            &= 0 \qquad\qquad \because \, \AvgDemeanedVec{x} = 0
 \end{align*}
 
 Let us try to determine $\Std{z}$.
@@ -66,9 +81,9 @@ Let us try to determine $\Std{z}$.
 \begin{align*}
     \Std{z} &= \dfrac{\Norm{\DemeanedVec{z}}}{\sqrt{n}} \\[4pt]
             &= \dfrac{\Norm{z}}{\sqrt{n}} \qquad\qquad \because \, \Avg{z} = 0 \\[4pt]
-            &= \dfrac{1}{\sqrt{n}} \left\lVert \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \, \DemeanedVec{x} \right\rVert \\[4pt]
+            &= \dfrac{1}{\sqrt{n}} \left\lVert \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \ \,\DemeanedVec{x} \right\rVert \\[4pt]
             &= \dfrac{1}{\sqrt{n}} \cdot \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \cdot \Norm{\DemeanedVec{x}}
-                \qquad\qquad \because \, \Norm{c\,\MVec{v}} = |c|\,\Norm{v} \text{ for } c > 0 \\[4pt]
+                \qquad\qquad \because \, \Norm{c\,\MVec{v}} = |c|\,\Norm{v} \emph{ for } c > 0 \\[4pt]
             &= 1
 \end{align*}
 

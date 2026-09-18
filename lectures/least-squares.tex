@@ -1,0 +1,90 @@
+\documentclass[12pt]{beamer}
+\usetheme{moloch}
+
+\usepackage{amsmath,amscd}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage[dvipsnames]{xcolor}
+
+\setbeamercolor{background canvas}{bg=black}
+\setbeamercolor{normal text}{fg=white}
+
+\setmonofont{DejaVu Sans Mono}
+
+% Set the title bar to black background with white text
+\setbeamercolor{frametitle}{bg=black, fg=white}
+
+% Ensure other structural elements (bullets, etc.) are visible
+\setbeamercolor{structure}{fg=white}
+
+\setmainfont{Libertinus Serif}
+\setsansfont{Libertinus Sans}
+\setmonofont{DejaVu Sans Mono}
+\setmathfont{STIXTwoMath-Regular.otf}
+%\setmathfont{STIX Two Math}
+
+
+% Define colors for syntax highlighting
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codecoffee}{rgb}{0.75,0.6,0.3}
+\definecolor{question}{rgb}{1.0,0.75,0.1}
+\definecolor{lightblue}{rgb}{0.55,0.75,0.9}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{codecomment}{rgb}{0.97, 0.74, 0.4}
+\definecolor{codepy}{rgb}{0.9, 0.85, 0.85} %{#F8BC65}
+\definecolor{funcColor}{rgb}{0.47, 0.6, 0.8}
+\definecolor{midgray}{rgb}{0.4, 0.4, 0.3}
+\definecolor{indexwhite}{rgb}{0.9, 0.9, 0.9}
+
+\newcommand{\FrameTitle}[2]{\frametitle{#1 \hfill \small\textnormal{\textcolor{midgray}{#2}}}}
+\newcommand{\snl}{\vspace*{4pt}\\}
+\newcommand{\nl}{\vspace*{1em}\\}
+\newcommand{\vsp}{\vspace*{1em}}
+\newcommand{\SixPtVspace}{\vspace*{6pt}}
+
+\newcommand{\Quiz}[1]{{\large\textbf{\color{question}{#1}}}}
+\newcommand{\QuizQuestion}[1]{{\Large\textbf{\color{question}{#1}}}}
+
+\newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\MMat}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
+\newcommand{\NormConst}[1]{\lVert #1 \rVert}
+\newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
+\newcommand{\abs}[1]{\lvert {#1} \rvert}
+\newcommand{\Avg}[1]{\mathbf{avg}(\MVec{#1})}
+\newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
+\begin{document}
+\title{\center{Applied Linear Algebra\\\vsp Least Squares\\}}
+
+\author{\center{Devi Prasad M \\ Manipal School of Information Sciences \\ Manipal \\}}
+\date{\center{September 2026}}
+\maketitle
+
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+For most choices of \Vector{b}, however, there is no $n$-vector
+\Vector{x} for which $\MMat{A} \MVec{x} = \MVec{b}$. As a
+compromise, we seek an $x$ for which $\MVec{r} = \MMat{A} \MVec{x} - \MVec{b}$,
+which we call the \emph{residual} (for the equations $\MMat{A} \MVec{x} - \MVec{b}$),
+is as small as possible.
+
+\vsp
+
+We should choose $\MVec{x}$ so as to minimize the norm of the
+residual, $\MMat{A} \MVec{x} - \MVec{b}.$
+
+\end{frame}
+
+
+\begin{frame}\FrameTitle{Least Squares}{Unit 1}
+Minimizing the norm of the residual and its square are the same, so we can just
+as well minimize
+\[
+    \lVert \MMat{A} \MVec{x} - \MVec{b} \rVert^2 = \lVert r \rVert^2 = r^2_1 + \cdots + r^2_m,
+\]
+the sum of squares of the residuals.
+\end{frame}
