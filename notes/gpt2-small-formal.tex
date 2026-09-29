@@ -1,0 +1,693 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{fontspec}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{unicode-math}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{nicematrix}
+\usepackage{graphicx}
+\usepackage[ruled,linesnumbered,noend,vlined]{algorithm2e}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+
+\geometry{a4paper, top=2cm, bottom=2cm, left=2.5cm, right=2.5cm}
+\setlength{\droptitle}{-2cm}
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\SetKwInOut{Hyperparameters}{Hyperparameters}
+\SetKwInOut{Parameters}{Parameters}
+\SetKwInput{KwParams}{Parameters}
+\SetKw{KwReturn}{return}
+\SetKwComment{Comment}{\big[\!\big[}{\big]\!\big]}
+\SetKwFor{For}{for}{do}{end}
+\SetKwFor{ForPlain}{for}{}{}
+\SetKwInput{KwIn}{Input}
+\SetKwInput{KwOut}{Output}
+\SetKwInput{KwParams}{Parameters}
+\SetKw{KwReturn}{return}
+\DontPrintSemicolon
+\SetNoFillComment
+
+%\setmainfont{Libertinus Serif}
+%\setsansfont{Libertinus Sans}[scale=0.5]
+%\setmonofont{DejaVu Sans Mono}[scale=0.5]
+\setmathfont{STIXTwoMath-Regular.otf}
+%\setmathfont{STIX Two Math}
+
+%
+%\newcommand{\scaletop}[1]{\vcenter{\hbox{\scalebox{0.75}{$#1\Trans$}}}}
+\newcommand{\scaletop}[1]{\raisebox{1.5pt}{\scalebox{0.75}{$#1\top$}}}
+\newcommand{\Trans}{{\mathpalette\scaletop\relax}}
+%%
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Matrix}[1]{\textbf{#1}}
+\newcommand{\Vector}[1]{\textbf{#1}}
+\newcommand{\MMat}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\Norm}[1]{\lVert {\mathbf{#1}} \rVert}
+\newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
+\newcommand{\NormConst}[1]{\lVert #1 \rVert}
+\newcommand{\abs}[1]{\lvert {#1} \rvert}
+\newcommand{\Avg}[1]{\mathbf{avg}(\mathbf{#1})}
+\newcommand{\Std}[1]{\mathbf{std}(\mathbf{#1})}
+\newcommand{\Draft}[1]{\big[\!\big[{#1}{\big]\!\big]}}
+
+\let\oldnl\nl % used in the next line.
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
+
+\title{Formal Algorithms for Transformers\\[4pt]
+    {\large{Multi-Head Attention, Decoder-Transformer and Decoder-Inference\\using\vspace*{-7pt}\\GPT-2 Small Hyperparameters}}
+     \\{\small\Draft{Draft 3}}}
+\author{Devi Prasad M}
+\date{September, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{The Formal Algorithms for GPT-2 Small Model}
+The technical report Formal Algorithms for Transformers
+by Phuong and Hutter of DeepMind (2022, arXiv:2207.09238)
+provides a formal yet readable breakdown of the original
+Transformer architecture. By explicitly defining matrix
+dimensions and tensor shapes in pseudocode, it offers a
+clear and succinct description of transformer architectures.
+In this report, we add a few extra annotations to their
+excellent pseudocode, making it even more accessible to a
+broader audience. Thiir work provides the baseline for
+the decoder-only models analyzed in this report.
+
+Phuong and Hutter's pseudocode explicitly shows how a
+Transformer processes different mathematical objects when
+predicting the next token. Despite its clarity, it can
+still be difficult to clearly visualise the concrete
+shape and structure of the computation. We found that
+plugging in specific values for all hyperparameters
+makes these operations much easier to track.
+Additionally, using an input sequence of a fixed
+length helps reveal the inner workings and dynamics
+of the attention mechanism.
+
+
+In this work, we focus on the following algorithms
+from the original report, instantiating them with
+the hyperparameters of OpenAI's GPT-2 Small model.
+We retain the original algorithm names and numbering
+scheme for easy cross-referencing:
+\begin{itemize}
+    \item Algorithm 1: Token embedding
+    \item Algorithm 3: Basic single-query attention
+    \item Algorithm 4: Attention
+    \item Algorithm 5: MHAttention
+    \item Algorithm 6: layer\_norm
+    \item Algorithm 7: Unembedding
+    \item Algorithm 10: DTransformer
+    \item Algorithm 14: DInference
+\end{itemize}
+
+The pseudocode here follows exactly the same syntax as
+the original. We introduce only one change to the syntax
+of passing hyperparameter arguments to the algorithms.
+We will indicate this change when we first encounter
+the affected code.
+
+\section*{Hyperparameters of GPT2-small}
+\begin{center}
+\begin{tabular}{r@{}llll@{}}
+\toprule
+\hspace*{2.5em}&$\ell_{\text{max}}$       & $1024$ \qquad\qquad & $d_{\text{e}}$ (model width)            & $768$\\
+&$L$ (layers)       & $12$                & $d_\text{mlp}$ (MLP width)          & $3072$ \\
+&$H$ (heads)        & $12$                & $d_\text{attn}=d_\text{mid}$ (per head)  & $64$ \\
+&$N_{\text{V}}$ (vocabulary) & $50{,}257$          & $d_\text{in}$ (per head)            & $= d_{\text{e}} = 768  \hspace*{2.5em}$ \\
+&total parameters ($W_u$)& $\approx124.4$M& $d_\text{out}$ (per head)           & $64$\\
+\bottomrule
+\end{tabular}
+\end{center}
+$d_\text{attn}=d_\text{mid}=d_{\text{e}}/H=768/12=64$: each of the 12 heads works in a 64-dimensional
+query, key, and value space; $H\cdot d_\text{mid}=768=d_{\text{e}}$, so the concatenated heads equal the
+model width before $W_o$ is applied.
+
+\section*{Notation Simplification}
+To simplify notation, we denote by $\symbfcal{W}$ the entire set of parameters (query, key,
+value and output linear projections) required by a multi-head attention layer:
+\begin{equation}
+\symbfcal{W} := \left(
+\begin{array}{l}
+    \symbf{W_q^h} \in \mathbb{R}^{d_\text{attn}\times d_\text{x}},\ \symbf{b_q^h} \in \mathbb{R}^{d_\text{attn}},\ h\in[H] \\[4pt]
+    \symbf{W_k^h} \in \mathbb{R}^{d_\text{attn}\times d_z},\ \symbf{b_k^h} \in \mathbb{R}^{d_\text{attn}},\ h\in[H] \\[4pt]
+    \symbf{W_v^h} \in \mathbb{R}^{d_\text{mid}\times d_z},\ \symbf{b_v^h} \in \mathbb{R}^{d_\text{mid}},\ h\in[H] \\[4pt]
+    \symbf{W_o} \in \mathbb{R}^{d_\text{out}\times Hd_\text{mid}},\ \symbf{b_o} \in \mathbb{R}^{d_\text{out}}
+\end{array}
+\right)
+\label{eq:mha-params}
+\end{equation}
+
+For GPT-2 small ($H=12$, $d_\text{attn}=d_\text{mid}=64$, $d_\text{x}=d_z=d_\text{out}=768$), the parameter set
+$\symbfcal{W}$ of a single multi-head attention layer becomes:
+\begin{equation}
+\symbfcal{W} := \left(
+\begin{array}{l}
+    \symbf{W_q^h} \in \mathbb{R}^{64\times768},\ \symbf{b_q^h} \in \mathbb{R}^{64},\ h\in[12] \\[4pt]
+    \symbf{W_k^h} \in \mathbb{R}^{64\times768},\ \symbf{b_k^h} \in \mathbb{R}^{64},\ h\in[12] \\[4pt]
+    \symbf{W_v^h} \in \mathbb{R}^{64\times768},\ \symbf{b_v^h} \in \mathbb{R}^{64},\ h\in[12] \\[4pt]
+    \symbf{W_o} \in \mathbb{R}^{768\times(12\cdot64)}=\mathbb{R}^{768\times768},\ \symbf{b_o} \in \mathbb{R}^{768}
+\end{array}
+\right)
+\label{eq:mha-params-gpt2small}
+\end{equation}
+
+\setcounter{algocf}{2} % so it is numbered "Algorithm 3"
+\begin{algorithm}
+\caption{Basic single-query attention.}
+\DontPrintSemicolon
+\KwIn{$\symbf{e} \in \mathbb{R}^{d_{\text{in}}}$, vector representation of the current token}
+\KwIn{$\symbf{e}_t \in \mathbb{R}^{d_{\text{in}}}$, vector representations of context tokens $t \in [T]$.}
+\KwOut{$\tilde{\symbf{v}} \in \mathbb{R}^{d_{\text{out}}}$, vector representation of the token and context combined.}
+\KwParams{$\symbf{W}_{\symbf{q}}, \symbf{W}_{\symbf{k}} \in \mathbb{R}^{d_{\text{attn}} \times d_{\text{in}}}$,
+  $\symbf{b}_{\symbf{q}}, \symbf{b}_{\symbf{k}} \in \mathbb{R}^{d_{\text{attn}}}$, the query and key linear projections.}
+\KwParams{$\symbf{W}_{\symbf{v}} \in \mathbb{R}^{d_{\text{out}} \times d_{\text{in}}}$,
+  $\symbf{b}_{\symbf{v}} \in \mathbb{R}^{d_{\text{out}}}$, the value linear projection.}
+$\symbf{q} \leftarrow \symbf{W}_{\symbf{q}}\symbf{e} + \symbf{b}_{\symbf{q}}$\;
+$\forall t:\ \symbf{k}_t \leftarrow \symbf{W}_{\symbf{k}}\symbf{e}_t + \symbf{b}_{\symbf{k}}$\;
+$\forall t:\ \symbf{v}_t \leftarrow \symbf{W}_{\symbf{v}}\symbf{e}_t + \symbf{b}_{\symbf{v}}$\;
+$\forall t:\ \alpha_t = \dfrac{\exp\bigl(\symbf{q}^{\Trans}\symbf{k}_t / \sqrt{d_{\text{attn}}}\bigr)}{\sum_u \exp\bigl(\symbf{q}^{\Trans}\symbf{k}_u / \sqrt{d_{\text{attn}}}\bigr)}$\;
+\KwReturn $\tilde{\symbf{v}} = \sum_{t=1}^{T} \alpha_t \symbf{v}_t$\;
+\end{algorithm}
+
+\newpage
+
+\section*{List of Notation}
+\addcontentsline{toc}{section}{List of notation}
+%\begin{group}
+%\begin{longtable}{@{} l l p{7cm} @{}}
+%\begin{longtable}{l l l p{5cm} l}
+\begingroup
+\setlength{\tabcolsep}{3pt} % Default is 6pt
+\small
+\begin{longtable}{@{} p{0.15\textwidth} p{0.15\textwidth} p{0.67\textwidth} @{}}
+\toprule
+\textbf{Symbol} & \textbf{Type} & \textbf{Explanation} \\
+\midrule
+\endhead
+$[N]$  & $:=\{1,\ldots,N\}$ & set of integers $1,2,\ldots,N-1,N$ \\
+$i,j$  & $\in\mathbb{N}$ & generic integer indices \\
+$V$    & $\cong[N_{\text{V}}]$ & vocabulary \\
+$N_{\text{V}}$  & $\in\mathbb{N}$ & vocabulary size \\
+$V^*$   & $=\bigcup_{\ell=0}^{\infty}V^\ell$ & set of token sequences; elements include e.g.\ sentences or documents \\
+$\ell_{\text{max}}$ & $\in\mathbb{N}$ & maximum sequence length \\
+$\ell$ & $\in[\ell_{\text{max}}]$ & length of token sequence \\
+$t$ & $\in[\ell]$ & index of token in a sequence \\
+$d_{\ldots}$ & $\in\mathbb{N}$ & dimension of various vectors \\
+$\symbf{x}$ & $\equiv x[1\!:\!\ell]$ & $\equiv x[1]x[2]\ldots x[\ell]$ $\in V^\ell$  primary token sequence \\
+$\symbf{z}$ & $\equiv z[1\!:\!\ell]$ & $\equiv z[1]z[2]\ldots z[\ell]$ $\in V^\ell$ context token sequence \\
+$M[i,j]$ & $\in\mathbb{R}$ & entry $M_{ij}$ of matrix $M\in\mathbb{R}^{d\times d'}$ \\
+$M[i,:]\equiv M[i]$ & $\in\mathbb{R}^{d'}$ & $i$-th row of matrix $M\in\mathbb{R}^{d\times d'}$ \\
+$M[:,j]$ & $\in\mathbb{R}^{d}$ & $j$-th column of matrix $M\in\mathbb{R}^{d\times d'}$ \\
+$\symbf{e}$ & $\in\mathbb{R}^{d_{\text{e}}}$ & vector representation / embedding of a token \\
+$\symbf{X}$ & $\in\mathbb{R}^{d_{\text{e}}\times\ell_{\text{x}}}$ & encoded primary token sequence \\
+$\symbf{Z}$ & $\in\mathbb{R}^{d_{\text{e}}\times\ell_{\text{z}}}$ & encoded context token sequence \\
+$\mathrm{Mask}$ & $\in\mathbb{R}^{\ell_{\text{z}}\times\ell_{\text{x}}}$ & masking matrix, it determines the attention context for each token \\
+$L,L_{enc},L_{dec}$ & $\in\mathbb{N}$ & number of network (encoder, decoder) layers \\
+$l$ & $\in[L]$ & index of network layer \\
+$H$ & $\in\mathbb{N}$ & number of attention heads \\
+$h$ & $\in[H]$ & index of attention head \\
+$N_{data}$ & $\in\mathbb{N}$ & (i.i.d.) sample size \\
+$n$ & $\in[N_{data}]$ & index of sample sequence \\
+$\eta$ & $\in(0,\infty)$ & learning rate \\
+$\tau$ & $\in(0,\infty)$ & temperature; it controls the diversity-plausibility trade-off at inference \\
+$\symbf{W_e}$ & $\in\mathbb{R}^{d_{\text{e}}\times N_{\text{V}}}$ & token embedding matrix \\
+$\symbf{W_p}$ & $\in\mathbb{R}^{d_{\text{e}}\times\ell_{\text{max}}}$ & positional embedding matrix \\
+$\symbf{W_u}$ & $\in\mathbb{R}^{N_{\text{V}}\times d_{\text{e}}}$ & unembedding matrix \\
+$\symbf{W_q}$ & $\in\mathbb{R}^{d_\text{attn}\times d_\text{x}}$ & query weight matrix \\
+$\symbf{b_q}$ & $\in\mathbb{R}^{d_\text{attn}}$ & query bias \\
+$\symbf{W_k}$ & $\in\mathbb{R}^{d_\text{attn}\times d_z}$ & key weight matrix \\
+$\symbf{b_k}$ & $\in\mathbb{R}^{d_\text{attn}}$ & key bias \\
+$\symbf{W_v}$ & $\in\mathbb{R}^{d_\text{out}\times d_z}$ & value weight matrix \\
+$\symbf{b_v}$ & $\in\mathbb{R}^{d_\text{out}}$ & value bias \\
+$\symbfcal{W}_{\symbf{qkv}}$ & & collection of above parameters of a single-head attention layer \\
+$\symbf{W_o}$ & $\in\mathbb{R}^{d_\text{out}\times Hd_\text{mid}}$ & output weight matrix \\
+$\symbf{b_o}$ & $\in\mathbb{R}^{d_\text{out}}$ & output bias \\
+$\symbfcal{W}$ & & collection of above parameters of a multi-head attention layer \\
+$\symbf{W}_\text{mlp}$ & $\in\mathbb{R}^{d_1\times d_2}$ & weight matrix corresponding to an MLP layer in a Transformer \\
+$\symbf{b}_\text{mlp}$ & $\in\mathbb{R}^{d_1}$ & bias corresponding to an MLP layer in a Transformer \\
+$\symbf{\gamma}$ & $\in\mathbb{R}^{d_{\text{e}}}$ & layer-norm learnable scale parameter \\
+$\symbf{\beta}$ & $\in\mathbb{R}^{d_{\text{e}}}$ & layer-norm learnable offset parameter \\
+$\symbf{\theta},\hat{\symbf{\theta}}$ & $\in\mathbb{R}^d$ & collection of all learnable / learned Transformer parameters \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+
+
+\newpage
+
+
+\medskip
+\section*{Mathematical Conventions of the Report}
+Phuong and Hutter use the column-vector convention throughout:
+tokens are \emph{columns} of $X$ and $Z$, which represent the
+primary and the context token sequences, respectively.
+The score matrix is $S=K^{\Trans} Q \in \R^{\ell_{\text{z}}\times\ell_{\text{x}}}$
+(context length $\times$ primary sequence length), with softmax
+taken down each column. This is the transpose
+of the row-vector, $S=QK^{\Trans}$. Note that the row-softmax
+convention is more commonly used elsewhere including
+in the course reference books and in our notes.
+The two are mathematically identical, just transposed.
+We retain Phuong and Hutter's convention below since our
+intention is to match their algorithms exactly.
+
+To begin with consider the expression used to compute an
+input mask. This appears in many places in the original
+article:
+\[
+    \operatorname{Mask}[t_{\text{z}}, t_{\text{x}}] =
+        \begin{cases}
+        1, & t_{\text{z}} \leq t_{\text{x}},\\
+        0, & t_{\text{z}} > t_{\text{x}}.
+        \end{cases}
+\]
+
+We may write the same expression in another way to
+convey the fact that the first subscript identifies
+rows, and the second, picks columns in a mask matrix:
+\[
+    \operatorname{Mask}[r,j] =
+        \begin{cases}
+        1, & r\leq j,\\
+        0, & r>j.
+        \end{cases}
+\]
+
+
+Recalling that we use the column-vector notation,
+it is not difficult to see that a $t^{th} column$
+represents a vector whose first $t$ indices are filled
+with 1s, followed by zeroes.
+
+\[
+    \begin{bNiceMatrix}[first-row,first-col]
+        \scriptstyle \symbf{r}\backslash
+            \symbf{j} & \scriptstyle 1 & \scriptstyle 2 & \scriptstyle 3 & \scriptstyle 4
+                      & \scriptstyle 5 & \scriptstyle 6 & \scriptstyle 7 & \scriptstyle 8\\
+        \scriptstyle 1 & 1&1&1&1&1&1&1&1\\
+        \scriptstyle 2 & 0&1&1&1&1&1&1&1\\
+        \scriptstyle 3 & 0&0&1&1&1&1&1&1\\
+        \scriptstyle 4 & 0&0&0&1&1&1&1&1\\
+        \scriptstyle 5 & 0&0&0&0&1&1&1&1\\
+        \scriptstyle 6 & 0&0&0&0&0&1&1&1\\
+        \scriptstyle 7 & 0&0&0&0&0&0&1&1\\
+        \scriptstyle 8 & 0&0&0&0&0&0&0&1
+    \end{bNiceMatrix}
+\]
+
+In the formal algorithms, \(t_{\text{x}}\in[\ell_{\text{x}}]\) indexes positions
+of the primary sequence \(\symbf{X}\), whose columns are projected
+to form queries, and \(t_{\text{z}}\in[\ell_{\text{z}}]\) indexes positions of the
+context sequence \(\symbf{Z}\), whose columns are projected to
+form keys and values.
+
+
+The mask has shape
+\(\operatorname{Mask}\in\{0,1\}^{\ell_{\text{z}}\times\ell_{\text{x}}}\).
+If \(\operatorname{Mask}[t_{\text{z}},t_{\text{x}}]=1\), the query at position
+\(t_{\text{x}}\) may attend to the key–value pair at position \(t_{\text{z}}\).
+If it is \(0\), the score \(S[t_{\text{z}},t_{\text{x}}]\) is set to \(-\infty\)
+before softmax, so that pair receives zero attention weight.
+
+
+In self-attention \(\symbf{Z}=\symbf{X}\); the causal mask
+\(\operatorname{Mask}[t_{\text{z}},t_{\text{x}}]=[\![t_{\text{z}}\leq t_{\text{x}}]\!]\)
+allows each query to attend to its own position and all
+earlier positions.
+
+\newpage
+\section*{Token Embedding and Unembedding.}
+The token embedding learns to represent each
+vocabulary element as a vector in $R^{d_{\text{e}}}$.
+
+The unembedding learns to convert a vector
+representation of a token and its context into a
+distribution over the vocabulary elements.
+The algorithm describes an independently learned
+unembedding matrix, but note that sometimes
+the unembedding matrix is instead fixed to be
+the transpose of the embedding matrix.
+
+\setcounter{algocf}{0}
+\begin{algorithm}[H]
+\caption{Token embedding.}
+\label{alg:token_embedding}
+\DontPrintSemicolon
+    \KwIn{$v \in V \cong [N_{\mathrm{V}}]$, \hfill a token ID.}
+    \KwOut{$\symbf{e} \in \mathbb{R}^{d_{\mathrm{e}}}$, \hfill vector representation of the token.}
+    \vspace*{2pt}
+    \KwParams{$\symbf{W}_{\symbf{e}} \in \mathbb{R}^{d_{\mathrm{e}} \times N_{\mathrm{V}}}$, \hfill token embedding matrix.}
+    \BlankLine
+    \KwReturn $\symbf{e} = \symbf{W}_{\symbf{e}}[:, v]$\;
+\end{algorithm}
+
+\setcounter{algocf}{6}
+\begin{algorithm}
+    \caption{Unembedding.}
+    \label{alg:unembedding}
+    \DontPrintSemicolon
+    \KwIn{$\symbf{e} \in \mathbb{R}^{d_{\mathrm{e}}}$, \hfill a token encoding.}
+    \KwOut{$\symbf{p} \in \Delta(V)$, \hfill a probability distribution over the vocabulary.}
+    \vspace*{2pt}
+    \KwParams{$\symbf{W}_{\symbf{u}} \in \mathbb{R}^{N_{\mathrm{V}} \times d_{\mathrm{e}}}$, \hfill the unembedding matrix.}
+    \BlankLine
+    \KwReturn $\symbf{p} = \operatorname{softmax}(\symbf{W}_{\symbf{u}}\symbf{e})$\;
+\end{algorithm}
+
+
+\setcounter{algocf}{5}
+\begin{algorithm}
+    \caption{$\hat{\symbf{e}} \leftarrow \mathtt{layer\_norm}(\symbf{e} \mid \symbf{\gamma}, \symbf{\beta})$}
+    \label{alg:layer_norm}
+    \DontPrintSemicolon
+    \tcc{Normalizes layer activations $\symbf{e}$.}
+    \Input{$\symbf{e} \in \mathbb{R}^{d_{\text{e}}}$, \hfill neural network activations.}
+    \Output{$\widehat{\symbf{e}} \in \mathbb{R}^{d_{\text{e}}}$, \hfill normalized activations.}\vspace*{4pt}
+    \Parameters{$\symbf{\gamma}, \symbf{\beta} \in \mathbb{R}^{d_{\mathrm{e}}}$, \hfill element-wise scale and offset.}\vspace*{4pt}
+    $\symbf{m} \leftarrow \sum_{i=1}^{d_{\text{e}}} \symbf{e}[i] / d_{\text{e}}$\;\vspace*{3pt}
+    $v \leftarrow \sum_{i=1}^{d_{\text{e}}} (\symbf{e}[i] - \symbf{m})^2 / d_{\mathrm{e}}$\;\vspace*{3pt}
+    \Return $\widehat{\symbf{e}} = \dfrac{\symbf{e} - \symbf{m}}{\sqrt{v}} \odot \symbf{\gamma} + \symbf{\beta}$, \hfill where $\odot$ denotes element-wise multiplication.
+\end{algorithm}
+
+\newpage
+\section*{Causal (unidirectional/masked) self-attention}
+
+Given a sequence of token representations, Algorithm~\ref{alg:attn}
+with the causal mask applies attention at every position, treating
+that position and all preceding ones as its context. Because future
+positions are masked out, the output at position $t$ depends only on
+positions $1,\dots,t$, so this auto-regressive version can be used
+for online prediction.
+
+\setcounter{algocf}{3}
+\begin{algorithm}[H]
+    \caption{$\tilde{\symbf{V}}\leftarrow \textsc{Attention}(\symbf{X}, \symbf{Z} \mid \mathcal{W}_{\symbf{qkv}}, \mathrm{Mask})$}
+    \label{alg:attn}
+        \Input{$\symbf{X}\in\R^{d_\text{x} \times \ell_\text{x}}$, $\symbf{Z}\in\R^{d_\text{z} \times \ell_\text{z}}$,
+               vector representations of the primary and context sequences.\\
+               GPT-2: $\symbf{X}=\symbf{Z}$, $d_\text{x} = d_\text{z} = d_\text{e} = 768$, and $\ell_\text{x} = \ell_\text{z}$.}
+        \Output{$\tilde{\symbf{V}}\in\R^{d_\text{out} \times \ell_\text{x}}$, updated representations of the tokens in
+               $\symbf{X}$, folding in information from the tokens in $\symbf{Z}$.\\
+               GPT-2: $d_\text{out} = 64$ (called $d_\text{mid}$ in Algorithm~5).}
+        \Hyperparameters{$\mathrm{Mask}\in\{0,1\}^{\ell_\text{z} \times \ell_\text{x}}$, here the causal mask
+               $\mathrm{Mask}[t_\text{z},t_\text{x}]=[\![t_\text{z}\le t_\text{x}]\!]$ for
+               $t_\text{z}\in[\ell_\text{z}]$, $t_\text{x}\in[\ell_\text{x}]$.}
+        \Parameters{$\mathcal{W}_{\symbf{qkv}}$ consisting of:\\
+            \quad $\symbf{W}_{\symbf{q}}\in\R^{d_\text{attn} \times d_\text{x}},\;
+                   \symbf{W}_{\symbf{k}} \in \R^{d_\text{attn} \times d_\text{z}},\;
+                   \symbf{W}_{\symbf{v}} \in \R^{d_\text{out} \times d_\text{z}}$,\\
+            \quad $\symbf{b}_{\symbf{q}}\in\R^{d_\text{attn}},\; \symbf{b}_{\symbf{k}}\in\R^{d_\text{attn}},\; \symbf{b}_{\symbf{v}}\in\R^{d_\text{out}}$.\\
+            GPT-2: $d_\text{attn} = 64$.}
+    \BlankLine
+    $\symbf{Q}\leftarrow \symbf{W}_{\symbf{q}} \symbf{X}+\symbf{b}_{\symbf{q}}\symbf{1}^{\Trans}_{\ell_\text{x}}$ \Comment*{Query $\in\R^{d_\text{attn}\times\ell_\text{x}}$}
+    $\symbf{K}\leftarrow \symbf{W}_{\symbf{k}} \symbf{Z}+\symbf{b}_{\symbf{k}}\symbf{1}^{\Trans}_{\ell_\text{z}}$ \Comment*{Key $\in\R^{d_\text{attn}\times\ell_\text{z}}$}
+    $\symbf{V}\leftarrow \symbf{W}_{\symbf{v}} \symbf{Z}+\symbf{b}_{\symbf{v}}\symbf{1}^{\Trans}_{\ell_\text{z}}$ \Comment*{Value $\in\R^{d_\text{out}\times\ell_\text{z}}$}
+    $\symbf{S}\leftarrow \symbf{K}^{\Trans} \symbf{Q}/\sqrt{d_\text{attn}}$ \Comment*{Score $\in \R^{\ell_\text{z} \times \ell_\text{x}}$}
+    $\forall t_\text{z}, t_\text{x}$: \textbf{if} $\lnot \mathrm{Mask}[t_\text{z}, t_\text{x}]$ \textbf{then} $\symbf{S}[t_\text{z}, t_\text{x}] \leftarrow -\infty$\;
+    \Return{$\tilde{\symbf{V}}=\symbf{V}\cdot\mathrm{softmax}(\symbf{S})$ \Comment*{$\tilde{\symbf{V}} \in\R^{d_\text{out} \times \ell_\text{x}}$}}
+\end{algorithm}
+
+In GPT-2 small, each layer has $H = 12$ attention heads. Each head
+reads the $768$-dimensional layer-normalized representation of every
+token in the input sequence and projects it to its own
+$64$-dimensional query, key and value vectors, one of each per token.
+In self-attention $\ell_\text{x} = \ell_\text{z} = \ell$, so
+$\symbf{Q}^{h}, \symbf{K}^{h}, \symbf{V}^{h} \in \R^{64 \times \ell}$.
+The heads \textbf{do not split} the input into twelve $64$-dimensional
+pieces; each applies its own learned projections
+$\symbf{W}_{\symbf{q}}^{h}, \symbf{W}_{\symbf{k}}^{h},
+\symbf{W}_{\symbf{v}}^{h} \in \R^{64 \times 768}$
+to the whole representation.
+
+Line~2 of Algorithm~5 calls Algorithm~\ref{alg:attn} once per head,
+passing that head's parameters; inside Algorithm~\ref{alg:attn} we
+drop the head index $h$. Lines~1--3 apply the affine map
+$\symbf{x} \mapsto \symbf{W}_{\symbf{q}}\symbf{x} + \symbf{b}_{\symbf{q}}$
+to every column of the primary sequence $\symbf{X}$, giving
+$d_\text{attn} = 64$-dimensional queries, and the maps
+$\symbf{z} \mapsto \symbf{W}_{\symbf{k}}\symbf{z} + \symbf{b}_{\symbf{k}}$ and
+$\symbf{z} \mapsto \symbf{W}_{\symbf{v}}\symbf{z} + \symbf{b}_{\symbf{v}}$
+to every column of the context sequence $\symbf{Z}$, giving
+$d_\text{attn} = 64$-dimensional keys and $d_\text{out} = 64$-dimensional
+values. In GPT-2's self-attention, $\symbf{Z} = \symbf{X}$.
+
+Line~4 divides each query--key dot product by
+$\sqrt{d_\text{attn}} = 8$, and line~5 sets the scores at masked
+positions to $-\infty$. In line~6, a softmax over the context
+positions, taken one column of scores at a time, gives the attention
+weights of each query, and the product
+$\symbf{V}\cdot\mathrm{softmax}(\symbf{S})$ forms, for each query
+token, the weighted average of the value vectors under those weights:
+\[
+  \tilde{\symbf{V}}[:, t_\text{x}] = \sum_{t_\text{z}=1}^{\ell_\text{z}}
+  \mathrm{softmax}(\symbf{S})[t_\text{z}, t_\text{x}]\;\symbf{V}[:, t_\text{z}].
+\]
+Because the softmax weights are non-negative and sum to $1$, each
+output is a convex combination of the value vectors, and since
+$\exp(-\infty) = 0$, masked positions receive weight exactly $0$.
+
+Each head therefore outputs one $64$-dimensional vector per query
+token. Line~3 of Algorithm~5 stacks the twelve head outputs into a
+vector of $H\,d_\text{mid} = 768$ entries for each query token, forming
+$\symbf{Y} \in \R^{768 \times \ell_\text{x}}$, and line~4 applies the
+output projection:
+\[
+  \tilde{\symbf{V}} = \symbf{W}_{\symbf{o}}\symbf{Y}
+    + \symbf{b}_{\symbf{o}}\symbf{1}_{\ell_\text{x}}^{\Trans},
+  \qquad
+  \symbf{W}_{\symbf{o}} \in \R^{768 \times 768},\;
+  \symbf{b}_{\symbf{o}} \in \R^{768}.
+\]
+Note the name clash: in Algorithm~5, $d_\text{out} = 768$ is the size
+of this final output, whereas in Algorithm~\ref{alg:attn} $d_\text{out}
+= 64$ is the size of a single head's output, which Algorithm~5 calls
+$d_\text{mid}$.
+
+The multi-head output $\tilde{\symbf{V}} \in \R^{768 \times \ell_\text{x}}$
+contains the updated token representations. Each column incorporates
+information from the positions that token attends to. Under the causal
+mask, $\tilde{\symbf{V}}[:, 1{:}t]$ depends only on $\symbf{X}[:, 1{:}t]$.
+Every other operation in the network (the embeddings, residual
+connections, layer normalization, MLP, and unembedding) acts on each
+column separately. Causal self-attention is thus the only step that
+mixes information across positions, and each position attends only to
+itself and earlier positions. Applying this reasoning layer by layer,
+column $t$ of the final output depends only on the tokens $x[1{:}t]$
+and can therefore be used to predict $x[t+1]$.
+
+\subsection*{Prediction and the Causal Mask}
+Nothing in the prefix $x[1{:}t]$ determines $x[t+1]$. To
+``predict'' $x[t+1]$ means to estimate its conditional distribution
+$\hat{P}(x[t+1] \mid x[1{:}t])$ from the observed prefix, not to
+determine it with certainty. The knowledge behind this estimate lies
+in the trained parameters $\hat{\symbf{\theta}}$, which hold what was
+learned from the training corpus (for GPT-2, about 8 million web
+documents, WebText): which tokens tend to follow which contexts,
+across a very large number of examples. The prefix selects the
+context while $\hat{\symbf{\theta}}$ supplies what usually comes
+next in such contexts.
+
+The causal mask ensures that this estimate never uses the answer, or
+any later token. This matters most in training, where the whole
+sequence is present in the input and column $t$ could otherwise read
+$x[t+1]$ directly. At inference there is nothing later to hide, but
+the mask stays.
+
+\newpage
+%\text{the query, key and value projections.}
+% $K^{h}\leftarrow W^{h}_{\!\!\!k} \, X+b_k\mathbf{1}^{\Trans}_{\ell_\text{z}}$ \Comment*{Key $\in\R^{d_{\text{attn}}\times\ell_{\text{z}}}$}
+
+\setcounter{algocf}{4}
+\begin{algorithm}[H]
+\caption{$\tilde{V}\leftarrow \textsc{MHAttention}(X, Z, \mathcal{W}, \mathrm{Mask})$}
+\label{alg:mha}
+    \Input{$X\in\R^{d_\text{x} \times \ell_{\text{x}}}$ \hfill layer-normalized primary sequence.\\
+                $Z\in\R^{d_z \times \ell_{\text{z}}}$ \hfill layer-normalized context sequence.\\
+                               \hfill $X = Z$, $\ell_{\text{x}} = \ell_{\text{z}}$}
+    \Output{$\tilde{V} \in \R^{d_\text{out} \times \ell_{\text{x}}}$ \hfill attention output.}
+    \Hyperparameters{$H=12$; $\mathrm{Mask}\in\{0,1\}^{\ell_{\text{z}} \times \ell_{\text{x}}}$}
+    \Parameters{$\mathcal{W}$ consisting of:\\
+        \hspace*{-2em}\textbf{for} $h\in[12]$: $W_{qkv}^h$ consisting of:\\
+            \hspace*{-2em}\quad $\mid W_q^h \in \R^{d_\text{attn} \times d_\text{x}}, \, b^h_q \in R^{d_\text{attn}}$\vspace*{3pt}\\
+            \hspace*{-2em}\quad $\mid W_k^h \in \R^{d_\text{attn} \times d_z}, \, b^h_k \in R^{d_\text{attn}}$\vspace*{3pt}\\
+            \hspace*{-2em}\quad $\mid W_v^h \in \R^{d_\text{mid}  \times d_z}, \, b^h_v \in \R^d_\text{mid} $\vspace*{3pt}\\
+        \hspace*{-2em}$W_o \in \R^{d_\text{out}\times(h \cdot d_\text{mid})}=\R^{d_\text{out} \times d_\text{out}}$, $b_o\in\R^{d_\text{out}}$, \hfill output projection.}
+    \BlankLine
+    \For{$h=1,2,\dots,12$}{
+    $Y^h\leftarrow \textsc{Attention}(X, X, W_{qkv}^h,\mathrm{Mask})$ \Comment*{Algorithm~\ref{alg:attn}; $Y^h\in\R^{64\times\ell}$}
+    }
+    $Y\leftarrow[Y^1;Y^2;\dots;Y^{12}]$ \Comment*{stack heads: $Y\in\R^{768\times\ell}$}
+    \Return{$\tilde{V}=W_oY+b_o\mathbf{1}^{\Trans}$}
+\end{algorithm}
+
+\noindent Note that a column $t$ of the output matrix
+$\tilde{V} \in \R^{d_\text{out} \times \ell_{\text{x}}}$
+is a convex combination of the value vectors $v_{t'}$
+over the permitted positions $t'$.
+
+\newpage
+\section*{Decoder-Transformer}
+
+\setcounter{algocf}{9}
+\begin{algorithm}[H]
+\SetAlgoLined
+\SetAlgoLongEnd
+\caption{$P\leftarrow \textsc{Decoder-Transformer}(x, \symbf\theta)$}
+\label{alg:dtransformer}
+    \Input{$x\in V^*$, a sequence of token IDs. \hfill{$length(x) \le \ell_{\text{max}} \le 1024$}}
+                    \vspace*{4pt}
+    \Output{$P\in(0,1)^{{N_{\text{V}}} \times length(x)}$. \hfill{$N_{\text{V}} = 50257$}}
+                    \vspace*{4pt}
+    \Hyperparameters{$\ell_{\text{max}},\ L \ H, \ d_{\text{e}},\ d_\text{mlp} \in \mathbb{N}$ \\
+                    $\ell_{\text{max}} = 1024,\ L=12 \ H=12, \ d_{\text{e}}=768,\ d_\text{mlp} =3072$ }
+                    \vspace*{4pt}
+    \Parameters{$\symbf\theta$ includes: \vspace*{2pt}\\
+        \hspace*{-4em}$W_e\in\R^{d_{\text{e}} \times N_{\text{V}}}$, \hfill token embeddings.\\
+        \hspace*{-4em}$W_p\in\R^{d_{\text{e}} \times \ell_{\text{max}}}$ \hfill positional embeddings.\\
+        \hspace*{-4em}{\textbf{for}} $l\in[12]$: \hfill{hyperparameters of each layer $\ldots$}\\
+        \hspace*{-4em} \quad $\mid \mathcal{W}_l$, \hfill attention parameters of Algorithm~\ref{alg:mha}.\vspace*{6pt}\\
+        \hspace*{-4em} \quad $\mid \ \gamma^{(1)}_l,\beta^{(1)}_l,\gamma^{(2)}_l,\beta^{(2)}_l\in\R^{d_{\text{e}}}$, \hfill two sets of layer-norm parameters.\vspace*{6pt}\\
+        \hspace*{-4em} \quad $\mid \ W_{\text{mlp1}}^l\in\R^{d_\text{mlp} \times d_{\text{e}}}$, $b_{\text{mlp1}}^l\in\R^{d_\text{mlp}}$, \hfill MLP parameters.\vspace*{6pt}\\
+        \hspace*{-4em} \quad $\mid \ W_{\text{mlp2}}^l\in\R^{d_{\text{e}} \times {d_\text{mlp}}}$, $b_{\text{mlp2}}^l\in\R^{d_{\text{e}}}$, \hfill MLP parameters.\vspace*{6pt}\\
+        \hspace*{-4em}$\gamma,\beta\in\R^{d_{\text{e}}}$, \hfill{final layer-norm parameters.}\vspace*{6pt}\\
+        \hspace*{-4em}$W_u \in \R^{{N_{\text{V}}} \times d_{\text{e}}}$, \hfill the unembedding matrix.}
+    \BlankLine
+    $\ell \leftarrow \mathrm{length}(x), \ \, \ell_\text{x} \leftarrow \mathrm{length}(x)$\;
+    \ForPlain{$i\in[\ell]$} {
+        \nonl $t \leftarrow x[i]$ \Comment*{next token id}
+        \nonl $e_i \leftarrow W_e[:,t] + W_p[:,i]$ \Comment*{token embedding; $e_i \in \R^{768}$}
+    }
+    \LinesNumbered
+    $X\leftarrow[e_1,e_2,\dots,e_\ell]$ \Comment*{$X\in\R^{768\times\ell}$}
+    \BlankLine
+    \For{$l=1,2,\dots,12$} {
+        \ForPlain{$t\in[\ell]$} {
+            \nonl $\tilde{X}[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t]\mid\gamma^{(1)}_l,\beta^{(1)}_l)$\;
+        }
+        \vspace*{10pt}
+        \tcc{residual attention mixes the unnormalized $x$.}
+        $X\leftarrow X+\textsc{MHAttention}(\tilde{X}, \tilde{X}, \mathcal{W}_l,\mathrm{Mask})$ \Comment*{Algorithm~\ref{alg:mha}}
+        \ForPlain{$t\in[\ell]$} {
+            \nonl $\tilde{X}[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t], \gamma^{(2)}_l,\beta^{(2)}_l)$\;
+        }
+        \LinesNumbered \vspace*{10pt}
+        \tcc{residual attention $x$.}
+        $X\leftarrow X+W_{\text{mlp2}}^l\,\mathtt{GELU}\!\left(W_{\text{mlp1}}^l\tilde{X}+b_{\text{mlp1}}^l\mathbf{1}^{\Trans}\right)+b_{\text{mlp2}}^l\mathbf{1}^{\Trans}_{\color{red}{\ell_{\text{x}}}}$ \Comment*{$768\to3072\to768$}
+    }
+    \BlankLine
+    \ForPlain{$t\in[\ell]$} {
+        \nonl $X[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t], \gamma,\beta)$\;
+    }
+    \BlankLine\BlankLine
+    \Return{$P=\mathrm{softmax}(W_uX)$}
+\end{algorithm}
+
+\newpage
+\section*{Decoder-Inference}
+The hyperparameters $\ell_{\text{gen}} \in \mathbb{N}$ and
+$\tau \in (0,\infty)$ belong to DInference,
+not to DTransformer. They are not part of the trained
+parameters $\hat{\symbf{\theta}}$ and are chosen at
+inference time.
+
+$\ell_{\text{gen}}$ is the number of tokens generated, and hence
+the number of calls to DTransformer. Since the last call sees
+$\ell + \ell_{\text{gen}} - 1$ tokens, we need
+$\ell + \ell_{\text{gen}} - 1 \le \ell_{\max}$.
+
+$\tau$ is the sampling temperature. Each new token is drawn from
+$\symbf{q} \propto \symbf{p}^{1/\tau}$, where $\symbf{p}$ is the
+last column of $\symbf{P}$. With $\tau = 1$ we sample from
+$\symbf{p}$ itself. With $\tau < 1$ the distribution is sharpened,
+and as $\tau \to 0$ sampling becomes greedy $\arg\max$ decoding
+(it concentrates all its mass on the most probable token).
+With $\tau > 1$ the distribution is flattened, approaching
+the uniform distribution over tokens as $\tau \to \infty$.
+
+For a fixed input sequence, neither \(\ell_{\text{gen}}\)
+nor \(\tau\) changes the \(\symbf{P}\) returned by
+DTransformer. $\ell_{\text{gen}}$ determines how many
+tokens are generated, and $\tau$ how each next token
+is selected. Because a selected token becomes part of the
+next input sequence, changing \(\tau\) (or simply a
+different random draw) can indirectly change
+\(\symbf{P}\) at later generation steps.
+
+\setcounter{algocf}{13}
+\begin{algorithm}[H]
+\caption{$y\leftarrow \textsc{DInference}(x,\widehat\theta)$}
+\label{alg:dinference}
+    \Input{$\widehat\theta$, Trained parameters \hfill(shapes as in Algorithm~\ref{alg:dtransformer}).}
+    \Input{$x\in V^*$, \hfill a prompt, $\mathrm{length}(x)\le 1024$.}
+    \Output{$y\in V^*$, \hfill model's continuation of the prompt.}
+    \Hyperparameters{$\ell_\text{gen}\in\mathbb{N}$, $\tau\in(0,\infty)$ \hfill inference-time choices.\\
+    \hfill{}}
+    \BlankLine
+    $\ell\leftarrow\mathrm{length}(x)$\;
+    \For{$i=1,2,\dots,\ell_\text{gen}$} {
+        $P\leftarrow \textsc{DTransformer}(x, \widehat\theta)$ \Comment*{Algorithm~\ref{alg:dtransformer}}
+        $\symbf{p}\leftarrow P[:,\ell+i-1]$\;
+        sample a token $y_i$ from $\symbf{q} \propto \symbf{p}^{1/\tau}$\;
+        $x\leftarrow[x,y_i]$\;
+    }
+    \vspace*{2pt}
+    \Return{$y=x[\ell{+}1:\ell+\ell_\text{gen}]$}
+\end{algorithm}
+
+With fixed $\widehat\theta$, Algorithm 10 is a deterministic
+function: the same $x$ always gives the same $P$. Every
+line in it is a fixed computation with no randomness:
+embedding lookups, layer norm, matrix products, softmax and GELU.
+
+The explicit randomness in Algorithm 14 is in line 5,
+where \(y\) is sampled from $y$ is sampled
+from $q \propto p^(1/\tau)$. Therefore, repeated runs
+from the same prompt can produce altogether different continuations.
+If we replace sampling with greedy decoding, DInference
+becomes deterministic for fixed parameters and
+generation length, provided ties are broken by
+a fixed rule.
+
+Further, Algorithm 10 has no dropout, and GPT-2's
+published inference code (found in src/model.py) does not
+use dropout. In frameworks that include dropout,
+it is switched off during inference.
+
+On GPUs, numerical results can sometimes vary between
+repeated runs because some operations are nondeterministic.
+Results can also differ across hardware, kernels, or
+precision settings: floating-point addition is not associative,
+so a different order of summation can change the last few bits.
+This is an implementation-level effect, not part of the
+mathematical algorithm. Even with greedy decoding,
+a sufficiently small numerical difference can flip the
+argmax between two closely tied tokens.
+
+\newpage
+
+\section*{Parameter-count check}
+Summing every shape in Algorithm~\ref{alg:dtransformer}'s
+parameter list (with Algorithm~\ref{alg:mha}'s attention parameters,
+$12\times(3\times(64{\times}768+64))+768{\times}768+768=23{,}62{,}368$
+per layer, expanded in):
+\begin{align*}
+    & \underbrace{768\,{\times}\,50257}_{W_e} \, + \\[2pt]
+    & \underbrace{768\,{\times}\,1024}_{W_p} \, + \\[2pt]
+    & 12\,\big(\underbrace{23{,}62{,}368}_{\text{attn/layer}} \, +
+    \underbrace{3{,}072}_{\text{LN/layer}} \, +
+    \underbrace{47{,}22{,}432}_{\text{MLP/layer}}\big) \, + \\[2pt]
+    & \underbrace{1{,}536}_{\text{final LN}} \\[2pt]
+    & = 12{,}44{,}39{,}808
+\end{align*}
+with $W_u$ tied to $W_e$ (untying adds another $768{\times}50257\approx38.6$M, giving $\approx163$M).
+$124.4$M matches the commonly cited ``124M'' parameter count for GPT2 small model.
+
+\end{document}

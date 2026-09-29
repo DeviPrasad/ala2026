@@ -16,22 +16,22 @@
 
 \setmonofont{DejaVu Sans Mono}[Scale=1.2]
 \setmainfont{Libertinus Serif}[Scale=1.2]
-\setsansfont{Libertinus Sans}[Scale=1.6]
-\setmathfont{STIXTwoMath-Regular.otf}[Scale=1.5]
+\setsansfont{Libertinus Sans}[Scale=1.2]
+\setmathfont{STIXTwoMath-Regular.otf}[Scale=1.2]
 
 \newcommand{\Matrix}[1]{\textbf{#1}}
 \newcommand{\Vector}[1]{\textbf{#1}}
 \newcommand{\MMat}[1]{\mathbf{#1}}
-\newcommand{\MVec}[1]{\mathbf{#1}}
+\newcommand{\MVec}[1]{\textbf{#1}}
 \newcommand{\Norm}[1]{\lVert {{#1}} \rVert}
 \newcommand{\NormBeta}[1]{\lVert \beta \mathbf{#1} \rVert}
 \newcommand{\NormConst}[1]{\lVert #1 \rVert}
 \newcommand{\Trans}{\text{\raisebox{0.5ex}{\scalebox{0.75}{T}}}}
 \newcommand{\abs}[1]{\lvert {#1} \rvert}
-\newcommand{\Avg}[1]{\mathbf{avg}{(\MVec{#1})}}
-\newcommand{\AvgVec}[1]{\mathbf{avg}{(\MVec{#1})}}
+\newcommand{\Avg}[1]{{\mathbf{avg}}{(\MVec{#1})}}
+\newcommand{\AvgVec}[1]{{\mathbf{avg}}{(\MVec{#1})}}
 \newcommand{\AvgDemeanedVec}[1]{\mathbf{avg}{(\tilde\MVec{#1})}}
-\newcommand{\DemeanedVec}[1]{\tilde\MVec{#1}}
+\newcommand{\DemeanedVec}[1]{\tilde\textbf{#1}}
 \newcommand{\Std}[1]{\mathbf{std}(\MVec{#1})}
 
 \title{Standard Deviation of a Standardized Vector}
@@ -83,7 +83,7 @@ Let us try to determine $\Std{z}$.
             &= \dfrac{\Norm{z}}{\sqrt{n}} \qquad\qquad \because \, \Avg{z} = 0 \\[4pt]
             &= \dfrac{1}{\sqrt{n}} \left\lVert \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \ \,\DemeanedVec{x} \right\rVert \\[4pt]
             &= \dfrac{1}{\sqrt{n}} \cdot \dfrac{\sqrt{n}}{\Norm{\DemeanedVec{x}}} \cdot \Norm{\DemeanedVec{x}}
-                \qquad\qquad \because \, \Norm{c\,\MVec{v}} = |c|\,\Norm{v} \emph{ for } c > 0 \\[4pt]
+                \qquad\qquad \because \, \Norm{c\,\MVec{v}} = |c|\,\Norm{\MVec{v}} \emph{ for } c > 0 \\[4pt]
             &= 1
 \end{align*}
 
