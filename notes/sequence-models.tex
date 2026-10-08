@@ -1,0 +1,138 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{unicode-math}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{nicematrix}
+\usepackage{graphicx}
+\usepackage[ruled,linesnumbered,noend,vlined]{algorithm2e}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\iffalse
+%\usepackage{ebgaramond}
+\fi
+
+\usepackage{setspace}
+
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+\setlength{\droptitle}{-2cm}
+\pagecolor{yellow!8}
+
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\definecolor{charcoal}{HTML}{2D2D2D} % Softens the ink intensity
+
+\iftrue
+\setstretch{1.025} % a little more space between lines
+\setmainfont{texgyrepagella}[
+  Extension = .otf,
+  UprightFont = *-regular,
+  BoldFont = *-bold,
+  ItalicFont = *-italic,
+  BoldItalicFont = *-bolditalic,
+  Color=charcoal,
+]
+\fi
+
+\setmathfont{texgyrepagella-math.otf}
+
+\iffalse
+\setmainfont{Libertinus Serif}[Color=charcoal]
+%\setsansfont{Libertinus Sans}[scale=0.5]
+%\setmonofont{DejaVu Sans Mono}[scale=0.5]
+\setmathfont{STIXTwoMath-Regular.otf}
+%\setmathfont{STIX Two Math}
+\fi
+
+\newcommand{\scaletop}[1]{\raisebox{1.5pt}{\scalebox{0.75}{$#1\top$}}}
+\newcommand{\Trans}{{\mathpalette\scaletop\relax}}
+
+\pretitle{\begin{center}\LARGE\addfontfeatures{LetterSpace=-1.5}}
+\posttitle{\end{center}\vspace*{-0.5em}}
+\preauthor{\begin{center}\large\addfontfeatures{LetterSpace=-1.5}}
+\postauthor{\end{center}\vspace*{-1.5cm}}
+%\postdate{\vspace*{-1em}}
+
+\title{Recurrent Neural Networks and Language Models}
+\author{Devi Prasad M -- October 2026}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Language models}
+\label{sec:lm-intro}
+
+Informally, a language model is a function that, given a
+sequence of words, returns a probability distribution over
+the vocabulary: a probability for each word that could come
+next. It can also score a whole sequence, such as a
+sentence, with a single probability. Assigning a joint
+probability to a sequence of discrete tokens is useful in
+many domains besides language. However, natural language
+processing has shaped sequence modeling so strongly that the
+name ``language model'' is commonly used for such models,
+regardless of the kind of data they handle.
+
+Applying the chain rule of probability turns language
+modeling into a series of next-token predictions. The
+joint probability of a sequence factors, from left to right,
+into conditional probabilities:
+\[
+P(x_1, \ldots, x_T) = P(x_1) \prod_{t=2}^{T} P(x_t \mid x_1, \ldots, x_{t-1}).
+\]
+With discrete tokens such as words, each factor is the
+output of a probabilistic classifier: the model reads
+the preceding tokens and returns a probability for every
+token in the vocabulary as the next one.
+
+In practice, a model can condition on only a bounded
+number of preceding tokens, called its
+\emph{context window}. Section~\ref{sec:lm-formal} makes
+this informal idea precise.
+
+\section{Formal definition}
+\label{sec:lm-formal}
+
+Let \(V\) be a finite vocabulary and let \(K \ge 1\)
+be an integer, the \emph{context window size}. For
+\(n \ge 0\), \(V^n\) denotes the set of sequences of
+length \(n\) over \(V\), with \(V^0 = \{\varepsilon\}\),
+and \(V^{<K} = \bigcup_{n=0}^{K-1} V^n\). For
+\(x = (x_1, \dots, x_n)\) we write
+\(x_{<t} = (x_1, \dots, x_{t-1})\),
+with \(x_{<1} = \varepsilon\).
+
+\begin{definition}[Language model with context window \(K\)]
+A \emph{language model with context window \(K\)} is
+a probability distribution \(P_K\) over \(V^K\),
+i.e.\ a function \(P_K : V^K \to [0,1]\) with
+\(\sum_{x \in V^K} P_K(x) = 1\).
+\end{definition}
+
+\begin{definition}[Autoregressive parameterization]
+An \emph{autoregressive model with context window \(K\)}
+is a family of conditional distributions
+\(p(\cdot \mid c)\) over \(V\), one for each context
+\(c \in V^{<K}\). It defines
+\[
+    P_K(x_{1:K}) = \prod_{t=1}^{K} p(x_t \mid x_{<t}),
+    \qquad x_{1:K} \in V^K .
+\]
+\end{definition}
+
+Summing out \(x_K, x_{K-1}, \dots, x_1\) in turn, each
+sum equals \(1\) because each \(p(\cdot \mid c)\) is a
+distribution over \(V\); hence \(P_K\) is a language
+model with context window \(K\). Each prediction
+conditions on at most \(K-1\) preceding tokens.
+\end{document}
