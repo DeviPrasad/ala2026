@@ -10,6 +10,7 @@
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{positioning}
 \usepackage{booktabs}
+\usepackage{array}
 
 \setbeamercolor{background canvas}{bg=black}
 \setbeamercolor{normal text}{fg=white}
@@ -174,6 +175,103 @@
         actually arrives, not at $x$.}
 
     \vfill
+\end{frame}
+
+
+% ---------------------------------------------------------------
+\definecolor{hypblue}{RGB}{110,180,255}
+\definecolor{hyporange}{RGB}{240,140,30}
+\definecolor{hypgreen}{RGB}{40,170,90}
+
+\begin{frame}\FrameTitle{The Chain Rule: Watching a Nudge Grow}{Unit 3}
+    \textbf{Straight lines:} $y = 3x$, \ $z = 2y$. Nudge $x$ from $1$ to $1.1$.
+
+    \begin{center}
+    \begin{tikzpicture}[
+        seg/.style  = {line width=3pt},
+        tick/.style = {thick},
+        lab/.style  = {below, font=\footnotesize},
+        name/.style = {left, font=\small}
+    ]
+        % x line
+        \draw[gray] (0,2.4) -- (6.4,2.4);
+        \node[name] at (0,2.4) {$x$};
+        \draw[seg, hypgreen] (0.6,2.4) -- (1.2,2.4);
+        \draw[tick] (0.6,2.3) -- (0.6,2.5);  \node[lab] at (0.6,2.3) {$1$};
+        \draw[tick] (1.2,2.3) -- (1.2,2.5);  \node[lab] at (1.25,2.3) {$1.1$};
+        \node[right, font=\footnotesize, hypgreen] at (6.5,2.4) {$\Delta x = 0.1$};
+
+        % y line
+        \draw[gray] (0,1.2) -- (6.4,1.2);
+        \node[name] at (0,1.2) {$y$};
+        \draw[seg, hypblue] (0.6,1.2) -- (2.4,1.2);
+        \draw[tick] (0.6,1.1) -- (0.6,1.3);  \node[lab] at (0.6,1.1) {$3$};
+        \draw[tick] (2.4,1.1) -- (2.4,1.3);  \node[lab] at (2.4,1.1) {$3.3$};
+        \node[right, font=\footnotesize, hypblue] at (6.5,1.2) {$\Delta y = 0.3$};
+
+        % z line
+        \draw[gray] (0,0) -- (6.4,0);
+        \node[name] at (0,0) {$z$};
+        \draw[seg, hyporange] (0.6,0) -- (4.2,0);
+        \draw[tick] (0.6,-0.1) -- (0.6,0.1);  \node[lab] at (0.6,-0.1) {$6$};
+        \draw[tick] (4.2,-0.1) -- (4.2,0.1);  \node[lab] at (4.2,-0.1) {$6.6$};
+        \node[right, font=\footnotesize, hyporange] at (6.5,0) {$\Delta z = 0.6$};
+
+        % stretch arrows
+        \draw[->, thick] (3.2,2.25) -- node[right, font=\small]{$\times 3$} (3.2,1.4);
+        \draw[->, thick] (5.0,1.05) -- node[right, font=\small]{$\times 2$} (5.0,0.2);
+    \end{tikzpicture}
+    \end{center}
+
+    The derivative is the \textbf{stretch factor}:
+    \[
+        \frac{dy}{dx} = 3, \qquad \frac{dz}{dy} = 2, \qquad
+        \frac{dz}{dx} = 3 \times 2 = 6.
+    \]
+    Check: $z = 2(3x) = 6x$.
+
+    %\medskip
+    %\textbf{On a curve,} the same picture holds, but only for small nudges
+    %(next slide).
+\end{frame}
+
+\begin{frame}\FrameTitle{On Curves, the Chain Rule Holds Locally}{Unit 3}
+    \vspace{-1em}
+    {\small
+    $y = x^3$, \ $z = y^2$, starting at $x = 1$. The derivatives predict
+    \[
+        \frac{dy}{dx} = 3x^2 = 3, \qquad
+        \frac{dz}{dy} = 2y = 2, \qquad
+        \frac{dz}{dx} = 3 \times 2 = 6.
+    \]
+
+    \vspace{-1mm}
+    Now nudge $x$ by less and less:
+    \begin{center}
+    \scriptsize
+    \begin{tabular}{l l c l c c}
+        \toprule
+        $\Delta x$ & $\Delta y$ & $\Delta y / \Delta x$ &
+        $\Delta z$ & $\Delta z / \Delta y$ & $\Delta z / \Delta x$ \\
+        \midrule
+        $0.1$   & $0.331$     & $3.31$   & $0.7716$   & $2.331$  & $7.716$ \\
+        $0.01$  & $0.030301$  & $3.0301$ & $0.061520$ & $2.0303$ & $6.152$ \\
+        $0.001$ & $0.0030030$ & $3.0030$ & $0.0060150$ & $2.0030$ & $6.015$ \\
+        \midrule
+        $\to 0$ &             & $\to 3$  &            & $\to 2$  & $\to 6$ \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    \small
+    \begin{itemize}
+        \item \textbf{Why not exactly $0.03$?} The slope predicts $0.03$;
+              the extra $0.000301$ comes from the curve bending.
+              Shrink the nudge $10\times$ and the extra shrinks $100\times$
+              (to $0.000003$), so the slope's prediction takes over.
+        \item In every row, $\tfrac{\Delta z}{\Delta x}
+              = \tfrac{\Delta z}{\Delta y}\cdot\tfrac{\Delta y}{\Delta x}$
+              exactly. As $\Delta x \to 0$, the factors become $3$ and $2$.
+    \end{itemize}}
 \end{frame}
 
 %% {\tiny\color{lightblue}\url{https://www.3blue1brown.com/lessons/chain-rule-and-product-rule/}}%
@@ -440,6 +538,318 @@ Simplify $\sigma(-z) = 1/(1+e^{z})$ into four steps.
     \end{itemize}
 \end{frame}
 
+% ---------------------------------------------------------
+% Non-differentiable points
+% ---------------------------------------------------------
+\pgfplotsset{
+    kink/.style = {
+        width=0.34\textwidth, height=0.34\textwidth,
+        axis lines=middle, ymin=-1.6, ymax=2.3,
+        xtick={-1,1,2}, ytick={1,2},
+        tick label style={font=\scriptsize},
+        clip=true, enlargelimits=false,
+    },
+    curve/.style     = {very thick, yellow, samples=2},
+    lefttan/.style   = {thick, dashed, orange!100!black, samples=2},
+    righttan/.style  = {thick, dashed, green!100!black, samples=2},
+    kinkpt/.style    = {only marks, mark=*, mark size=2pt, black},
+}
+
+\begin{frame}\FrameTitle{When Left and Right Slopes Disagree}{Unit 3}
+    %\centering
+    \begin{center}
+    \footnotesize
+    \begin{tabular}{@{}*{3}{>{\centering\arraybackslash}p{0.30\textwidth}}@{}}
+        % |x| -------------------------------------------------------
+        \begin{tikzpicture}
+        \begin{axis}[kink, xmin=-2, xmax=2]
+            \addplot[lefttan,  domain=0:2]  {-x};
+            \addplot[righttan, domain=-2:0] {x};
+            \addplot[curve,    domain=-2:0] {-x};
+            \addplot[curve,    domain=0:2]  {x};
+            \addplot[kinkpt] coordinates {(0,0)};
+        \end{axis}
+        \end{tikzpicture}
+        &
+        % ReLU ------------------------------------------------------
+        \begin{tikzpicture}
+        \begin{axis}[kink, xmin=-2, xmax=2]
+            \addplot[lefttan,  domain=0:2]  {0};
+            \addplot[righttan, domain=-2:0] {x};
+            \addplot[curve,    domain=-2:0] {0};
+            \addplot[curve,    domain=0:2]  {x};
+            \addplot[kinkpt] coordinates {(0,0)};
+        \end{axis}
+        \end{tikzpicture}
+        &
+        % Hinge -----------------------------------------------------
+        \begin{tikzpicture}
+        \begin{axis}[kink, xmin=-1, xmax=3]
+            \addplot[lefttan,  domain=1:3]  {1-x};
+            \addplot[righttan, domain=-1:1] {0};
+            \addplot[curve,    domain=-1:1] {1-x};
+            \addplot[curve,    domain=1:3]  {0};
+            \addplot[kinkpt] coordinates {(1,0)};
+        \end{axis}
+        \end{tikzpicture}
+        \\[2pt]
+        \textbf{Absolute value} & \textbf{ReLU} & \textbf{Hinge loss} \\
+        $f(x) = |x|$ & $f(x) = \max(0, x)$ & $f(x) = \max(0, 1-x)$ \\
+        kink at $x=0$ & kink at $x=0$ & kink at $x=1$ \\[2pt]
+        \textcolor{orange!100!black}{$f'_-(0) = -1$} &
+        \textcolor{orange!100!black}{$f'_-(0) = 0$}  &
+        \textcolor{orange!100!black}{$f'_-(1) = -1$} \\
+        \textcolor{green!100!black}{$f'_+(0) = +1$} &
+        \textcolor{green!100!black}{$f'_+(0) = 1$}  &
+        \textcolor{green!100!black}{$f'_+(1) = 0$}
+    \end{tabular}
+    \end{center}
+
+    \vspace*{1em}
+    \small
+    Dashed lines continue each side's slope past the kink:
+    {\color{orange!100!black}left slope} and {\color{green!100!black}right slope}.
+
+    \vspace*{1em}
+    Two different lines: no single tangent, $f'$ does not exist there.
+\end{frame}
+
+
+
+\definecolor{hypblue}{RGB}{66,133,244}
+\definecolor{hyporange}{RGB}{240,140,30}
+\definecolor{hypgreen}{RGB}{40,170,90}
+\definecolor{hypred}{RGB}{225,70,70}
+
+% ---------------------------------------------------------------
+\begin{frame}\FrameTitle{From Circle to Hyperbola}{Unit 3}
+    \begin{columns}[t]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{Circle} \; $x^2 + y^2 = 1$
+
+            \medskip
+            \begin{tikzpicture}[scale=1.05]
+                \fill[hypblue!35] (0,0) -- (1,0) arc[start angle=0, end angle=51.6, radius=1] -- cycle;
+                \draw[->, gray] (-1.3,0) -- (2.3,0) node[right] {\scriptsize $x$};
+                \draw[->, gray] (0,-1.3) -- (0,1.5) node[above] {\scriptsize $y$};
+                \draw[very thick, hypblue] (0,0) circle[radius=1];
+                \draw[thick] (0,0) -- (51.6:1);
+                \fill (51.6:1) circle[radius=1.6pt];
+                \node[above right, font=\footnotesize] at (51.6:1) {$(\cos t,\ \sin t)$};
+                \node[font=\tiny, color=black] at (0.65,0.25) {$\tfrac{t}{2}$};
+            \end{tikzpicture}
+
+            \medskip
+            $\cos^2 t + \sin^2 t = 1$
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \centering
+            \textbf{Hyperbola} \; $x^2 - y^2 = 1$
+
+            \medskip
+            \begin{tikzpicture}[scale=1.05]
+                \fill[hyporange!40] (0,0) -- plot[domain=0:0.9, variable=\s, samples=30]
+                    ({cosh(\s)}, {sinh(\s)}) -- cycle;
+                \draw[->, gray] (-0.3,0) -- (2.3,0) node[right] {\scriptsize $x$};
+                \draw[->, gray] (0,-1.3) -- (0,1.5) node[above] {\scriptsize $y$};
+                \draw[dashed, gray] (0,0) -- (1.4,1.4);
+                \draw[dashed, gray] (0,0) -- (1.3,-1.3);
+                \draw[very thick, hyporange] plot[domain=-1.08:1.17, variable=\s, samples=60]
+                    ({cosh(\s)}, {sinh(\s)});
+                \draw[thick] (0,0) -- ({cosh(0.9)}, {sinh(0.9)});
+                \fill ({cosh(0.9)}, {sinh(0.9)}) circle[radius=1.6pt];
+                \node[right, font=\footnotesize] at ({cosh(0.9)}, {sinh(0.9)}) {$(\cosh t,\ \sinh t)$};
+                \node[font=\tiny, color=black] at (0.75,0.25) {$\tfrac{t}{2}$};
+            \end{tikzpicture}
+
+            \medskip
+            $\cosh^2 t - \sinh^2 t = 1$
+        \end{column}
+    \end{columns}
+
+    \bigskip
+    Shaded area $= \tfrac{t}{2}$ in both pictures. The hyperbolic pair is built from exponentials:
+    \[
+        \cosh t = \frac{e^{t} + e^{-t}}{2},
+        \qquad
+        \sinh t = \frac{e^{t} - e^{-t}}{2}.
+    \]
+\end{frame}
+
+% ---------------------------------------------------------------
+\begin{frame}\FrameTitle{Derivatives Without Sign Flips}{Unit 3}
+    Differentiate the definitions directly:
+    \[
+        \frac{d}{dt}\cosh t = \frac{e^{t} - e^{-t}}{2} = \sinh t,
+        \qquad
+        \frac{d}{dt}\sinh t = \frac{e^{t} + e^{-t}}{2} = \cosh t.
+    \]
+
+    \vspace*{-2mm}
+    \begin{columns}[c]
+        \begin{column}{0.42\textwidth}
+            \begin{tikzpicture}
+            \begin{axis}[
+                width=\linewidth, height=0.9\linewidth, color=white!80!black,
+                xmin=-2.5, xmax=2.5, ymin=-3.2, ymax=3.2,
+                xtick={-2,-1,1,2}, ytick={-2,2},
+                xlabel={$t$}, axis lines=middle,
+                tick label style={font=\tiny},
+                legend style={at={(0.5,-0.08)}, anchor=north,
+                              font=\tiny, draw=none, fill=none},
+                legend columns=-1,
+                legend style={/tikz/every even column/.append style={column sep=4pt}},
+                legend cell align=left,
+                every axis plot/.append style={samples=81, domain=-2.5:2.5}
+            ]
+                \addplot[very thick, hyporange] {cosh(x)};
+                \addlegendentry{$\cosh t$}
+                \addplot[very thick, hypblue] {sinh(x)};
+                \addlegendentry{$\sinh t$}
+                \addplot[thick, dashed, white!60] {exp(x)/2};
+                \addlegendentry{$\tfrac12 e^{t}$}
+            \end{axis}
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.57\textwidth}
+            \small
+            \begin{itemize}
+                \item Trigonometry has a sign flip, $(\cos t)' = -\sin t$.
+                      The hyperbolic pair has \textbf{none}.
+                \item $e^{t} = \cosh t + \sinh t$: cosh is the
+                      \textbf{even} part of $e^{t}$, sinh the \textbf{odd} part.
+                \item For large $t$, both approach $\tfrac12 e^{t}$ (dashed).
+                %\item A hanging chain takes the shape $y = a\cosh(x/a)$, the \emph{catenary}.%
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------
+\begin{frame}\FrameTitle{tanh: A ``Better'' Sigmoid}{Unit 3}
+    \vspace*{-1em}
+    \[
+        \tanh z = \frac{\sinh z}{\cosh z} = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
+    \]
+    \vspace*{-1em}
+    \begin{columns}[c]
+        \begin{column}{0.40\textwidth}
+            \begin{tikzpicture}
+            \begin{axis}[
+                width=1.1\linewidth, height=1.1\linewidth,
+                xmin=-4, xmax=4, ymin=-1.15, ymax=1.15,
+                xtick={-4,-2,2,4}, ytick={-1,0.5,1},
+                xlabel={$z$}, axis lines=middle,
+                tick label style={font=\scriptsize},
+                legend style={at={(0.5,-0.08)}, anchor=north,
+                              font=\footnotesize, draw=none, fill=none},
+                legend columns=-1,
+                legend style={/tikz/every even column/.append style={column sep=4pt}},
+                legend cell align=left,
+                every axis plot/.append style={samples=81, domain=-4:4}
+            ]
+                \addplot[very thick, hypgreen] {tanh(x)};
+                \addlegendentry{$\tanh z$}
+                \addplot[very thick, hypblue, dashed] {1/(1+exp(-x))};
+                \addlegendentry{$\sigma(z)$}
+                % tangent lines at z = 0: slope 1 for tanh, slope 1/4 for sigma
+                \addplot[thin, hypgreen, domain=-0.9:0.9, forget plot] {x};
+                \addplot[thin, hypblue,  domain=-1.8:1.8, forget plot] {0.5 + x/4};
+                \addplot[only marks, mark=*, mark size=1.6pt, forget plot]
+                    coordinates {(0,0) (0,0.5)};
+            \end{axis}
+            \end{tikzpicture}
+        \end{column}
+        \begin{column}{0.67\textwidth}
+            \small
+            \begin{itemize}
+                \item \textbf{Same S-shape:} $\tanh z = 2\,\sigma(2z) - 1$,
+                      the sigmoid stretched to $(-1, 1)$.
+                \item \textbf{Zero-centred:} $\tanh 0 = 0$, outputs of both
+                      signs. $\sigma$ outputs are always positive.
+                \item \textbf{Steeper:} slope at $0$ is $1$, versus
+                      $\tfrac14$ for $\sigma$ (thin lines).
+                \item \textbf{Still saturates:} flat for large $|z|$,
+                      so gradients still vanish there.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+
+    \medskip
+    {\color{question}{\scriptsize Check: $2\sigma(2z) - 1 = \dfrac{1-e^{-2z}}{1+e^{-2z}}$;
+    multiply top and bottom by $e^{z}$ to get $\tanh z$.}}
+\end{frame}
+
+\begin{frame}\FrameTitle{Recap: The Quotient Rule}{Unit 3}
+    For $h(x) = \dfrac{f(x)}{g(x)}$, wherever $g(x) \neq 0$:
+    \[
+        h'(x) = \frac{f'(x)\,g(x) - f(x)\,g'(x)}{g(x)^2}
+    \]
+    \begin{itemize}
+        \item The order matters: the term with $f'$ comes first.
+        \item The denominator is the original denominator, squared.
+    \end{itemize}
+
+    \medskip
+    \textbf{Example.} $h(x) = \dfrac{x}{1+x^2}$, with $f = x$, $g = 1 + x^2$:
+    \[
+        h'(x) = \frac{1\cdot(1+x^2) - x\cdot 2x}{(1+x^2)^2}
+              = \frac{1 - x^2}{(1+x^2)^2}
+    \]
+\end{frame}
+
+\begin{frame}\FrameTitle{Derivative of Hyperbolic Tangent}{Unit 3}
+    \begin{align*}
+        \frac{d}{dz}\tanh z &= \frac{d}{dz}\,\frac{\sinh z}{\cosh z}\\[3mm]
+            &= \frac{\cosh z \cdot \cosh z - \sinh z \cdot \sinh z}{\cosh^2 z}
+            \qquad \text{(quotient rule)} \\[3mm]
+            &= \frac{\cosh^2 z}{\cosh^2 z} - \frac{\sinh^2 z}{\cosh^2 z} = 1 - \tanh^2 z
+\end{align*}
+%Since $\cosh^2 z - \sinh^2 z = 1$, this also equals $\dfrac{1}{\cosh^2 z}$.
+\end{frame}
+
+\begin{frame}\FrameTitle{Derivative of tanh using the Chain Rule}{Unit 3}
+    Start from $\tanh z = 2\,\sigma(2z) - 1$ and break it into three steps.
+    Above each arrow is the operation; below it, the local derivative.
+
+    \begin{center}
+    \begin{tikzpicture}[
+        var/.style = {circle, draw, thick, minimum size=7mm, inner sep=0pt},
+        op/.style  = {above, font=\footnotesize},
+        loc/.style = {below, font=\footnotesize},
+        node distance = 20mm
+    ]
+        \node[var]             (z) {$z$};
+        \node[var, right=of z] (u) {$u$};
+        \node[var, right=of u] (s) {$s$};
+        \node[var, right=of s] (t) {$t$};
+        \draw[->, thick] (z) -- node[op]{$u = 2z$}       node[loc]{$\frac{du}{dz} = 2$}                    (u);
+        \draw[->, thick] (u) -- node[op]{$s = \sigma(u)$} node[loc]{$\frac{ds}{du} = s(1-s)$}               (s);
+        \draw[->, thick] (s) -- node[op]{$t = 2s - 1$}   node[loc]{$\frac{dt}{ds} = 2$}                    (t);
+    \end{tikzpicture}
+    \end{center}
+
+    \textbf{Chain rule:} multiply the local derivatives.
+    \[
+        \frac{d}{dz}\tanh z
+        = \frac{dt}{ds}\,\frac{ds}{du}\,\frac{du}{dz}
+        = 2 \cdot s(1-s) \cdot 2
+        = 4\,\sigma(2z)\bigl(1-\sigma(2z)\bigr)
+    \]
+
+    \textbf{Rewrite in terms of tanh:} since $t = 2s - 1$,
+    $s = \tfrac{1+\tanh z}{2}$ and $1-s = \tfrac{1-\tanh z}{2}$.
+    \[
+        4 \cdot \frac{1+\tanh z}{2} \cdot \frac{1-\tanh z}{2}
+        = (1+\tanh z)(1-\tanh z)
+        = \boxed{1 - \tanh^2 z}
+    \]
+\end{frame}
+
+%% ---------------------------------------------------------------
+
+%% Gradients in Multiple Dimensions
 \begin{frame}\FrameTitle{Gradients in Multiple Dimensions}{Unit 3}
     \begin{itemize}
         \item \textbf{Partial derivative.} $\partial f/\partial x_j$: change one
