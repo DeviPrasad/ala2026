@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage[ruled,linesnumbered,noend,vlined]{algorithm2e}
 \usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{setspace}
 
 \geometry{a4paper, top=2cm, bottom=2cm, left=2.5cm, right=2.5cm}
 \setlength{\droptitle}{-2cm}
@@ -31,11 +32,27 @@
 \DontPrintSemicolon
 \SetNoFillComment
 
+\iffalse
 %\setmainfont{Libertinus Serif}
 %\setsansfont{Libertinus Sans}[scale=0.5]
 %\setmonofont{DejaVu Sans Mono}[scale=0.5]
 \setmathfont{STIXTwoMath-Regular.otf}
 %\setmathfont{STIX Two Math}
+\fi
+
+\iftrue
+\setstretch{1.025} % a little more space between lines
+\setmainfont{texgyrepagella}[
+  Extension = .otf,
+  UprightFont = *-regular,
+  BoldFont = *-bold,
+  ItalicFont = *-italic,
+  BoldItalicFont = *-bolditalic,
+  Color=charcoal,
+]
+\fi
+
+\setmathfont{texgyrepagella-math.otf}
 
 %
 %\newcommand{\scaletop}[1]{\vcenter{\hbox{\scalebox{0.75}{$#1\Trans$}}}}
@@ -60,9 +77,9 @@
 
 \title{Formal Algorithms for Transformers\\[4pt]
     {\large{Multi-Head Attention, Decoder-Transformer and Decoder-Inference\\using\vspace*{-7pt}\\GPT-2 Small Hyperparameters}}
-     \\{\small\Draft{Draft 3}}}
+     \\{\small\Draft{Draft 4}}}
 \author{Devi Prasad M}
-\date{September, 2026}
+\date{October, 2026}
 
 \begin{document}
 \maketitle
@@ -365,15 +382,15 @@ the transpose of the embedding matrix.
 
 \setcounter{algocf}{5}
 \begin{algorithm}
-    \caption{$\hat{\symbf{e}} \leftarrow \mathtt{layer\_norm}(\symbf{e} \mid \symbf{\gamma}, \symbf{\beta})$}
+    \caption{$\hat{\symbf{e}} \leftarrow \mathtt{layer\_norm}(\symbf{e}, \symbf{\gamma}, \symbf{\beta})$}
     \label{alg:layer_norm}
     \DontPrintSemicolon
-    \tcc{Normalizes layer activations $\symbf{e}$.}
+    % \tcc{Normalizes layer activations $\symbf{e}$.}
     \Input{$\symbf{e} \in \mathbb{R}^{d_{\text{e}}}$, \hfill neural network activations.}
     \Output{$\widehat{\symbf{e}} \in \mathbb{R}^{d_{\text{e}}}$, \hfill normalized activations.}\vspace*{4pt}
     \Parameters{$\symbf{\gamma}, \symbf{\beta} \in \mathbb{R}^{d_{\mathrm{e}}}$, \hfill element-wise scale and offset.}\vspace*{4pt}
-    $\symbf{m} \leftarrow \sum_{i=1}^{d_{\text{e}}} \symbf{e}[i] / d_{\text{e}}$\;\vspace*{3pt}
-    $v \leftarrow \sum_{i=1}^{d_{\text{e}}} (\symbf{e}[i] - \symbf{m})^2 / d_{\mathrm{e}}$\;\vspace*{3pt}
+    $\symbf{m} \leftarrow \sum_{i=1}^{d_{\text{e}}} \symbf{e}[i] / d_{\text{e}}$\;\vspace*{1mm}
+    $v \leftarrow \sum_{i=1}^{d_{\text{e}}} (\symbf{e}[i] - \symbf{m})^2 / d_{\mathrm{e}}$\;\vspace*{1mm}
     \Return $\widehat{\symbf{e}} = \dfrac{\symbf{e} - \symbf{m}}{\sqrt{v}} \odot \symbf{\gamma} + \symbf{\beta}$, \hfill where $\odot$ denotes element-wise multiplication.
 \end{algorithm}
 
