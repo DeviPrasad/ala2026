@@ -1021,11 +1021,12 @@ Larger model $\Rightarrow$ larger batch, \emph{smaller} learning rate: the paper
 % ============================================================ why B is a hyperparameter
 \begin{frame}\FrameTitle{Why the batch size is a hyperparameter}{Unit 3}
 \begin{columns}[T]
-\begin{column}{0.44\linewidth}
+\begin{column}{0.40\linewidth}
   \includegraphics[width=\linewidth]{figures/s8_batchnoise.png}
 \end{column}
-\begin{column}{0.55\linewidth}
-  \begin{itemize}\footnotesize\setlength{\itemsep}{1.6mm}
+\vspace*{-4mm}
+\begin{column}{0.62\linewidth}
+  \begin{itemize}\footnotesize\setlength{\itemsep}{1.4mm}
     \item \textbf{Gradient quality.} $\symbf{g}$ is an average over $B$ samples. The scatter shrinks roughly like $1/\sqrt{B}$ (synthetic example, same true gradient).
     \item \textbf{Learning rate.} The best $\eta$ depends on $B$; GPT-3 pairs larger batches with smaller learning rates.
     \item \textbf{Cost.} Memory and hardware grow with $B$.
@@ -1034,9 +1035,9 @@ Larger model $\Rightarrow$ larger batch, \emph{smaller} learning rate: the paper
   \end{itemize}
 \end{column}
 \end{columns}
-\vfill
-{\color{yellow}\rule{\linewidth}{0.5pt}}\par\vspace{1mm}
-{\raggedright\small\textcolor{yellow}{\textbf{In an LLM:}} $B$ is chosen before training, like $\eta$, and often changed on a schedule.\par}
+%\vfill
+%{\color{yellow}\rule{\linewidth}{0.5pt}}\par\vspace{1mm}
+%{\raggedright\small\textcolor{yellow}{\textbf{In an LLM:}} $B$ is chosen before training, like $\eta$, and often changed on a schedule.\par}
 \end{frame}
 
 

@@ -406,7 +406,7 @@ for online prediction.
 
 \setcounter{algocf}{3}
 \begin{algorithm}[H]
-    \caption{$\tilde{\symbf{V}}\leftarrow \textsc{Attention}(\symbf{X}, \symbf{Z} \mid \mathcal{W}_{\symbf{qkv}}, \mathrm{Mask})$}
+    \caption{$\tilde{\symbf{V}}\leftarrow \textsc{Attention}(\symbf{X}, \symbf{Z}, \mathcal{W}_{\symbf{qkv}}, \mathrm{Mask})$}
     \label{alg:attn}
         \Input{$\symbf{X}\in\R^{d_\text{x} \times \ell_\text{x}}$, $\symbf{Z}\in\R^{d_\text{z} \times \ell_\text{z}}$,
                vector representations of the primary and context sequences.\\
@@ -538,8 +538,8 @@ the mask stays.
             \hspace*{-2em}\quad $\mid W_v^h \in \R^{d_\text{mid}  \times d_z}, \, b^h_v \in \R^d_\text{mid} $\vspace*{3pt}\\
         \hspace*{-2em}$W_o \in \R^{d_\text{out}\times(h \cdot d_\text{mid})}=\R^{d_\text{out} \times d_\text{out}}$, $b_o\in\R^{d_\text{out}}$, \hfill output projection.}
     \BlankLine
-    \For{$h=1,2,\dots,12$}{
-    $Y^h\leftarrow \textsc{Attention}(X, X, W_{qkv}^h,\mathrm{Mask})$ \Comment*{Algorithm~\ref{alg:attn}; $Y^h\in\R^{64\times\ell}$}
+    \For{$h=1,2,\dots,12$} {
+        $Y^h\leftarrow \textsc{Attention}(X, X, W_{qkv}^h, \mathrm{Mask})$ \Comment*{Algorithm~\ref{alg:attn}; $Y^h\in\R^{64\times\ell}$}
     }
     $Y\leftarrow[Y^1;Y^2;\dots;Y^{12}]$ \Comment*{stack heads: $Y\in\R^{768\times\ell}$}
     \Return{$\tilde{V}=W_oY+b_o\mathbf{1}^{\Trans}$}
@@ -589,13 +589,13 @@ over the permitted positions $t'$.
         \ForPlain{$t\in[\ell]$} {
             \nonl $\tilde{X}[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t]\mid\gamma^{(1)}_l,\beta^{(1)}_l)$\;
         }
-        \vspace*{10pt}
+        %\vspace*{10pt}
         \tcc{residual attention mixes the unnormalized $x$.}
         $X\leftarrow X+\textsc{MHAttention}(\tilde{X}, \tilde{X}, \mathcal{W}_l,\mathrm{Mask})$ \Comment*{Algorithm~\ref{alg:mha}}
         \ForPlain{$t\in[\ell]$} {
             \nonl $\tilde{X}[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t], \gamma^{(2)}_l,\beta^{(2)}_l)$\;
         }
-        \LinesNumbered \vspace*{10pt}
+        \LinesNumbered \vspace*{3pt}
         \tcc{residual attention $x$.}
         $X\leftarrow X+W_{\text{mlp2}}^l\,\mathtt{GELU}\!\left(W_{\text{mlp1}}^l\tilde{X}+b_{\text{mlp1}}^l\mathbf{1}^{\Trans}\right)+b_{\text{mlp2}}^l\mathbf{1}^{\Trans}_{\color{red}{\ell_{\text{x}}}}$ \Comment*{$768\to3072\to768$}
     }
@@ -603,7 +603,7 @@ over the permitted positions $t'$.
     \ForPlain{$t\in[\ell]$} {
         \nonl $X[:,t]\leftarrow\mathtt{layer\_norm}(X[:,t], \gamma,\beta)$\;
     }
-    \BlankLine\BlankLine
+    \BlankLine%\BlankLine
     \Return{$P=\mathrm{softmax}(W_uX)$}
 \end{algorithm}
 
