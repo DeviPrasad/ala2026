@@ -1,0 +1,841 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{fontspec}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{unicode-math}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{nicematrix}
+\usepackage{graphicx}
+\usepackage[ruled,linesnumbered,noend,vlined]{algorithm2e}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+\usepackage{setspace}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc}
+\numberwithin{equation}{section} % equations numbered section.number
+
+\geometry{a4paper, top=2.2cm, bottom=2.2cm, left=2.5cm, right=2.5cm}
+\setlength{\droptitle}{-2cm}
+
+\definecolor{charcoal}{HTML}{36454F}
+
+\iftrue
+\setstretch{1.025} % a little more space between lines
+\setmainfont{texgyrepagella}[
+  Extension = .otf,
+  UprightFont = *-regular,
+  BoldFont = *-bold,
+  ItalicFont = *-italic,
+  BoldItalicFont = *-bolditalic,
+  Color=charcoal,
+]
+\fi
+
+\setmathfont{texgyrepagella-math.otf}
+\pagecolor{brown!10}
+
+%
+%\newcommand{\scaletop}[1]{\vcenter{\hbox{\scalebox{0.75}{$#1\Trans$}}}}
+\newcommand{\scaletop}[1]{\raisebox{1.5pt}{\scalebox{0.75}{$#1\top$}}}
+\newcommand{\Trans}{{\mathpalette\scaletop\relax}}
+%%
+\newcommand{\WOne}{\begin{pmatrix}0.5 & 0.25 \\ 0.4 & -0.1 \\ -0.3 & -0.1\end{pmatrix}}
+\newcommand{\bOne}{\begin{pmatrix}0 \\ 0 \\ 0\end{pmatrix}}
+\newcommand{\WTwo}{\begin{pmatrix}0.5 & -0.5 & 0.3 \\ 0.2 & 0.4 & -0.1 \\ 0.1 & 0.6 & 0.5\end{pmatrix}}
+\newcommand{\bTwo}{\begin{pmatrix}0 \\ 0 \\ 0\end{pmatrix}}
+\newcommand{\WThree}{\begin{pmatrix}0.3 & -0.2 & 0.5 \\ -0.4 & 0.6 & 0.1 \\ 0.2 & 0.1 & -0.3\end{pmatrix}}
+\newcommand{\bThree}{\begin{pmatrix}0 \\ 0 \\ 0\end{pmatrix}}
+\newcommand{\xIn}{\begin{pmatrix}1 \\ 2\end{pmatrix}}
+\newcommand{\xTwoIn}{\begin{pmatrix}2 \\ 1\end{pmatrix}}
+\newcommand{\etaVal}{0.1}
+\newcommand{\zOne}{\begin{pmatrix}1.0000 \\ 0.2000 \\ -0.5000\end{pmatrix}}
+\newcommand{\aOne}{\begin{pmatrix}1.0000 \\ 0.2000 \\ 0\end{pmatrix}}
+\newcommand{\zTwo}{\begin{pmatrix}0.4000 \\ 0.2800 \\ 0.2200\end{pmatrix}}
+\newcommand{\aTwo}{\begin{pmatrix}0.4000 \\ 0.2800 \\ 0.2200\end{pmatrix}}
+\newcommand{\zThree}{\begin{pmatrix}0.1740 \\ 0.0300 \\ 0.0420\end{pmatrix}}
+\newcommand{\pOut}{\begin{pmatrix}0.3647 \\ 0.3158 \\ 0.3196\end{pmatrix}}
+\newcommand{\Lzero}{1.1528}
+\newcommand{\lnThree}{1.0986}
+\newcommand{\pTrue}{0.3158}
+\newcommand{\dThree}{\begin{pmatrix}0.3647 \\ -0.6842 \\ 0.3196\end{pmatrix}}
+\newcommand{\dTwo}{\begin{pmatrix}0.4470 \\ -0.4515 \\ 0.0180\end{pmatrix}}
+\newcommand{\dOne}{\begin{pmatrix}0.1350 \\ -0.3933 \\ 0\end{pmatrix}}
+\newcommand{\gWOne}{\begin{pmatrix}0.1350 & 0.2700 \\ -0.3933 & -0.7866 \\ 0 & 0\end{pmatrix}}
+\newcommand{\gbOne}{\begin{pmatrix}0.1350 \\ -0.3933 \\ 0\end{pmatrix}}
+\newcommand{\gWTwo}{\begin{pmatrix}0.4470 & 0.0894 & 0 \\ -0.4515 & -0.0903 & 0 \\ 0.0180 & 0.0036 & 0\end{pmatrix}}
+\newcommand{\gbTwo}{\begin{pmatrix}0.4470 \\ -0.4515 \\ 0.0180\end{pmatrix}}
+\newcommand{\gWThree}{\begin{pmatrix}0.1459 & 0.1021 & 0.0802 \\ -0.2737 & -0.1916 & -0.1505 \\ 0.1278 & 0.0895 & 0.0703\end{pmatrix}}
+\newcommand{\gbThree}{\begin{pmatrix}0.3647 \\ -0.6842 \\ 0.3196\end{pmatrix}}
+\newcommand{\epsVal}{0.01}
+\newcommand{\Lplus}{1.155473}
+\newcommand{\Lminus}{1.150073}
+\newcommand{\fdVal}{0.270010}
+\newcommand{\bpVal}{0.270010}
+\newcommand{\fdRounded}{0.27000}
+\newcommand{\WOneNew}{\begin{pmatrix}0.4865 & 0.2230 \\ 0.4393 & -0.0213 \\ -0.3000 & -0.1000\end{pmatrix}}
+\newcommand{\bOneNew}{\begin{pmatrix}-0.0135 \\ 0.0393 \\ 0\end{pmatrix}}
+\newcommand{\WTwoNew}{\begin{pmatrix}0.4553 & -0.5089 & 0.3000 \\ 0.2452 & 0.4090 & -0.1000 \\ 0.0982 & 0.5996 & 0.5000\end{pmatrix}}
+\newcommand{\bTwoNew}{\begin{pmatrix}-0.0447 \\ 0.0452 \\ -0.0018\end{pmatrix}}
+\newcommand{\WThreeNew}{\begin{pmatrix}0.2854 & -0.2102 & 0.4920 \\ -0.3726 & 0.6192 & 0.1151 \\ 0.1872 & 0.0911 & -0.3070\end{pmatrix}}
+\newcommand{\bThreeNew}{\begin{pmatrix}-0.0365 \\ 0.0684 \\ -0.0320\end{pmatrix}}
+\newcommand{\pAfter}{\begin{pmatrix}0.3190 \\ 0.4077 \\ 0.2733\end{pmatrix}}
+\newcommand{\pTrueAfter}{0.4077}
+\newcommand{\Lone}{0.8972}
+\newcommand{\dropAct}{0.2556}
+\newcommand{\dropPred}{0.2767}
+\newcommand{\gradSq}{2.7666}
+\newcommand{\pTwoOut}{\begin{pmatrix}0.3635 \\ 0.3684 \\ 0.2681\end{pmatrix}}
+\newcommand{\LTwo}{1.3165}
+\newcommand{\Lbatch}{1.2346}
+\newcommand{\dThreeLabelOne}{\begin{pmatrix}-0.6353 \\ 0.3158 \\ 0.3196\end{pmatrix}}
+\newcommand{\LLabelOne}{1.0088}
+\newcommand{\gbThreeZero}{\begin{pmatrix}0.3333 \\ -0.6667 \\ 0.3333\end{pmatrix}}
+% ---- explicit arithmetic (worked_values.tex) ----
+\newcommand{\arZOne}{\begin{aligned}z^{(1)}_{1} &= 0.5\cdot 1 + 0.25\cdot 2 = 1.0000 \\ z^{(1)}_{2} &= 0.4\cdot 1 + (-0.1)\cdot 2 = 0.2000 \\ z^{(1)}_{3} &= (-0.3)\cdot 1 + (-0.1)\cdot 2 = -0.5000\end{aligned}}
+\newcommand{\arZTwo}{\begin{aligned}z^{(2)}_{1} &= 0.5\cdot 1 + (-0.5)\cdot 0.2 + 0.3\cdot 0 = 0.4000 \\ z^{(2)}_{2} &= 0.2\cdot 1 + 0.4\cdot 0.2 + (-0.1)\cdot 0 = 0.2800 \\ z^{(2)}_{3} &= 0.1\cdot 1 + 0.6\cdot 0.2 + 0.5\cdot 0 = 0.2200\end{aligned}}
+\newcommand{\arZThree}{\begin{aligned}z^{(3)}_{1} &= 0.3\cdot 0.4 + (-0.2)\cdot 0.28 + 0.5\cdot 0.22 = 0.1740 \\ z^{(3)}_{2} &= (-0.4)\cdot 0.4 + 0.6\cdot 0.28 + 0.1\cdot 0.22 = 0.0300 \\ z^{(3)}_{3} &= 0.2\cdot 0.4 + 0.1\cdot 0.28 + (-0.3)\cdot 0.22 = 0.0420\end{aligned}}
+\newcommand{\xRow}{\begin{pmatrix}1 & 2\end{pmatrix}}
+\newcommand{\aOneRow}{\begin{pmatrix}1 & 0.2 & 0\end{pmatrix}}
+\newcommand{\aTwoRow}{\begin{pmatrix}0.4 & 0.28 & 0.22\end{pmatrix}}
+\newcommand{\arSoftmax}{\begin{aligned}e^{z^{(3)}_1} &= e^{0.1740} = 1.1901 \\ e^{z^{(3)}_2} &= e^{0.0300} = 1.0305 \\ e^{z^{(3)}_3} &= e^{0.0420} = 1.0429 \\ \textstyle\sum_j e^{z^{(3)}_j} &= 3.2634 \\ q_1 &= 1.1901/3.2634 = 0.3647 \\ q_2 &= 1.0305/3.2634 = 0.3158 \\ q_3 &= 1.0429/3.2634 = 0.3196\end{aligned}}
+\newcommand{\arLoss}{L = -\ln q_2 = -\ln 0.3158 = 1.1528}
+\newcommand{\arDThree}{\begin{aligned}\delta^{(3)}_1 &= q_1 - y_1 = 0.3647 - 0 = 0.3647 \\ \delta^{(3)}_2 &= q_2 - y_2 = 0.3158 - 1 = -0.6842 \\ \delta^{(3)}_3 &= q_3 - y_3 = 0.3196 - 0 = 0.3196\end{aligned}}
+\newcommand{\arDTwo}{\begin{aligned}\delta^{(2)}_{1} &= 0.3\cdot 0.3647 + (-0.4)\cdot (-0.6842) + 0.2\cdot 0.3196 = 0.4470 \\ \delta^{(2)}_{2} &= (-0.2)\cdot 0.3647 + 0.6\cdot (-0.6842) + 0.1\cdot 0.3196 = -0.4515 \\ \delta^{(2)}_{3} &= 0.5\cdot 0.3647 + 0.1\cdot (-0.6842) + (-0.3)\cdot 0.3196 = 0.0180\end{aligned}}
+\newcommand{\arDOneRaw}{\begin{aligned}r^{(1)}_{1} &= 0.5\cdot 0.447 + 0.2\cdot (-0.4515) + 0.1\cdot 0.018 = 0.1350 \\ r^{(1)}_{2} &= (-0.5)\cdot 0.447 + 0.4\cdot (-0.4515) + 0.6\cdot 0.018 = -0.3933 \\ r^{(1)}_{3} &= 0.3\cdot 0.447 + (-0.1)\cdot (-0.4515) + 0.5\cdot 0.018 = 0.1883\end{aligned}}
+\newcommand{\dOneRaw}{\begin{pmatrix}0.1350 \\ -0.3933 \\ 0.1883\end{pmatrix}}
+\newcommand{\maskOne}{\begin{pmatrix}1 \\ 1 \\ 0\end{pmatrix}}
+\newcommand{\maskTwo}{\begin{pmatrix}1 \\ 1 \\ 1\end{pmatrix}}
+\newcommand{\zOneNew}{\begin{pmatrix}0.9190 \\ 0.4360 \\ -0.5000\end{pmatrix}}
+\newcommand{\aOneNew}{\begin{pmatrix}0.9190 \\ 0.4360 \\ 0\end{pmatrix}}
+\newcommand{\zTwoNew}{\begin{pmatrix}0.1518 \\ 0.4488 \\ 0.3499\end{pmatrix}}
+\newcommand{\aTwoNew}{\begin{pmatrix}0.1518 \\ 0.4488 \\ 0.3499\end{pmatrix}}
+\newcommand{\zThreeNew}{\begin{pmatrix}0.0847 \\ 0.3300 \\ -0.0701\end{pmatrix}}
+\newcommand{\pOneNew}{0.3190}
+\newcommand{\pThreeNew}{0.2733}
+\newcommand{\pOneOld}{0.3647}
+\newcommand{\pThreeOld}{0.3196}
+\newcommand{\zOneB}{\begin{pmatrix}1.2500 \\ 0.7000 \\ -0.7000\end{pmatrix}}
+\newcommand{\aOneB}{\begin{pmatrix}1.2500 \\ 0.7000 \\ 0\end{pmatrix}}
+\newcommand{\zTwoB}{\begin{pmatrix}0.2750 \\ 0.5300 \\ 0.5450\end{pmatrix}}
+\newcommand{\aTwoB}{\begin{pmatrix}0.2750 \\ 0.5300 \\ 0.5450\end{pmatrix}}
+\newcommand{\zThreeB}{\begin{pmatrix}0.2490 \\ 0.2625 \\ -0.0555\end{pmatrix}}
+
+\newcommand{\relu}{\operatorname{ReLU}}
+\newcommand{\softmax}{\operatorname{softmax}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\vc}[1]{\symbf{#1}}
+\newcommand{\grad}[1]{\nabla_{#1}L}
+
+\def\dx{3.5}
+\def\dy{1.9}
+
+\definecolor{relucol}{HTML}{D55E00}
+\definecolor{hlcol}{HTML}{0072B2}
+
+\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 3]}
+\author{Devi Prasad M.
+  \thanks{Prepared with the assistance of Claude
+  (Anthropic; model \texttt{claude-sonnet-5-5}), which produced
+  the figure code, and drafts of the text
+  in various places, and checked the numerical results with code.
+  The author conceived the material, and reviewed and edited
+  the text over many iterations. The author is responsible for
+  the content.}\\Manipal School of Information Sciences.}
+\date{October, 2026}
+
+\begin{document}
+\maketitle
+
+\section{The setup}
+We will use the example network of Figure~\ref{fig:network}
+in this exercise. This is a fully connected network
+with two hidden layers of width 3. The hidden layers use
+ReLU activation. The network maps an input $\vc{x}\in\R^2$
+to a probability vector $\vc{q}\in\R^3$.
+
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\linewidth}{!}{%
+    \begin{tikzpicture}[
+        font=\tiny,
+        neuron/.style={circle,draw=black,line width=0.8pt,fill=white,
+                        minimum size=0.95cm,inner sep=0pt},
+        edge/.style={draw=black,line width=0.3pt},
+        wl/.style={fill=brown!10,inner sep=0.6pt,font=\tiny},
+        box/.style={draw=black,line width=0.8pt,fill=white,rounded corners=2pt,inner sep=4pt},
+        arr/.style={-{Stealth[length=2.2mm]},line width=0.6pt},
+    ]
+
+    % ---------- neurons ----------
+    \foreach \n/\y in {1/0.5,2/-0.5}
+    \node[neuron] (i\n) at (0,\y*\dy) {$x_{\n}$};
+    \foreach \n/\y in {1/1,2/0,3/-1} {
+    \node[neuron] (h\n) at (\dx,\y*\dy) {};
+    \node[neuron] (g\n) at (2*\dx,\y*\dy) {};
+    \node[neuron] (o\n) at (3*\dx,\y*\dy) {};
+    }
+
+    % ---------- weights: edges, then labels a quarter of the way along each edge ----------
+    \foreach \j in {1,2} \foreach \i in {1,2,3} \draw[edge] (i\j) -- (h\i);
+    \foreach \j in {1,2,3} \foreach \i in {1,2,3} {
+    \draw[edge] (h\j) -- (g\i);
+    \draw[edge] (g\j) -- (o\i);
+    }
+    % highlighted example weight: from input 2 into hidden unit 1
+    %\draw[hlcol,line width=0.6pt] (i2) -- (h1);
+
+    \foreach \j in {1,2} \foreach \i in {1,2,3}
+    \node[wl] at ($(i\j)!0.24!(h\i)$) {$W_{\i\j}$};
+    \foreach \j in {1,2,3} \foreach \i in {1,2,3} {
+    \node[wl] at ($(h\j)!0.24!(g\i)$) {$W_{\i\j}$};
+    \node[wl] at ($(g\j)!0.24!(o\i)$) {$W_{\i\j}$};
+    }
+    %\node[wl,text=hlcol] at ($(i2)!0.25!(h1)$) {$W_{12}$};
+
+    % ---------- ReLU marks (orange hinge) and identity marks ----------
+    \foreach \n in {1,2,3} {
+    \foreach \c in {h,g}
+        \draw[relucol,line width=1.2pt]
+        ($(\c\n)+(-0.23,-0.14)$) -- ($(\c\n)+(0,-0.14)$) -- ($(\c\n)+(0.21,0.16)$);
+    \draw[black,line width=0.9pt] ($(o\n)+(-0.2,-0.17)$) -- ($(o\n)+(0.2,0.17)$);
+    \node[font=\scriptsize] at ($(h\n)+(0,0.72)$) {\n};
+    \node[font=\scriptsize] at ($(g\n)+(0,0.72)$) {\n};
+    \node[font=\scriptsize] at ($(o\n)+(0,0.72)$) {\n};
+    }
+
+    % ---------- layer headings ----------
+    \node[align=center] at (0,3.45)      {\scriptsize\textbf{Layer 0}\\[1pt]\footnotesize input};
+    \node[align=center] at (\dx,3.45)    {\scriptsize\textbf{Layer 1}\\[1pt]\footnotesize hidden, ReLU};
+    \node[align=center] at (2*\dx,3.45)  {\scriptsize\textbf{Layer 2}\\[1pt]\footnotesize hidden, ReLU};
+    \node[align=center] at (3*\dx,3.45)  {\scriptsize\textbf{Layer 3}\\[1pt]\footnotesize output (logits)};
+
+    % ---------- weight-matrix names under each bundle ----------
+    \node at (0.5*\dx,-3.15)  {\scriptsize$\vc{W}^{(1)}\in\R^{3\times2}$};
+    \node at (1.5*\dx,-3.15)  {\scriptsize$\vc{W}^{(2)}\in\R^{3\times3}$};
+    \node at (2.5*\dx,-3.15)  {\scriptsize$\vc{W}^{(3)}\in\R^{3\times3}$};
+
+    % ---------- softmax, probabilities, loss ----------
+    \node[box,minimum width=1.4cm,minimum height=4.7cm] (sm) at (3*\dx+2.3,0) {\scriptsize softmax};
+    \foreach \n in {1,2,3} \draw[arr] (o\n) --
+        node[above,inner sep=1.5pt,font=\scriptsize] {$z^{(3)}_{\n}$} (sm.west |- o\n);
+    \draw[arr] (sm.east) -- ++(0.55,0) node[anchor=west,inner sep=2pt] (p) {$\vc{q}$};
+    \draw[arr] ($(p.east)+(0.05,0)$) -- ++(0.5,0);
+    \node[box,align=center,anchor=west] (loss) at ($(p.east)+(0.6,0)$)
+    {\scriptsize$L=-\ln q_c$\\[1pt]\scriptsize $c$ = label\\[2pt]\scriptsize (true class)};
+
+    % ---------- legend ----------
+    \def\ly{-4.15}
+    \draw[relucol,line width=1.2pt] (0,\ly) -- ++(0.2,0) -- ++(0.2,0.3);
+    \node[anchor=west] at (0.55,\ly+0.1) {\footnotesize ReLU: $a=\max(z,0)$};
+    \draw[black,line width=0.9pt] (6.1,\ly-0.05) -- ++(0.4,0.3);
+    \node[anchor=west] at (6.65,\ly+0.1) {\footnotesize no activation};
+    %\draw[hlcol,line width=1.2pt] (7.4,\ly+0.1) -- ++(0.5,0);
+    %\node[anchor=west] at (8.0,\ly+0.1)
+    %{\footnotesize $W^{(1)}_{12}$: from input 2 into unit 1};
+    \node[anchor=west] at (0,\ly-0.7)
+    {\footnotesize $W^{(l)}_{ij}$ connects unit $j$ of layer $l\!-\!1$ to unit $i$ of layer $l$;
+    biases $\vc{b}^{(l)}$ are not drawn.};
+
+    \end{tikzpicture}}
+    \caption{Example network}
+  \label{fig:network}
+\end{figure}
+
+\bigskip
+
+We assume column vectors, and define $\vc{a}^{(0)}=\vc{x}$.
+The last layer, Layer 3, has no activation. Its output
+$\vc{z}^{(3)}$, the \emph{logits}, goes through the softmax
+function:
+\begin{align}
+  \vc{z}^{(l)} &= \vc{W}^{(l)}\vc{a}^{(l-1)}+\vc{b}^{(l)}, & l&=1,2,3,\label{eq:z}\\
+  \vc{a}^{(l)} &= \relu(\vc{z}^{(l)}), & l&=1,2,\label{eq:a}\\
+  \vc{q} &= \softmax(\vc{z}^{(3)}).\label{eq:q}
+\end{align}
+Here $\relu$ is applied entry by entry and, for $K$ classes
+($K=3$ here), the softmax is defined by
+\begin{equation}\label{eq:softmax}
+  \softmax(\vc{z})_k=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}},
+  \qquad k=1,\dots,K.
+\end{equation}
+
+The weight matrix $\vc{W}^{(l)}$ of layer $l$ stores the weights of each unit as
+a \emph{row}: row $i$ holds the weights into unit $i$ of layer $l$, one for each
+unit of layer $l-1$ (see Figure~\ref{fig:network}). Thus $z^{(l)}_i$ in
+Eq.~\eqref{eq:z} is the product of row $i$ of $\vc{W}^{(l)}$ with
+$\vc{a}^{(l-1)}$, and no transpose is needed in the forward pass.
+
+Each example has a
+\emph{label} $c$, the index of its true class, and a \emph{target}
+$\vc{y}$, the one-hot vector with $y_c=1$ and all other entries~0. The loss is
+$L=-\ln q_c$.
+
+There are 24 weights ($6+9+9$) and 9 biases ($3+3+3$), so 33 parameters
+in all, collected in $\theta$.
+
+Training adjusts $\theta$ by gradient descent with learning
+rate $\eta$, $\theta\leftarrow\theta-\eta\,\nabla_{\theta}L$.
+\emph{Backpropagation} is the method for computing all 33
+partial derivatives at once, in two passes: a forward
+pass that stores intermediate values, followed by a
+backward sweep that reuses them.
+
+In these notes, Part~I derives the method in general, and
+Part~II demonstrates an example.
+
+\section{The loss and its gradient at the logits}
+\paragraph{Likelihood Function.}
+Given a set of observed data points
+$\mathcal{D} = \{d_1, d_2, \dots, d_n\}$ assumed to be independent
+and identically distributed (i.i.d.), and a model with
+parameters $\theta$, the likelihood function
+$\mathcal{L}(\theta; \mathcal{D})$ represents the joint probability
+of observing that data given those parameters:
+\begin{equation}\label{eq:likelihood}
+    \mathcal{L}(\theta; \mathcal{D}) = P(\mathcal{D} \mid \theta)
+      = \prod_{i=1}^{n} P(d_i \mid \theta)
+\end{equation}
+
+\paragraph{The Log-Likelihood Function.}
+Maximising $\mathcal{L}$ directly runs into two practical problems.
+Differentiating a product of $n$ probabilities with the product rule
+gives a sum of $n$ terms, each a product of $n-1$ probabilities
+and one derivative, which is clumsy to compute. And multiplying many small probabilities underflows
+in floating-point arithmetic. The natural logarithm avoids both. It is
+increasing, so it leaves the maximiser unchanged, and by
+$\ln(ab)=\ln a+\ln b$ it turns the product into a sum:
+\begin{equation}\label{eq:loglik}
+  \ell(\theta; \mathcal{D})=\ln\mathcal{L}(\theta; \mathcal{D})
+    =\sum_{i=1}^{n}\ln P(d_i\mid\theta).
+\end{equation}
+This function $\ell(\theta; \mathcal{D})$ is the log-likelihood. Its derivative is a sum
+of $n$ simple terms.
+
+\paragraph{Loss Function.}
+In classification each data point is a labelled example,
+$d_i=(\vc{x}_i,c_i)$, and, treating the inputs as given, the model
+assigns the observed label the probability
+$P(c_i\mid\vc{x}_i,\theta)=q_{c_i}$, where $\vc{q}$ is computed from
+$\vc{x}_i$. The log-likelihood is then
+$\ell(\theta;\mathcal{D})=\sum_i\ln q_{c_i}$, so each example
+contributes $-\ln q_{c_i}$ to the loss.
+
+For one example, the loss $L=-\ln q_c$ is the negative
+log-likelihood of the observed label $c$ given the input
+$\vc{x}$, under the model (also called the per-example
+negative log-likelihood). For a one-hot
+target $\vc{y}$ it equals the cross-entropy
+$H(\vc{y},\vc{q})=-\sum_k y_k\ln q_k$. Averaged over
+a data set, the loss is $-\ell(\theta;\mathcal{D})/n$, so
+minimising it maximises the likelihood.
+A network with small random weights
+outputs a nearly uniform $\vc{q}$,
+so its loss is close to $\ln K$, where $K$ is the number of
+classes. %With $K=3$ and $\ln 3\approx1.0986$ here), a useful
+%sanity check at the start of any training run.
+
+When loss is calculated using natural logarithm,
+\emph{nat} is the conventional unit. We may say, for
+instance, ``the loss is \(2.303\) nats''.
+
+\paragraph{The gradient.}
+Writing $\vc{z}=\vc{z}^{(3)}$, the definition of the softmax gives
+$q_c=\softmax(\vc{z})_c=e^{z_c}/\sum_j e^{z_j}$, so
+\begin{align}
+    L &= -\ln q_c\label{eq:loss}\\[2pt]
+      &= -\ln \, \dfrac{e^{z_c}}{\sum\nolimits_j e^{z_j}}\notag\\[2pt]
+      &= -\bigg(\ln e^{z_c} - \ln \sum\nolimits_j e^{z_j}\bigg)\notag\\[2pt]
+      &= -z_c + \ln \sum\nolimits_j e^{z_j}\, . \label{eq:lse} %%\quad \blacksquare
+\end{align}
+where $j$ ranges over the $K$ classes (the $K=3$ output units), and $c$ is
+the fixed label.
+
+The last line of the derivation, Eq.~\eqref{eq:lse}, is how libraries
+compute $L$ (a log-sum-exp), because it avoids taking
+the logarithm of a tiny probability. Note that
+$L\ge0$, because $\sum_j e^{z_j}\ge e^{z_c}$.
+
+
+Let $k$ range over the $K$ classes (the $K=3$ output units).
+Differentiating $L=-z_c+\ln\sum_j e^{z_j}$ (Eq.~\eqref{eq:lse}) with respect
+to the logit $z_k$, the first term gives $-[k{=}c]=-y_k$
+(here $[k{=}c]$ is 1 if $k=c$ and 0 otherwise, which is
+exactly the one-hot target), and the second gives
+the softmax $q_k$:
+\begin{equation}\label{eq:dLdz}
+    \frac{\partial L}{\partial z_k}
+      = -[k{=}c]+\frac{e^{z_k}}{\sum_j e^{z_j}}
+      = - y_k + q_k = q_k - y_k \, .
+\end{equation}
+That is, the $k$-th entry of the gradient is the $k$-th
+entry of the predicted distribution $\vc{q}$ minus the
+$k$-th entry of the target $\vc{y}$. In vector form,
+\begin{equation}\label{eq:delta3}
+  \vc{\delta}^{(3)}:=\frac{\partial L}{\partial\vc{z}^{(3)}}=\vc{q}-\vc{y}\,.
+\end{equation}
+
+Two remarks on the gradient $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
+at the logits:
+\begin{itemize}
+  \item The entries sum to zero, since
+        $\sum_k q_k=\sum_k y_k=1$. This reflects the fact that
+        softmax is unchanged when the same constant is
+        added to every logit, so moving all logits
+        together cannot change the loss.
+  \item Each entry lies in $[-1,1]$: the true
+        class has $\delta_c=q_c-1\in[-1,0]$, every other
+        class has $\delta_k=q_k\in[0,1]$. A gradient-descent
+        step on the logits would raise the true logit in
+        proportion to the probability still missing,
+        $1-q_c$, and lower each wrong logit in
+        proportion to the probability it holds.
+\iffalse
+    \item The gradient does not fade when the model is confidently wrong: as
+        $q_c\to0$, $\delta_c\to-1$. A squared-error loss on the softmax outputs
+        can behave differently. If the softmax saturates on a wrong class,
+        $q_w\approx1$, the Jacobian factors $q_w(1-q_w)$ vanish and the
+        gradient almost disappears although the prediction is badly wrong,
+        whereas $\vc{q}-\vc{y}$ keeps a magnitude near~1.
+\fi
+\end{itemize}
+
+\section{Backpropagation through a layer}
+
+Consider layer $l$ with input $\vc{a}^{(l-1)}$, and suppose
+$\vc{\delta}^{(l)}=\partial L/\partial\vc{z}^{(l)}$ is known. Three results
+follow from the chain rule.
+
+\paragraph{Gradient of the weights and biases.}
+The pre-activation $z^{(l)}_i=\sum_j W^{(l)}_{ij}a^{(l-1)}_j+b^{(l)}_i$ depends
+on $W^{(l)}_{ij}$ only through the single term $W^{(l)}_{ij}a^{(l-1)}_j$, and
+no other pre-activation $z^{(l)}_{i'}$ ($i'\ne i$) involves $W^{(l)}_{ij}$,
+so by the chain rule only one term survives:
+\begin{equation}\label{eq:dW}
+  \frac{\partial L}{\partial W^{(l)}_{ij}}
+  =\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial W^{(l)}_{ij}}
+  =\delta^{(l)}_i\,a^{(l-1)}_j .
+\end{equation}
+The bias $b^{(l)}_i$ likewise enters only $z^{(l)}_i$, as a plain additive term, so
+$\partial z^{(l)}_i/\partial b^{(l)}_i=1$ and
+\begin{equation}\label{eq:db}
+  \frac{\partial L}{\partial b^{(l)}_i}
+  =\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial b^{(l)}_i}
+  =\delta^{(l)}_i\cdot 1=\delta^{(l)}_i .
+\end{equation}
+A bias behaves like a weight on an input that is always~$1$.
+In matrix form, $\grad{\vc{W}^{(l)}}=\vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top}$, an
+outer product, and $\grad{\vc{b}^{(l)}}=\vc{\delta}^{(l)}$.
+
+\paragraph{Gradient passed to the layer below.}
+The entry $a^{(l-1)}_j$ influences the loss through every $z^{(l)}_i$, so the
+contributions add:
+\begin{equation}\label{eq:da}
+  \frac{\partial L}{\partial a^{(l-1)}_j}
+  =\sum_i\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial a^{(l-1)}_j}
+  =\sum_i\delta^{(l)}_i\,W^{(l)}_{ij}
+  =\Big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\Big)_j .
+\end{equation}
+
+\paragraph{Through the activation.}
+Since $a^{(l-1)}_j=f(z^{(l-1)}_j)$, where $f$ is the activation function
+(ReLU in layers 1 and 2) and acts elementwise,
+$\partial L/\partial z^{(l-1)}_j=\big(\partial L/\partial a^{(l-1)}_j\big)\,f'(z^{(l-1)}_j)$,
+and in vector form
+\begin{equation}\label{eq:deltarec}
+  \vc{\delta}^{(l-1)}=\Big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\Big)\odot f'(\vc{z}^{(l-1)}).
+\end{equation}
+
+The backward pass is therefore: start from $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
+(Eq.~\eqref{eq:delta3}); at each layer form the weight gradient as an outer
+product (Eq.~\eqref{eq:dW}), multiply by $(\vc{W}^{(l)})^{\top}$
+(Eq.~\eqref{eq:da}), and multiply elementwise by $f'$ of the stored
+pre-activation (Eq.~\eqref{eq:deltarec}). Shapes provide a check: with $n_l$ the number of units in layer $l$,
+$\vc{\delta}^{(l)}\in\R^{n_l}$ and
+$\vc{a}^{(l-1)}\in\R^{n_{l-1}}$ give
+$\grad{\vc{W}^{(l)}}\in\R^{n_l\times n_{l-1}}$, the shape of $\vc{W}^{(l)}$.
+
+\paragraph{What the forward pass must store.}
+For every layer, the input $\vc{a}^{(l-1)}$ (for the weight gradient) and
+$\vc{z}^{(l)}$ (for $f'$). The memory needed grows with depth and width, which
+is one reason why training a large network needs much more memory than running
+it.
+
+\paragraph{Cost.}
+Each layer costs about one matrix--vector product in the forward pass, and
+about two operations of the same size in the backward pass (the outer product
+for the weight gradient and the product with $\vc{W}^{\top}$). A backward
+sweep therefore costs roughly twice a forward pass, whatever the number of
+parameters, whereas finite differences need two forward passes per parameter.
+That is what makes backpropagation practical.
+
+\section{The ReLU}
+
+$\relu(z)=\max(z,0)$ has $\relu'(z)=1$ for $z>0$ and $0$ for $z<0$. At $z=0$ it
+has a kink; the convention here is $\relu'(0)=0$. A hidden
+unit with $z\le0$ is \emph{inactive}, and:
+\begin{itemize}
+  \item its $\delta$ is zero, so the weights feeding it (a row of
+        $\grad{\vc{W}^{(l)}}$) and its bias receive no gradient;
+  \item its output is $a=0$, so the weights leaving it (a column of the next
+        layer's weight gradient, $\vc{\delta}\,\vc{a}^{\top}$) receive none
+        either;
+  \item a unit that is inactive for \emph{every} training example is never
+        updated and cannot recover; it is called \emph{dead}.
+\end{itemize}
+
+\section{Checking a gradient numerically}
+
+A derived gradient can be tested against the definition of a derivative. The
+\emph{central difference}
+\begin{equation}\label{eq:cd}
+  \frac{L(\theta_i+\varepsilon)-L(\theta_i-\varepsilon)}{2\varepsilon}
+  =\frac{\partial L}{\partial\theta_i}+\frac{\varepsilon^{2}}{6}\,
+   \frac{\partial^{3}L}{\partial\theta_i^{3}}+\cdots
+\end{equation}
+has an error of order $\varepsilon^{2}$ (the one-sided difference has order
+$\varepsilon$), which is why it is preferred. The step $\varepsilon$ is a
+compromise: too large and the truncation error dominates; too small and the
+subtraction of two nearly equal losses loses digits to rounding. In double
+precision a value around $10^{-5}$ or $10^{-6}$ is typical. In a hand
+calculation with $\varepsilon=0.01$, the losses must be carried to six decimals.
+
+Each parameter needs two forward passes, so checking all $N$ parameters costs
+$2N$ passes against a single backward pass for backpropagation. This is why the
+check is a test of the code or the algebra, never the way a network is trained.
+
+\section{The update, epochs and batches}
+
+For a gradient $\vc{g}=\nabla_\theta L$, the first-order expansion gives
+\begin{equation}\label{eq:firstorder}
+  L(\theta-\eta\vc{g})=L(\theta)-\eta\,\lVert\vc{g}\rVert^{2}+O(\eta^{2}),
+\end{equation}
+so for small enough $\eta$ the loss decreases unless $\vc{g}=\vc{0}$. The
+$O(\eta^{2})$ term involves curvature and explains why a large step can overshoot.
+
+\paragraph{Epochs and batches.}
+The training data consist of $n$ labelled examples, with per-example losses
+$L_1,\dots,L_n$. One pass over all $n$ examples is an \emph{epoch}; training
+usually runs for many epochs, often reshuffling the examples before each one.
+How many updates an epoch contains depends on how many examples are used for
+each update:
+\begin{itemize}
+  \item \emph{Per-example} (stochastic) gradient descent updates $\theta$ after
+        every single example, so an epoch has $n$ updates.
+  \item With \emph{minibatches} of size $B$, each update uses the gradient of the
+        \emph{mean} loss over the batch, so an epoch has $n/B$ updates (rounded
+        up if $B$ does not divide $n$).
+  \item With $B=n$ (\emph{full-batch} gradient descent), each update uses the
+        mean loss over the whole data set, so an epoch has a single update.
+\end{itemize}
+By linearity of differentiation, the gradient of the mean loss over a batch is
+the mean of the per-example gradients. Small batches give noisier but more
+frequent updates; large batches give smoother gradient estimates and make
+efficient use of matrix hardware.
+
+\paragraph{A batch as a matrix.}
+With $B=5$ examples, the inputs are the columns of a matrix
+$\vc{X}\in\R^{2\times5}$ and the targets are the columns of a matrix
+$\vc{Y}\in\R^{3\times5}$; column $b$ of $\vc{Y}$ is the one-hot target of
+column $b$ of $\vc{X}$. With labels $c=(2,3,1,2,3)$,
+\[
+  \vc{X}=\begin{pmatrix}
+    1 & 2 & 0 & -1 & \phantom{-}3\\
+    2 & 1 & 1 & \phantom{-}2 & -1
+  \end{pmatrix},
+  \qquad
+  \vc{Y}=\begin{pmatrix}
+    0 & 0 & 1 & 0 & 0\\
+    1 & 0 & 0 & 1 & 0\\
+    0 & 1 & 0 & 0 & 1
+  \end{pmatrix}.
+\]
+Column $b$ of $\vc{X}$ is $\vc{x}_b$ and column $b$ of $\vc{Y}$ is
+$\vc{y}_b$, so the first column of each is the pair $\vc{x}=(1,2)^{\top}$,
+$\vc{y}=(0,1,0)^{\top}$ of the exercise. The forward pass keeps the same
+shapes with one column per example: $\vc{A}^{(0)}=\vc{X}$, and $\vc{Z}^{(l)}$,
+$\vc{A}^{(l)}$, the output $\vc{Q}$ and $\vc{\Delta}^{(3)}=\vc{Q}-\vc{Y}$ each
+have $5$ columns. In general, if the examples of a batch are the columns of
+$\vc{A}^{(l-1)}$ and the matching $\vc{\delta}$'s the columns of
+$\vc{\Delta}^{(l)}$, the weight gradient is
+$\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\top}$ (divided by $B$ for the mean loss):
+a batch is more columns, and the same products. None of this depends on the
+architecture. It holds for any feed-forward network trained by backpropagation;
+only the layer sizes and the activation functions differ.
+
+\paragraph{What practice adds.}
+Large-scale training typically uses large minibatches, an adaptive optimizer
+such as Adam in place of the plain step, a learning-rate schedule and gradient
+clipping. The gradient formulas above are unchanged; only what is done with the
+gradient differs.
+
+\section{Summary of formulas}
+
+\begin{itemize}
+  \item \textbf{Forward:} $\vc{z}^{(l)}=\vc{W}^{(l)}\vc{a}^{(l-1)}+\vc{b}^{(l)}$,
+        $\vc{a}^{(l)}=\relu(\vc{z}^{(l)})$, $\vc{q}=\softmax(\vc{z}^{(3)})$,
+        $L=-\ln q_c$ (Eqs.~\eqref{eq:z}--\eqref{eq:q}, \eqref{eq:loss}).
+  \item \textbf{Start of the backward pass:}
+        $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$ (Eq.~\eqref{eq:delta3}).
+  \item \textbf{Each layer:}
+        $\grad{\vc{W}^{(l)}}=\vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top}$,
+        $\grad{\vc{b}^{(l)}}=\vc{\delta}^{(l)}$,
+        $\vc{\delta}^{(l-1)}=\big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\big)\odot\relu'(\vc{z}^{(l-1)})$
+        (Eqs.~\eqref{eq:dW}, \eqref{eq:db}, \eqref{eq:deltarec}).
+  \item \textbf{Check:} central difference with step $\varepsilon$
+        (Eq.~\eqref{eq:cd}).
+  \item \textbf{Update:} $\theta\leftarrow\theta-\eta\nabla_\theta L$.
+\end{itemize}
+
+\section{Differences from PyTorch}
+\label{sec:pytorch}
+
+Code written with PyTorch computes the same numbers as
+our notes here, but it does not look exactly like the
+formulas above. The weights of a layer are laid out as
+in the notes, whereas a batch is laid out the other way
+round, and the transposes in the code come from that.
+
+Table~\ref{tab:pytorch} lists the differences.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.3cm}@{}}
+    \toprule
+    & \textbf{Our notes} & \textbf{PyTorch} \\
+    \midrule
+    Weights of a layer
+      & $\vc{W}^{(l)}$ of shape $n_l\times n_{l-1}$; row $i$ holds the weights into unit $i$
+      & \texttt{weight} of \texttt{nn.Linear}, shape \texttt{(out\_features, in\_features)}: the same layout \\[4pt]
+    Bias
+      & $\vc{b}^{(l)}\in\R^{n_l}$
+      & \texttt{bias}, shape \texttt{(out\_features,)} \\[4pt]
+    A batch
+      & examples are the \emph{columns} of $\vc{A}^{(l-1)}$, shape $n_{l-1}\times B$
+      & examples are the \emph{rows} of \texttt{X}, shape \texttt{(B, in\_features)} \\[4pt]
+    A layer
+      & $\vc{Z}^{(l)}=\vc{W}^{(l)}\vc{A}^{(l-1)}+\vc{b}^{(l)}$ (Eq.~\eqref{eq:z})
+      & \texttt{Z = X @ weight.T + bias} \\[4pt]
+    Weight gradient
+      & $\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\top}$, divided by $B$ for the mean loss
+      & \texttt{weight.grad}, same shape as \texttt{weight}; includes the $1/B$ of the default mean loss \\[4pt]
+    Loss
+      & $L=-\ln q_c$, computed as $-z_c+\ln\sum_j e^{z_j}$ (Eq.~\eqref{eq:lse})
+      & \texttt{nn.CrossEntropyLoss} takes the logits $\vc{z}^{(3)}$, not $\vc{q}$, so the network does not end in a softmax layer \\[4pt]
+    Label
+      & $c\in\{1,2,3\}$; target $\vc{y}$ one-hot
+      & class index in $\{0,1,2\}$, no one-hot vector needed \\
+    \bottomrule
+  \end{tabular}
+  \caption{Notes versus PyTorch conventions}
+  \label{tab:pytorch}
+\end{table}
+
+The transpose in \texttt{X @ weight.T} appears because examples are stored as
+rows; the weight matrix itself is the same $\vc{W}^{(l)}$. When comparing code
+with these notes, read \texttt{weight} as $\vc{W}^{(l)}$ and \texttt{X} as
+$(\vc{A}^{(l-1)})^{\top}$. Remember too that classes are numbered from~0 in
+code, so the label $c=2$ of the worked example is the index \texttt{1}.
+
+%----------------------------------------------------------
+\clearpage
+\part*{Part II: Worked computation}
+%----------------------------------------------------------
+
+\section{Data}
+\[
+  \vc{W}^{(1)}=\WOne,\qquad \vc{W}^{(2)}=\WTwo,
+\]
+\[
+  \vc{W}^{(3)}=\WThree,\qquad \vc{b}^{(1)}=\vc{b}^{(2)}=\vc{b}^{(3)}=\vc{0}.
+\]
+Input $\vc{x}=\xIn$, label $c=2$ (so the target is $\vc{y}=(0,1,0)^{\top}$), learning
+rate $\eta=\etaVal$.
+
+\section{Forward pass and loss (Tasks 1 and 2)}
+
+Layer 1, using Eq.~\eqref{eq:z} (the biases are zero):
+\begin{equation}\label{eq:wz1}
+\arZOne
+\end{equation}
+Applying the ReLU gives $\vc{a}^{(1)}=\aOne$: unit 3 is inactive because
+$z^{(1)}_3=-0.5<0$.
+
+Layer 2:
+\begin{equation}\label{eq:wz2}
+\arZTwo
+\end{equation}
+Because $a^{(1)}_3=0$, the third column of $\vc{W}^{(2)}$ had no effect here. All
+three values are positive, so $\vc{a}^{(2)}=\vc{z}^{(2)}=\aTwo$.
+
+Layer 3 (the logits):
+\begin{equation}\label{eq:wz3}
+\arZThree
+\end{equation}
+Softmax, Eq.~\eqref{eq:softmax}:
+\begin{equation}\label{eq:wsoft}
+\arSoftmax
+\end{equation}
+Loss, Eq.~\eqref{eq:loss}:
+\begin{equation}\label{eq:wloss}
+\arLoss
+\end{equation}
+This is slightly above $\ln 3=\lnThree$ because the true class received
+$q_2=\pTrue<1/3$.
+
+\section{Gradient at the logits (Task 3)}
+By Eq.~\eqref{eq:dLdz},
+\begin{equation}\label{eq:wd3}
+\arDThree
+\end{equation}
+so $\vc{\delta}^{(3)}=\dThree$, and its entries sum to zero.
+
+\section{Backward pass (Task 4)}
+
+\paragraph{Layer 3.}
+By Eqs.~\eqref{eq:dW} and~\eqref{eq:db},
+\begin{gather}
+  \grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\top}
+  =\dThree\,\aTwoRow=\gWThree,\label{eq:wgW3}\\
+  \grad{\vc{b}^{(3)}}=\vc{\delta}^{(3)}=\gbThree .\label{eq:wgb3}
+\end{gather}
+
+\paragraph{Layer 2.}
+First pass the gradient down through $(\vc{W}^{(3)})^{\top}$
+(Eq.~\eqref{eq:da}):
+\begin{equation}\label{eq:wd2raw}
+\arDTwo
+\end{equation}
+All second-layer units are active, $\relu'(\vc{z}^{(2)})=\maskTwo$, so
+$\vc{\delta}^{(2)}=\dTwo$. Then
+\begin{equation}\label{eq:wgW2}
+  \grad{\vc{W}^{(2)}}=\vc{\delta}^{(2)}(\vc{a}^{(1)})^{\top}
+  =\dTwo\,\aOneRow=\gWTwo,
+\end{equation}
+and $\grad{\vc{b}^{(2)}}=\vc{\delta}^{(2)}$. The third column is zero because
+$a^{(1)}_3=0$.
+
+\paragraph{Layer 1.}
+The product with $(\vc{W}^{(2)})^{\top}$ (Eq.~\eqref{eq:da}) gives
+\begin{equation}\label{eq:wd1raw}
+\arDOneRaw
+\end{equation}
+Now apply the mask $\relu'(\vc{z}^{(1)})=\maskOne$ (Eq.~\eqref{eq:deltarec}):
+\begin{equation}\label{eq:wd1}
+  \vc{\delta}^{(1)}=\dOneRaw\odot\maskOne=\dOne .
+\end{equation}
+The value $0.1883$ is discarded: unit 3 is inactive, so it cannot pass gradient
+on. Finally
+\begin{gather}
+  \grad{\vc{W}^{(1)}}=\vc{\delta}^{(1)}\vc{x}^{\top}
+  =\dOne\,\xRow=\gWOne,\label{eq:wgW1}\\
+  \grad{\vc{b}^{(1)}}=\vc{\delta}^{(1)}=\gbOne .\label{eq:wgb1}
+\end{gather}
+The third row of $\grad{\vc{W}^{(1)}}$ is zero, for the reason given above.
+
+\section{Numerical check (Task 5)}
+
+Take $W^{(1)}_{12}=0.25$, the weight from $x_2$ into hidden unit 1, with
+$\varepsilon=\epsVal$. This entry is a good test because it influences the loss
+through all later layers, so it exercises the whole backward chain. Two extra
+forward passes give
+\begin{equation}\label{eq:wLpm}
+  L(+\varepsilon)=\Lplus,\qquad L(-\varepsilon)=\Lminus,
+\end{equation}
+so the central difference of Eq.~\eqref{eq:cd} is
+\begin{equation}\label{eq:wcd}
+  \frac{L(+\varepsilon)-L(-\varepsilon)}{2\varepsilon}=\fdVal,
+\end{equation}
+(or $\fdRounded$ if the printed six-decimal losses are used), against
+$\bpVal$ from backpropagation, the $(1,2)$ entry of
+$\grad{\vc{W}^{(1)}}$ in Eq.~\eqref{eq:wgW1}. All 33 gradient entries were checked
+the same way in double precision, with a largest discrepancy below $10^{-9}$.
+
+\section{One update (Task 6)}
+
+With $\eta=\etaVal$, the first layer becomes
+\begin{equation}\label{eq:wup1W}
+  \vc{W}^{(1)}\leftarrow\WOne-\etaVal\,\gWOne=\WOneNew,
+\end{equation}
+\begin{equation}\label{eq:wup1b}
+  \vc{b}^{(1)}\leftarrow\bOne-\etaVal\,\gbOne=\bOneNew .
+\end{equation}
+The other layers are updated in the same way:
+\begin{align}
+  \vc{W}^{(2)}&\leftarrow\WTwoNew, & \vc{b}^{(2)}&\leftarrow\bTwoNew,\\
+  \vc{W}^{(3)}&\leftarrow\WThreeNew, & \vc{b}^{(3)}&\leftarrow\bThreeNew .
+\end{align}
+Re-running the forward pass with the new parameters:
+\begin{gather}
+  \vc{z}^{(1)}=\zOneNew,\quad \vc{a}^{(1)}=\aOneNew,\quad \vc{z}^{(2)}=\zTwoNew,\\
+  \vc{a}^{(2)}=\aTwoNew,\quad \vc{z}^{(3)}=\zThreeNew,\quad \vc{q}=\pAfter .
+\end{gather}
+The new loss is $L=\Lone$, a decrease of $\dropAct$. The probability of the true
+class rose from $\pTrue$ to $\pTrueAfter$, while the wrong classes fell
+($q_1$ from $\pOneOld$ to $\pOneNew$, $q_3$ from $\pThreeOld$ to $\pThreeNew$).
+Unit 3 of the first layer is still inactive, with $z^{(1)}_3=-0.5$ unchanged:
+a dead unit does not move at all.
+
+For the first-order check, Eq.~\eqref{eq:firstorder}, the sum of squares of
+all 33 gradient entries is
+$\lVert\nabla L\rVert^{2}=\gradSq$, so $\eta\lVert\nabla L\rVert^{2}=\dropPred$,
+against the actual decrease of $\dropAct$. The difference is the second-order
+term, and it shrinks as $\eta\to0$.
+
+\section{Beyond one example (Tasks 7 and 8)}
+
+\paragraph{A second example.}
+For $\vc{x}'=\xTwoIn$ with label $c'=3$, under the \emph{original}
+parameters:
+\begin{gather}
+  \vc{z}^{(1)}=\zOneB,\quad \vc{a}^{(1)}=\aOneB,\quad \vc{z}^{(2)}=\zTwoB,\\
+  \vc{a}^{(2)}=\aTwoB,\quad \vc{z}^{(3)}=\zThreeB,\quad \vc{q}'=\pTwoOut,
+\end{gather}
+so $L'=-\ln q'_3=\LTwo$, and the mean loss over the two examples is $\Lbatch$.
+The gradient of the mean loss is the mean of the two per-example gradients. (A
+batch gradient was not computed here.) Unit 3 of layer 1 is inactive for both
+examples; had it been inactive for \emph{all} training data, it would be dead.
+With $n=4$ training examples, per-example updates give 4 updates per epoch and
+minibatches of size $B=2$ give 2.
+
+\paragraph{All parameters zero.}
+Every $\vc{z}$ and $\vc{a}$ is then zero and $\vc{q}$ is uniform. The weight
+gradients vanish, $\grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\top}=\vc{0}$
+because $\vc{a}^{(2)}=\vc{0}$, and $\vc{\delta}^{(2)}=\vc{0}$ because
+$\vc{W}^{(3)}=\vc{0}$. Only the output bias has a gradient,
+\begin{equation}\label{eq:wzero}
+  \grad{\vc{b}^{(3)}}=\gbThreeZero ,
+\end{equation}
+and over later steps the hidden layers never receive one (confirmed over 50
+steps): the network can learn only the class frequencies. More generally, any
+initialisation that makes the units of a layer identical keeps them identical,
+since they receive identical gradients; this is why weights are initialised
+randomly.
+
+\paragraph{A different label.}
+If the label were 1 instead of 2, so that $\vc{y}=(1,0,0)^{\top}$, the forward
+quantities $\vc{z}^{(l)}$, $\vc{a}^{(l)}$, $\vc{q}$ of
+Eqs.~\eqref{eq:wz1}--\eqref{eq:wsoft} would not change, because they do not
+depend on the label. The label enters only through the loss,
+$L=-\ln q_1=\LLabelOne$ (Eq.~\eqref{eq:loss}), and through
+$\vc{\delta}^{(3)}=\vc{q}-\vc{y}=\dThreeLabelOne$ (Eq.~\eqref{eq:delta3}).
+Everything downstream of $\vc{\delta}^{(3)}$ in the backward pass would change.
+
+\iffalse
+\section{What to take from the computation}
+\begin{itemize}
+  \item The backward pass mirrors the forward pass: the same matrices, transposed,
+        with the stored forward values supplying $\vc{a}^{(l-1)}$ and the ReLU masks.
+  \item Gradient reaches a weight only through active units: the zero row and
+        zero column above are exactly the inactive unit.
+  \item One step of size $\eta=0.1$ lowered the loss from $\Lzero$ to $\Lone$ and
+        moved probability toward the true class, as the first-order estimate
+        predicted.
+  \item A numerical derivative agreed with backpropagation to the digits shown,
+        which is the standard way to trust a hand-derived gradient.
+\end{itemize}
+\fi
+
+\end{document}

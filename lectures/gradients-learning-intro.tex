@@ -180,6 +180,97 @@
         billions in all.\par}
 \end{frame}
 
+\begin{frame}\FrameTitle{How Many Epochs? GPT-2, GPT-3 and LLaMA}{Unit 3}
+\begin{columns}[T]
+  \column{0.32\textwidth}
+  \textbf{GPT-2 (124M)}\\
+  {\small Karpathy's open implementation}\medskip
+
+  {\large\alert{1}}\\
+  {\small epoch}\medskip
+
+  \begin{itemize}
+    \item 10B tokens of FineWeb-Edu
+    \item 19{,}072 steps of $\sim$0.5M tokens
+    \item OpenAI's paper gives no epoch count
+  \end{itemize}
+
+  \column{0.32\textwidth}
+  \textbf{GPT-3 (175B)}\\
+  {\small Brown et al., 2020}\medskip
+
+  {\large\alert{0.44--3.4}}\\
+  {\small epochs, depending on the source}\medskip
+
+  \begin{itemize}
+    \item 300B tokens in total
+    \item Common Crawl: 0.44
+    \item Wikipedia: 3.4
+  \end{itemize}
+
+  \column{0.35\textwidth}
+  \textbf{LLaMA}\\
+  {\small Touvron et al., 2023}\medskip
+
+  {\large\alert{0.64--2.45}}\\
+  {\small epochs, depending on the source}\medskip
+
+  \begin{itemize}
+    \item 1.4T tokens in total
+    \item CommonCrawl 1.10, C4 1.06
+    \item Wikipedia 2.45, Books 2.23
+  \end{itemize}
+\end{columns}
+\vfill
+{\footnotesize Sources: nano-gpt GPT-2 README; Brown et al.\ 2020, Table 2.2; Touvron et al.\ 2023, Table 1.}
+\end{frame}
+
+\begin{frame}\FrameTitle{How Large-Scale Pretraining Counts Data}{Unit 3}
+\begin{columns}[T]
+  \column{0.30\textwidth}
+  {\Huge\alert{$\le 4$}}\medskip
+
+  epochs of repeated data cost almost nothing in loss compared with unique data.\medskip
+
+  {\small Muennighoff et al., data-constrained scaling}
+
+  \column{0.66\textwidth}
+  \textbf{\alert{Count tokens, not epochs.}}
+  GPT-3 saw 300B tokens and LLaMA 1.4T. Reports state tokens seen; epochs appear only per data source.\medskip
+
+  \textbf{\alert{Crawl once, curated data repeated.}}
+  Web crawl is used about once. Wikipedia and books are repeated roughly 2 to 3 times.\medskip
+
+  \textbf{\alert{Heavy repetition has a limit.}}
+  Beyond a few epochs, extra compute spent on repeated data eventually adds nothing.\medskip
+
+  {\small Closed frontier labs do not publish their data mixes.}
+\end{columns}
+
+\vspace*{6pt}
+{\footnotesize Sources: Muennighoff et al.\ 2023; Brown et al.\ 2020; Touvron et al.\ 2023.}
+\end{frame}
+
+\begin{frame}\FrameTitle{Epochs Mean Different Things at Each Stage}{Unit 3}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{}p{0.22\textwidth}p{0.10\textwidth}p{0.58\textwidth}@{}}
+  \alert{\textbf{Stage}} & \alert{\textbf{Passes}} & \alert{\textbf{Example}}\\
+  \hline
+  Pretraining & $\sim$1 & GPT-2 reproduction: 1 epoch. LLaMA: most data used about once.\\
+  Repeated sources & 2 to 3 & Wikipedia: 3.4 in GPT-3, 2.45 in LLaMA.\\
+  Fine-tuning (SFT) & many & InstructGPT: 16 epochs, chosen by reward-model score, not validation loss.\\
+  Reward models & $\sim$1 & Preference models overfit quickly; HelpSteer3 kept to 1 epoch.\\
+\end{tabular}
+\bigskip
+
+\begin{block}{Takeaway}
+Parameters update every \emph{step}, not every epoch. Report steps and tokens.
+\end{block}
+\vfill
+{\footnotesize Sources: Ouyang et al.\ 2022, App.\ C.1; Brown et al.\ 2020; Touvron et al.\ 2023; HelpSteer3 (arXiv:2503.04378).}
+\end{frame}
+
+
 % ============================================================ GPT-2
 \begin{frame}\FrameTitle{GPT-2: one batch in numbers}{Unit 3}
     \vspace*{-3mm}
