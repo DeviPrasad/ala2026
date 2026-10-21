@@ -254,8 +254,8 @@ function:
   \vc{a}^{(l)} &= \relu(\vc{z}^{(l)}), & l&=1,2,\label{eq:a}\\
   \vc{q} &= \softmax(\vc{z}^{(3)}).\label{eq:q}
 \end{align}
-Here $\relu$ is applied entry by entry and, for $K$ classes
-($K=3$ here), the softmax is defined by
+
+For $K$ classes ($K=3$ here), the softmax is defined by
 \begin{equation}\label{eq:softmax}
   \softmax(\vc{z})_k=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}},
   \qquad k=1,\dots,K.
@@ -266,6 +266,34 @@ a \emph{row}: row $i$ holds the weights into unit $i$ of layer $l$, one for each
 unit of layer $l-1$ (see Figure~\ref{fig:network}). Thus $z^{(l)}_i$ in
 Eq.~\eqref{eq:z} is the product of row $i$ of $\vc{W}^{(l)}$ with
 $\vc{a}^{(l-1)}$, and no transpose is needed in the forward pass.
+
+For the network of Figure~\ref{fig:network}, the three weight matrices are
+\begin{equation}
+  \begin{gathered}
+    \vc{W}^{(1)}=\begin{pmatrix}
+      W_{11} & W_{12}\\
+      W_{21} & W_{22}\\
+      W_{31} & W_{32}
+    \end{pmatrix}\in\R^{3\times2},\\[6pt]
+    \vc{W}^{(2)}=\begin{pmatrix}
+      W_{11} & W_{12} & W_{13}\\
+      W_{21} & W_{22} & W_{23}\\
+      W_{31} & W_{32} & W_{33}
+    \end{pmatrix}\in\R^{3\times3},\qquad
+    \vc{W}^{(3)}=\begin{pmatrix}
+      W_{11} & W_{12} & W_{13}\\
+      W_{21} & W_{22} & W_{23}\\
+      W_{31} & W_{32} & W_{33}
+    \end{pmatrix}\in\R^{3\times3},
+  \end{gathered}
+  \label{eq:Wmats}
+\end{equation}
+where, as in the figure, the layer index is left off the entries: $W_{ij}$ in
+$\vc{W}^{(l)}$ stands for $W^{(l)}_{ij}$. Row $i$ lists the weights into unit $i$
+of layer $l$, and column $j$ the weights leaving unit $j$ of layer $l-1$. For
+example, row~1 of $\vc{W}^{(2)}$ holds $W_{11}$, $W_{12}$, $W_{13}$, the weights
+from units 1, 2 and 3 of Layer~1 into unit~1 of Layer~2. Each layer also has a
+bias vector $\vc{b}^{(l)}\in\R^{3}$, one entry per unit.
 
 Each example has a
 \emph{label} $c$, the index of its true class, and a \emph{target}
@@ -286,11 +314,11 @@ In these notes, Part~I derives the method in general, and
 Part~II demonstrates an example.
 
 \section{The loss and its gradient at the logits}
-\paragraph{Likelihood Function.}
+%\paragraph{Likelihood Function.}
 Given a set of observed data points
 $\mathcal{D} = \{d_1, d_2, \dots, d_n\}$ assumed to be independent
 and identically distributed (i.i.d.), and a model with
-parameters $\theta$, the likelihood function
+parameters $\theta$, the \textbf{likelihood} function
 $\mathcal{L}(\theta; \mathcal{D})$ represents the joint probability
 of observing that data given those parameters:
 \begin{equation}\label{eq:likelihood}
@@ -299,13 +327,22 @@ of observing that data given those parameters:
 \end{equation}
 
 \paragraph{The Log-Likelihood Function.}
-Maximising $\mathcal{L}$ directly runs into two practical problems.
+Maximising $\mathcal{L}$ directly runs into practical problems.
 Differentiating a product of $n$ probabilities with the product rule
 gives a sum of $n$ terms, each a product of $n-1$ probabilities
-and one derivative, which is clumsy to compute. And multiplying many small probabilities underflows
-in floating-point arithmetic. The natural logarithm avoids both. It is
-increasing, so it leaves the maximiser unchanged, and by
-$\ln(ab)=\ln a+\ln b$ it turns the product into a sum:
+and one derivative, which is clumsy to compute.
+\[
+    \frac{d}{dx} \left(f_1(x) f_2(x) \cdots f_n(x)\right) =
+        f_1'(x) f_2(x) \cdots f_n(x) +
+            f_1(x) f_2'(x) \cdots f_n(x) +
+                \cdots + f_1(x) f_2(x) \cdots f_n'(x)
+\]
+Further, multiplying many small probabilities underflows
+in floating-point arithmetic. The natural logarithm
+circumvents both issues. Because it is a monotonically
+increasing function, it preserves the location of the
+extrema. And because $\ln(ab)=\ln a+\ln b$, it turns
+the product into a sum:
 \begin{equation}\label{eq:loglik}
   \ell(\theta; \mathcal{D})=\ln\mathcal{L}(\theta; \mathcal{D})
     =\sum_{i=1}^{n}\ln P(d_i\mid\theta).
@@ -314,27 +351,66 @@ This function $\ell(\theta; \mathcal{D})$ is the log-likelihood. Its derivative 
 of $n$ simple terms.
 
 \paragraph{Loss Function.}
-In classification each data point is a labelled example,
-$d_i=(\vc{x}_i,c_i)$, and, treating the inputs as given, the model
-assigns the observed label the probability
-$P(c_i\mid\vc{x}_i,\theta)=q_{c_i}$, where $\vc{q}$ is computed from
-$\vc{x}_i$. The log-likelihood is then
-$\ell(\theta;\mathcal{D})=\sum_i\ln q_{c_i}$, so each example
-contributes $-\ln q_{c_i}$ to the loss.
+In classification tasks, every data point is a labeled
+example $d_i = (\symbf{x}_i, c_i)$.
+By treating the input features as fixed, the model
+defines the probability of the observed label as
+$P(c_i \mid \symbf{x}_i, \theta) = q_{c_i}$, where
+the distribution $\symbf{q}$ is predicted from
+$\symbf{x}_{i}$. Summing over the dataset yields
+the log-likelihood $\ell(\theta;
+\mathcal{D}) = \sum_{i} \ln q_{c_i}$.
+Because we minimize loss rather than maximize
+likelihood, each example contributes
+$-\ln q_{c_{i}}$ to the final loss function,
+meaning the total loss is simply the sum of
+these individual negative log-likelihood values.
 
-For one example, the loss $L=-\ln q_c$ is the negative
-log-likelihood of the observed label $c$ given the input
-$\vc{x}$, under the model (also called the per-example
-negative log-likelihood). For a one-hot
-target $\vc{y}$ it equals the cross-entropy
-$H(\vc{y},\vc{q})=-\sum_k y_k\ln q_k$. Averaged over
-a data set, the loss is $-\ell(\theta;\mathcal{D})/n$, so
-minimising it maximises the likelihood.
-A network with small random weights
-outputs a nearly uniform $\vc{q}$,
-so its loss is close to $\ln K$, where $K$ is the number of
-classes. %With $K=3$ and $\ln 3\approx1.0986$ here), a useful
-%sanity check at the start of any training run.
+For a single example, the loss $L = -\ln q_c$ is the negative log-likelihood of the
+observed label $c$ given the input $\symbf{x}$ under the model (the per-example
+negative log-likelihood). For a one-hot target $\symbf{y}$, it equals the
+cross-entropy
+\[
+  H(\symbf{y}, \symbf{q}) = -\sum_{k=1}^{K} y_k \ln q_k .
+\]
+Averaged over a dataset $\mathcal{D}$ of $n$ examples, the loss is
+$-\ell(\theta; \mathcal{D})/n$, so minimizing it maximizes the likelihood.
+A network with small random weights outputs a nearly uniform $\symbf{q}$, so its
+initial loss is close to $\ln K$, where $K$ is the number of classes.
+
+\begin{quote}
+\textit{Derivation of the initial loss $\ln K$:}
+\begin{enumerate}
+  \item \textbf{Near-equal logits:} Let $\symbf{z} = \symbf{W}\symbf{h} + \symbf{b}$
+  be the final-layer scores (logits) for the penultimate features $\symbf{h}$.
+  With small random $\symbf{W}$, $\symbf{b} = \symbf{0}$, and features of moderate
+  norm, the logits are all close to zero:
+  \[
+    z_k \approx 0 \quad \forall k \in \{1, \dots, K\}.
+  \]
+  In fact, it suffices that $z_1 \approx \dots \approx z_K$, since softmax is
+  invariant to adding a constant to every logit.
+
+  \item \textbf{Uniform probabilities:} If all logits equal a common value $a$,
+  the softmax gives
+  \[
+    q_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}
+        = \frac{e^{a}}{K e^{a}} = \frac{1}{K}
+    \quad \forall k,
+  \]
+  i.e.\ the uniform distribution over the $K$ classes.
+
+  \item \textbf{Loss:} Substituting $q_c = 1/K$ into the per-example loss for the
+  true class $c$ gives
+  \[
+    L = -\ln q_c = -\ln\!\left(\frac{1}{K}\right) = \ln K .
+  \]
+\end{enumerate}
+
+\textit{Sanity check.} For $K = 10$ the initial loss should be about
+$\ln 10 \approx 2.303$. A much larger value usually indicates a bug or an
+overly large weight initialization.
+\end{quote}
 
 When loss is calculated using natural logarithm,
 \emph{nat} is the conventional unit. We may say, for
@@ -365,17 +441,64 @@ to the logit $z_k$, the first term gives $-[k{=}c]=-y_k$
 exactly the one-hot target), and the second gives
 the softmax $q_k$:
 \begin{equation}\label{eq:dLdz}
-    \frac{\partial L}{\partial z_k}
-      = -[k{=}c]+\frac{e^{z_k}}{\sum_j e^{z_j}}
+    \dfrac{\partial L}{\partial z_k}
+      = -[k{=}c]+\dfrac{e^{z_k}}{\sum_j e^{z_j}}
       = - y_k + q_k = q_k - y_k \, .
 \end{equation}
 That is, the $k$-th entry of the gradient is the $k$-th
 entry of the predicted distribution $\vc{q}$ minus the
 $k$-th entry of the target $\vc{y}$. In vector form,
 \begin{equation}\label{eq:delta3}
-  \vc{\delta}^{(3)}:=\frac{\partial L}{\partial\vc{z}^{(3)}}=\vc{q}-\vc{y}\,.
+  \vc{\delta}^{(3)}:=\dfrac{\partial L}{\partial\vc{z}^{(3)}}=\vc{q}-\vc{y}\,.
 \end{equation}
 
+\subsubsection*{From $L$ To ${\partial L}/{\partial z_k}$}
+We need the chain rule to find the derivative of the term $\ln {\sum_j e^{z_j}}$
+with respect to $z_{k}$. Let
+$$u = {\sum_j e^{z_j}} = e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}$$
+so,
+\[
+    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_j e^{z_j}\right) =
+        \dfrac{\partial}{\partial z_{k}} \left(\ln u \right) =
+        \dfrac{\ln u}{\partial u} \cdot \dfrac{\partial u}{\partial z_{k}} =
+        \dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_{k}} =
+        \dfrac{1}{\sum _{j}e^{z_{j}}} \cdot \dfrac{\partial}{\partial z_{k}}\left(\sum_j e^{z_j}\right)
+\]
+
+We now take the derivative of every single
+term in $\sum_j e^{z_j}$, with respect to the
+specific target logit \(z_{k}\):
+\[
+    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right)= \dfrac{\partial}{\partial z_{k}}\left(e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}\right)
+\]
+Note that
+\begin{itemize}
+  \item for any term $j$ where the index is not $k$
+        (such as \(e^{z_1}, e^{z_2}\), etc.), $z_{j}$ is treated
+        as a constant. The derivative of a constant is 0.
+  \item for the specific term where the index is $k$
+        (the term \(e^{z_{k}}\)), the derivative of \(e^{z_{k}}\)
+        with respect to \(z_{k}\) is simply \(e^{z_{k}}\).
+\end{itemize}
+
+Therefore, only one term survives out of the entire sum:
+\[
+    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
+        0+0+\dots +e^{z_{k}}+\dots +0=e^{z_{k}}
+\]
+
+Finally, we plug these results back in the original equation
+(\(\dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_k}\)):
+\[
+    \dfrac{\partial }{\partial z_{k}}\left(\ln \sum _{j}e^{z_{j}}\right)
+        = \left(\frac{1}{\sum _{j}e^{z_{j}}}\right)\cdot e^{z_{k}}
+        = \dfrac{e^{z_{k}}}{\sum _{j}e^{z_{j}}}
+\]
+
+Notice this is same as the softmax function. Therefore, we simply
+refer to it as $q_{k}$.
+
+\paragraph{Remarks}
 Two remarks on the gradient $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
 at the logits:
 \begin{itemize}
@@ -822,6 +945,87 @@ depend on the label. The label enters only through the loss,
 $L=-\ln q_1=\LLabelOne$ (Eq.~\eqref{eq:loss}), and through
 $\vc{\delta}^{(3)}=\vc{q}-\vc{y}=\dThreeLabelOne$ (Eq.~\eqref{eq:delta3}).
 Everything downstream of $\vc{\delta}^{(3)}$ in the backward pass would change.
+
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.4cm}@{}}
+    \toprule
+    \textbf{Quantity} & \textbf{Definition} & \textbf{Common-sense meaning} \\
+    \midrule
+    Surprisal of outcome $k$ under $\vc{q}$
+      & $I_{\vc{q}}(k)=-\ln q_k$
+      & How surprised the model is when outcome $k$ occurs. It is $0$ when $q_k=1$ and grows without bound as $q_k\to0$; surprisals of independent events add. The loss $L=-\ln q_c$ is the surprisal of the true label. \\[6pt]
+    Entropy of $\vc{y}$
+      & $H(\vc{y})=-\sum_k y_k\ln y_k=\mathbb{E}_{k\sim\vc{y}}[-\ln y_k]$
+      & The average surprisal of outcomes drawn from $\vc{y}$, judged by $\vc{y}$ itself: the uncertainty built into $\vc{y}$. It is $0$ for a one-hot $\vc{y}$ and largest, $\ln K$, for the uniform one. \\[6pt]
+    Cross-entropy
+      & $H(\vc{y},\vc{q})=-\sum_k y_k\ln q_k=\mathbb{E}_{k\sim\vc{y}}[-\ln q_k]$
+      & The average surprisal of the model $\vc{q}$ when outcomes actually come from $\vc{y}$. This is the training loss; for a one-hot $\vc{y}$ it equals $-\ln q_c$. \\[6pt]
+    KL divergence
+      & $\operatorname{KL}(\vc{y}\,\|\,\vc{q})=\sum_k y_k\ln\dfrac{y_k}{q_k}=H(\vc{y},\vc{q})-H(\vc{y})$
+      & The extra surprisal caused by using $\vc{q}$ instead of the truth $\vc{y}$. It is never negative, it is $0$ only when $\vc{q}=\vc{y}$, and it is not symmetric in $\vc{y}$ and $\vc{q}$. \\[6pt]
+    Perplexity
+      & $\mathrm{PP}=e^{H(\vc{y},\vc{q})}$ (base $e$ with $\ln$; use $2^{H}$ if $H$ is in bits)
+      & The number of equally likely options the model is effectively hesitating between. A uniform $\vc{q}$ over $K$ classes has $\mathrm{PP}=K$ and a perfect model has $\mathrm{PP}=1$. In practice it is $e^{\text{mean loss}}$. \\
+    \bottomrule
+  \end{tabular}
+  \caption{Surprisal, entropy, cross-entropy, KL divergence and perplexity}
+  \label{tab:info}
+\end{table}
+
+\newpage
+
+\paragraph{Cross-entropy $=$ entropy $+$ KL divergence.}
+For each class $k$, $-\ln q_k=-\ln y_k+\ln\dfrac{y_k}{q_k}$, because
+$\ln\dfrac{y_k}{q_k}=\ln y_k-\ln q_k$. Multiplying by $y_k$ and summing over $k$ gives
+\begin{equation}
+  \underbrace{-\sum_k y_k\ln q_k}_{H(\vc{y},\vc{q})}
+  =\underbrace{-\sum_k y_k\ln y_k}_{H(\vc{y})}
+  +\underbrace{\sum_k y_k\ln\frac{y_k}{q_k}}_{\operatorname{KL}(\vc{y}\,\|\,\vc{q})}.
+  \label{eq:cekl}
+\end{equation}
+(Terms with $y_k=0$ contribute $0$ throughout, with the convention $0\ln0=0$.)
+
+\paragraph{KL divergence is never negative.}
+Use $\ln t\le t-1$ for $t>0$, with equality only at $t=1$. Taking
+$t=q_k/y_k$ for the classes with $y_k>0$,
+\[
+  -\operatorname{KL}(\vc{y}\,\|\,\vc{q})=\sum_{y_k>0}y_k\ln\frac{q_k}{y_k}
+  \le\sum_{y_k>0}y_k\Big(\frac{q_k}{y_k}-1\Big)
+  =\sum_{y_k>0}q_k-\sum_{y_k>0}y_k
+  =\sum_{y_k>0}q_k-1\le0 .
+\]
+Hence $\operatorname{KL}\ge0$, with equality only if $q_k=y_k$ for every $k$.
+By Eq.~\eqref{eq:cekl}, $H(\vc{y},\vc{q})\ge H(\vc{y})$: the loss cannot go
+below the entropy of the targets, and it reaches that value exactly when
+$\vc{q}=\vc{y}$. For a one-hot $\vc{y}$ the floor is $H(\vc{y})=0$.
+
+\paragraph{Maximum entropy, and why a fresh network has loss near $\ln K$.}
+Let $\vc{u}$ be the uniform distribution, $u_k=1/K$. Then
+\[
+  \operatorname{KL}(\vc{y}\,\|\,\vc{u})=\sum_k y_k\ln\frac{y_k}{1/K}
+  =\sum_k y_k\ln y_k+\ln K\sum_k y_k=-H(\vc{y})+\ln K .
+\]
+Since $\operatorname{KL}\ge0$, $H(\vc{y})\le\ln K$, with equality only for a
+uniform $\vc{y}$. Also, for any $\vc{y}$,
+$H(\vc{y},\vc{u})=-\sum_k y_k\ln\frac1K=\ln K$: a model that outputs a uniform
+$\vc{q}$ has loss $\ln K$ whatever the target.
+
+\paragraph{Perplexity is the exponential of the mean loss.}
+For labelled examples $(\vc{x}_i,c_i)$, $i=1,\dots,n$, let
+$\bar L=-\frac1n\sum_{i=1}^{n}\ln q_{c_i}$ be the mean loss. Then
+\[
+  e^{\bar L}=\exp\Big(-\frac1n\sum_{i=1}^{n}\ln q_{c_i}\Big)
+  =\Big(\prod_{i=1}^{n}q_{c_i}\Big)^{-1/n},
+\]
+the reciprocal of the geometric mean of the probabilities given to the true
+labels. For $n=1$ it is $1/q_c$: in the worked example the perplexity was
+$1/0.3158\approx3.17$ before the update and $1/0.4077\approx2.45$ after it, so
+the model went from hesitating between about three classes to about two and a
+half.
 
 \iffalse
 \section{What to take from the computation}
