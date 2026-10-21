@@ -37,7 +37,6 @@
 \pagecolor{brown!10}
 
 %
-%\newcommand{\scaletop}[1]{\vcenter{\hbox{\scalebox{0.75}{$#1\Trans$}}}}
 \newcommand{\scaletop}[1]{\raisebox{1.5pt}{\scalebox{0.75}{$#1\top$}}}
 \newcommand{\Trans}{{\mathpalette\scaletop\relax}}
 %%
@@ -134,7 +133,7 @@
 \definecolor{relucol}{HTML}{D55E00}
 \definecolor{hlcol}{HTML}{0072B2}
 
-\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 3]}
+\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 4]}
 \author{Devi Prasad M.
   \thanks{Prepared with the assistance of Claude
   (Anthropic; model \texttt{claude-sonnet-5-5}), which produced
@@ -270,66 +269,72 @@ $\vc{a}^{(l-1)}$, and no transpose is needed in the forward pass.
 For the network of Figure~\ref{fig:network}, the three weight matrices are
 \begin{equation}
   \begin{gathered}
-    \vc{W}^{(1)}=\begin{pmatrix}
+    \vc{W}^{(1)}=\begin{bmatrix}
       W_{11} & W_{12}\\
       W_{21} & W_{22}\\
       W_{31} & W_{32}
-    \end{pmatrix}\in\R^{3\times2},\\[6pt]
-    \vc{W}^{(2)}=\begin{pmatrix}
+    \end{bmatrix}\in\R^{3\times2},\\[6pt]
+    \vc{W}^{(2)}=\begin{bmatrix}
       W_{11} & W_{12} & W_{13}\\
       W_{21} & W_{22} & W_{23}\\
       W_{31} & W_{32} & W_{33}
-    \end{pmatrix}\in\R^{3\times3},\qquad
-    \vc{W}^{(3)}=\begin{pmatrix}
+    \end{bmatrix}\in\R^{3\times3},\qquad
+    \vc{W}^{(3)}=\begin{bmatrix}
       W_{11} & W_{12} & W_{13}\\
       W_{21} & W_{22} & W_{23}\\
       W_{31} & W_{32} & W_{33}
-    \end{pmatrix}\in\R^{3\times3},
+    \end{bmatrix}\in\R^{3\times3},
   \end{gathered}
   \label{eq:Wmats}
 \end{equation}
-where, as in the figure, the layer index is left off the entries: $W_{ij}$ in
-$\vc{W}^{(l)}$ stands for $W^{(l)}_{ij}$. Row $i$ lists the weights into unit $i$
-of layer $l$, and column $j$ the weights leaving unit $j$ of layer $l-1$. For
-example, row~1 of $\vc{W}^{(2)}$ holds $W_{11}$, $W_{12}$, $W_{13}$, the weights
-from units 1, 2 and 3 of Layer~1 into unit~1 of Layer~2. Each layer also has a
+where, as in the figure, the layer index is left off
+the entries: $W_{ij}$ in $\vc{W}^{(l)}$ stands for
+$W^{(l)}_{ij}$. Row $i$ lists the weights into
+unit $i$ of layer $l$, and column $j$ the weights
+leaving unit $j$ of layer $l-1$. For
+example, row~1 of $\vc{W}^{(2)}$ holds $W_{11}$,
+$W_{12}$, $W_{13}$, the weights from units 1, 2 and 3
+of Layer~1 into unit~1 of Layer~2. Each layer also has a
 bias vector $\vc{b}^{(l)}\in\R^{3}$, one entry per unit.
 
 Each example has a
-\emph{label} $c$, the index of its true class, and a \emph{target}
-$\vc{y}$, the one-hot vector with $y_c=1$ and all other entries~0. The loss is
+\emph{label} $c$, the index of its true class, and
+a \emph{target} $\vc{y}$, the one-hot vector with
+$y_c=1$ and all other entries~0. The loss is
 $L=-\ln q_c$.
 
-There are 24 weights ($6+9+9$) and 9 biases ($3+3+3$), so 33 parameters
-in all, collected in $\theta$.
+There are 24 weights ($6+9+9$) and 9 biases ($3+3+3$),
+so 33 parameters in all, collected in $\theta$.
 
-Training adjusts $\theta$ by gradient descent with learning
-rate $\eta$, $\theta\leftarrow\theta-\eta\,\nabla_{\theta}L$.
-\emph{Backpropagation} is the method for computing all 33
-partial derivatives at once, in two passes: a forward
-pass that stores intermediate values, followed by a
-backward sweep that reuses them.
+Training adjusts $\theta$ by gradient descent with
+learning rate $\eta$, $\theta\leftarrow\theta-\eta\,\nabla_{\theta}L$.
+\emph{Backpropagation} is the method for computing
+all 33 partial derivatives at once, in two passes:
+a forward pass that stores intermediate values,
+followed by a backward sweep that reuses them.
 
-In these notes, Part~I derives the method in general, and
-Part~II demonstrates an example.
+In these notes, Part~I derives the method in general,
+and Part~II demonstrates an example.
 
 \section{The loss and its gradient at the logits}
 %\paragraph{Likelihood Function.}
 Given a set of observed data points
-$\mathcal{D} = \{d_1, d_2, \dots, d_n\}$ assumed to be independent
-and identically distributed (i.i.d.), and a model with
-parameters $\theta$, the \textbf{likelihood} function
-$\mathcal{L}(\theta; \mathcal{D})$ represents the joint probability
-of observing that data given those parameters:
+$\mathcal{D} = \{d_1, d_2, \dots, d_n\}$ assumed to be
+independent and identically distributed (i.i.d.), and
+a model with parameters $\theta$, the \textbf{likelihood}
+function $\mathcal{L}(\theta; \mathcal{D})$ represents
+the joint probability of observing that data given
+those parameters:
 \begin{equation}\label{eq:likelihood}
     \mathcal{L}(\theta; \mathcal{D}) = P(\mathcal{D} \mid \theta)
       = \prod_{i=1}^{n} P(d_i \mid \theta)
 \end{equation}
 
 \paragraph{The Log-Likelihood Function.}
-Maximising $\mathcal{L}$ directly runs into practical problems.
-Differentiating a product of $n$ probabilities with the product rule
-gives a sum of $n$ terms, each a product of $n-1$ probabilities
+Maximising $\mathcal{L}$ directly runs into
+practical problems. Differentiating a product of
+$n$ probabilities with the product rule gives a
+sum of $n$ terms, each a product of $n-1$ probabilities
 and one derivative, which is clumsy to compute.
 \[
     \frac{d}{dx} \left(f_1(x) f_2(x) \cdots f_n(x)\right) =
@@ -347,7 +352,8 @@ the product into a sum:
   \ell(\theta; \mathcal{D})=\ln\mathcal{L}(\theta; \mathcal{D})
     =\sum_{i=1}^{n}\ln P(d_i\mid\theta).
 \end{equation}
-This function $\ell(\theta; \mathcal{D})$ is the log-likelihood. Its derivative is a sum
+This function $\ell(\theta; \mathcal{D})$ is the
+log-likelihood. Its derivative is a sum
 of $n$ simple terms.
 
 \paragraph{Loss Function.}
@@ -366,57 +372,66 @@ $-\ln q_{c_{i}}$ to the final loss function,
 meaning the total loss is simply the sum of
 these individual negative log-likelihood values.
 
-For a single example, the loss $L = -\ln q_c$ is the negative log-likelihood of the
-observed label $c$ given the input $\symbf{x}$ under the model (the per-example
-negative log-likelihood). For a one-hot target $\symbf{y}$, it equals the
-cross-entropy
+For a single example, the loss $L = -\ln q_c$ is the
+negative log-likelihood of the observed label $c$
+given the input $\symbf{x}$ under the model
+(the per-example negative log-likelihood). For a
+one-hot target $\symbf{y}$, it equals the cross-entropy
 \[
   H(\symbf{y}, \symbf{q}) = -\sum_{k=1}^{K} y_k \ln q_k .
 \]
-Averaged over a dataset $\mathcal{D}$ of $n$ examples, the loss is
-$-\ell(\theta; \mathcal{D})/n$, so minimizing it maximizes the likelihood.
-A network with small random weights outputs a nearly uniform $\symbf{q}$, so its
-initial loss is close to $\ln K$, where $K$ is the number of classes.
+Averaged over a dataset $\mathcal{D}$ of $n$ examples,
+the loss is $-\ell(\theta; \mathcal{D})/n$, so
+minimizing it maximizes the likelihood. A network with
+small random weights outputs a nearly uniform $\symbf{q}$,
+so its initial loss is close to $\ln K$, where $K$ is
+the number of classes.
 
 \begin{quote}
 \textit{Derivation of the initial loss $\ln K$:}
 \begin{enumerate}
-  \item \textbf{Near-equal logits:} Let $\symbf{z} = \symbf{W}\symbf{h} + \symbf{b}$
-  be the final-layer scores (logits) for the penultimate features $\symbf{h}$.
-  With small random $\symbf{W}$, $\symbf{b} = \symbf{0}$, and features of moderate
-  norm, the logits are all close to zero:
-  \[
-    z_k \approx 0 \quad \forall k \in \{1, \dots, K\}.
-  \]
-  In fact, it suffices that $z_1 \approx \dots \approx z_K$, since softmax is
-  invariant to adding a constant to every logit.
+    \item \textbf{Near-equal logits:}
+        Let $\symbf{z} = \symbf{W}\symbf{h} + \symbf{b}$
+        be the final-layer scores (logits) for the
+        penultimate features $\symbf{h}$. With small
+        random $\symbf{W}$, $\symbf{b} = \symbf{0}$,
+        and features of moderate norm, the logits
+        are all close to zero:
+        \[
+            z_k \approx 0 \quad \forall k \in \{1, \dots, K\}.
+        \]
+        In fact, it suffices that $z_1 \approx \dots
+        \approx z_K$, since softmax is
+        invariant to adding a constant to every logit.
 
-  \item \textbf{Uniform probabilities:} If all logits equal a common value $a$,
-  the softmax gives
-  \[
-    q_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}
-        = \frac{e^{a}}{K e^{a}} = \frac{1}{K}
-    \quad \forall k,
-  \]
-  i.e.\ the uniform distribution over the $K$ classes.
+  \item \textbf{Uniform probabilities:} If all logits
+        equal a common value $a$,
+        the softmax gives
+        \[
+            q_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}
+                = \frac{e^{a}}{K e^{a}} = \frac{1}{K}
+            \quad \forall k,
+        \]
+        i.e.\ the uniform distribution over the $K$ classes.
 
-  \item \textbf{Loss:} Substituting $q_c = 1/K$ into the per-example loss for the
-  true class $c$ gives
-  \[
-    L = -\ln q_c = -\ln\!\left(\frac{1}{K}\right) = \ln K .
-  \]
+    \item \textbf{Loss:} Substituting $q_c = 1/K$ into the per-example loss for the
+    true class $c$ gives
+    \[
+        L = -\ln q_c = -\ln\!\left(\frac{1}{K}\right) = \ln K .
+    \]
 \end{enumerate}
 
-\textit{Sanity check.} For $K = 10$ the initial loss should be about
-$\ln 10 \approx 2.303$. A much larger value usually indicates a bug or an
-overly large weight initialization.
+\textit{Sanity check.} For $K = 10$ the initial loss
+should be about $\ln 10 \approx 2.303$. A much larger
+value usually indicates a bug or an overly large
+weight initialization.
 \end{quote}
 
 When loss is calculated using natural logarithm,
 \emph{nat} is the conventional unit. We may say, for
 instance, ``the loss is \(2.303\) nats''.
 
-\paragraph{The gradient.}
+\paragraph{Gradient of Softmax Cross-Entropy with Respect to Logits.}
 Writing $\vc{z}=\vc{z}^{(3)}$, the definition of the softmax gives
 $q_c=\softmax(\vc{z})_c=e^{z_c}/\sum_j e^{z_j}$, so
 \begin{align}
@@ -452,25 +467,35 @@ $k$-th entry of the target $\vc{y}$. In vector form,
   \vc{\delta}^{(3)}:=\dfrac{\partial L}{\partial\vc{z}^{(3)}}=\vc{q}-\vc{y}\,.
 \end{equation}
 
-\subsubsection*{From $L$ To ${\partial L}/{\partial z_k}$}
-We need the chain rule to find the derivative of the term $\ln {\sum_j e^{z_j}}$
-with respect to $z_{k}$. Let
-$$u = {\sum_j e^{z_j}} = e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}$$
-so,
-\[
-    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_j e^{z_j}\right) =
-        \dfrac{\partial}{\partial z_{k}} \left(\ln u \right) =
-        \dfrac{\ln u}{\partial u} \cdot \dfrac{\partial u}{\partial z_{k}} =
-        \dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_{k}} =
-        \dfrac{1}{\sum _{j}e^{z_{j}}} \cdot \dfrac{\partial}{\partial z_{k}}\left(\sum_j e^{z_j}\right)
-\]
+%\subsubsection*{From $L$ To ${\partial L}/{\partial z_k}$}
+\paragraph{Working Through the Gradient Derivation.}
+The chain rule is required to find the derivative of the
+term $\ln {\sum_j e^{z_j}}$ with respect to $z_{k}$. Let
+\begin{equation}\label{eq:u-sum-def}
+    u = {\sum_j e^{z_j}} = e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}.
+\end{equation}
+
+Applying the chain rule, we get
+\begin{equation}\label{eq:delta-intermediate-1}
+\begin{aligned}[b]
+    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_j e^{z_j}\right) &=
+        \dfrac{\partial}{\partial z_{k}} \left(\ln u \right) \\[1pt]
+        &=
+        \dfrac{\ln u}{\partial u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
+        &=
+        \dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
+        &=
+        \dfrac{1}{\sum _{j}e^{z_{j}}} \cdot \dfrac{\partial}{\partial z_{k}}\left(\sum_j e^{z_j}\right).
+\end{aligned}
+\end{equation}
 
 We now take the derivative of every single
 term in $\sum_j e^{z_j}$, with respect to the
 specific target logit \(z_{k}\):
-\[
-    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right)= \dfrac{\partial}{\partial z_{k}}\left(e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}\right)
-\]
+\begin{equation}\label{eq:delta-intermediate-2}
+    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
+        \dfrac{\partial}{\partial z_{k}}\left(e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}\right)
+\end{equation}
 Note that
 \begin{itemize}
   \item for any term $j$ where the index is not $k$
@@ -481,20 +506,20 @@ Note that
         with respect to \(z_{k}\) is simply \(e^{z_{k}}\).
 \end{itemize}
 
-Therefore, only one term survives out of the entire sum:
-\[
+Therefore, out of the entire sum, only one term survives:
+\begin{equation}\label{eq:delta-sum-logit-zk}
     \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
         0+0+\dots +e^{z_{k}}+\dots +0=e^{z_{k}}
-\]
+\end{equation}
 
 Finally, we plug these results back in the original equation
-(\(\dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_k}\)):
-\[
-    \dfrac{\partial }{\partial z_{k}}\left(\ln \sum _{j}e^{z_{j}}\right)
-        = \left(\frac{1}{\sum _{j}e^{z_{j}}}\right)\cdot e^{z_{k}}
-        = \dfrac{e^{z_{k}}}{\sum _{j}e^{z_{j}}}
-\]
-
+\eqref{eq:delta-intermediate-1}
+%(\(\dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_k}\)):
+\begin{equation}\label{eq:delta-wrt-logit}
+    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_{j}e^{z_{j}}\right)
+        = \left(\frac{1}{\sum_{j}e^{z_{j}}}\right)\cdot e^{z_{k}}
+        = \dfrac{e^{z_{k}}}{\sum_{j}e^{z_{j}}}
+\end{equation}
 Notice this is same as the softmax function. Therefore, we simply
 refer to it as $q_{k}$.
 
@@ -526,9 +551,10 @@ at the logits:
 
 \section{Backpropagation through a layer}
 
-Consider layer $l$ with input $\vc{a}^{(l-1)}$, and suppose
-$\vc{\delta}^{(l)}=\partial L/\partial\vc{z}^{(l)}$ is known. Three results
-follow from the chain rule.
+Consider layer $l$ with input $\vc{a}^{(l-1)}$,
+and suppose
+$\vc{\delta}^{(l)}=\partial L/\partial\vc{z}^{(l)}$
+is known. Three results follow from the chain rule.
 
 \paragraph{Gradient of the weights and biases.}
 The pre-activation $z^{(l)}_i=\sum_j W^{(l)}_{ij}a^{(l-1)}_j+b^{(l)}_i$ depends
@@ -696,19 +722,36 @@ gradient differs.
 \section{Summary of formulas}
 
 \begin{itemize}
-  \item \textbf{Forward:} $\vc{z}^{(l)}=\vc{W}^{(l)}\vc{a}^{(l-1)}+\vc{b}^{(l)}$,
-        $\vc{a}^{(l)}=\relu(\vc{z}^{(l)})$, $\vc{q}=\softmax(\vc{z}^{(3)})$,
-        $L=-\ln q_c$ (Eqs.~\eqref{eq:z}--\eqref{eq:q}, \eqref{eq:loss}).
+  \item \textbf{Forward:}
+        $\vc{z}^{(l)}=\vc{W}^{(l)}\vc{a}^{(l-1)}+\vc{b}^{(l)}$,
+        $\vc{a}^{(l)}=\relu(\vc{z}^{(l)})$,
+        $\vc{q}=\softmax(\vc{z}^{(3)})$,
+        $L=-\ln q_c$
+        (Eqs.~\eqref{eq:z}--\eqref{eq:q}, \eqref{eq:loss}).
+
   \item \textbf{Start of the backward pass:}
-        $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$ (Eq.~\eqref{eq:delta3}).
+        $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
+        (Eq.~\eqref{eq:delta3}).
+
   \item \textbf{Each layer:}
-        $\grad{\vc{W}^{(l)}}=\vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top}$,
-        $\grad{\vc{b}^{(l)}}=\vc{\delta}^{(l)}$,
-        $\vc{\delta}^{(l-1)}=\big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\big)\odot\relu'(\vc{z}^{(l-1)})$
-        (Eqs.~\eqref{eq:dW}, \eqref{eq:db}, \eqref{eq:deltarec}).
-  \item \textbf{Check:} central difference with step $\varepsilon$
+        \[
+          \begin{aligned}
+            \grad{\vc{W}^{(l)}}
+              &= \vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top},\\
+            \grad{\vc{b}^{(l)}}
+              &= \vc{\delta}^{(l)},\\
+            \vc{\delta}^{(l-1)}
+              &= \bigl((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\bigr)
+                 \odot \relu'(\vc{z}^{(l-1)}).
+          \end{aligned}
+        \]
+        See Eqs.~\eqref{eq:dW}, \eqref{eq:db}, and \eqref{eq:deltarec}.
+
+  \item \textbf{Check:} Central difference with step $\varepsilon$
         (Eq.~\eqref{eq:cd}).
-  \item \textbf{Update:} $\theta\leftarrow\theta-\eta\nabla_\theta L$.
+
+  \item \textbf{Update:}
+        $\theta\leftarrow\theta-\eta\nabla_\theta L$.
 \end{itemize}
 
 \section{Differences from PyTorch}
