@@ -133,7 +133,7 @@
 \definecolor{relucol}{HTML}{D55E00}
 \definecolor{hlcol}{HTML}{0072B2}
 
-\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 4]}
+\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 5]}
 \author{Devi Prasad M.
   \thanks{Prepared with the assistance of Claude
   (Anthropic; model \texttt{claude-sonnet-5-5}), which produced
@@ -316,87 +316,206 @@ followed by a backward sweep that reuses them.
 In these notes, Part~I derives the method in general,
 and Part~II demonstrates an example.
 
-\section{The loss and its gradient at the logits}
-%\paragraph{Likelihood Function.}
+% =====================================================================
+% (A) NEW SECTION 2 -- replaces the current Section 2,
+%     "From Likelihood to the Logistic Loss" (all of it).
+% =====================================================================
+\section{From likelihood to the cross-entropy loss}
+\label{sec:likelihood}
+
+Training chooses the parameters $\theta$, and the
+likelihood conveys what the best choice is. We identify
+four steps that lead this idea to the loss
+used in practice. Each step addresses one practical
+problem.
+
+\paragraph{Step 1: Make the observed data most probable.}
 Given a set of observed data points
-$\mathcal{D} = \{d_1, d_2, \dots, d_n\}$ assumed to be
-independent and identically distributed (i.i.d.), and
-a model with parameters $\theta$, the \textbf{likelihood}
-function $\mathcal{L}(\theta; \mathcal{D})$ represents
-the joint probability of observing that data given
-those parameters:
+$\mathcal{D}=\{d_1,d_2,\dots,d_n\}$, assumed to be
+independent and identically distributed (i.i.d.),
+the \textbf{likelihood}
+$\mathcal{L}(\theta;\mathcal{D})$ is the probability
+of observing $\mathcal{D}$ under the model with
+parameters $\theta$. It is regarded as a function of
+$\theta$ with the data held fixed.
+
+By independence it factorises into a product:
 \begin{equation}\label{eq:likelihood}
-    \mathcal{L}(\theta; \mathcal{D}) = P(\mathcal{D} \mid \theta)
-      = \prod_{i=1}^{n} P(d_i \mid \theta)
+  \mathcal{L}(\theta;\mathcal{D})=P(\mathcal{D}\mid\theta)
+    =\prod_{i=1}^{n}P(d_i\mid\theta).
 \end{equation}
 
-\paragraph{The Log-Likelihood Function.}
-Maximising $\mathcal{L}$ directly runs into
-practical problems. Differentiating a product of
-$n$ probabilities with the product rule gives a
-sum of $n$ terms, each a product of $n-1$ probabilities
-and one derivative, which is clumsy to compute.
+Training searches for the $\theta$ that makes
+$\mathcal{L}$ as large as possible, improving
+$\theta$ step by step. (For a neural network this
+finds a good local maximum rather than a
+guaranteed global one)
+
+\paragraph{Step 2: Take the logarithm.}
+Maximising Eq.~\eqref{eq:likelihood} directly runs
+into two practical problems. First, every factor is
+at most~$1$, so the product shrinks geometrically with
+$n$. For instance, for $1000$ examples each given
+probability $0.1$ %have likelihood $10^{-1000}$,
+%far below the smallest positive double-precision number (about
+%$4.9\times10^{-324}$):
+the computed product is exactly $0$. Second,
+differentiating a product of $n$ probabilities with
+the product rule gives a sum of $n$ terms,  each a
+product of $n-1$ probabilities and one derivative:
 \[
-    \frac{d}{dx} \left(f_1(x) f_2(x) \cdots f_n(x)\right) =
-        f_1'(x) f_2(x) \cdots f_n(x) +
-            f_1(x) f_2'(x) \cdots f_n(x) +
-                \cdots + f_1(x) f_2(x) \cdots f_n'(x)
+  \begin{aligned}
+    \frac{d}{dx}\bigl(f_1(x)f_2(x)\cdots f_n(x)\bigr)
+      &= f_1'(x)f_2(x)\cdots f_n(x)+f_1(x)f_2'(x)\cdots f_n(x)\\
+      &\quad+\cdots+f_1(x)f_2(x)\cdots f_n'(x).
+  \end{aligned}
 \]
-Further, multiplying many small probabilities underflows
-in floating-point arithmetic. The natural logarithm
-circumvents both issues. Because it is a monotonically
-increasing function, it preserves the location of the
-extrema. And because $\ln(ab)=\ln a+\ln b$, it turns
-the product into a sum:
+The natural logarithm removes both problems.
+It is strictly increasing, so it
+does not move the maximiser, and because
+$\ln(ab)=\ln a+\ln b$ it turns the
+product into a sum:
 \begin{equation}\label{eq:loglik}
-  \ell(\theta; \mathcal{D})=\ln\mathcal{L}(\theta; \mathcal{D})
+  \ell(\theta;\mathcal{D})=\ln\mathcal{L}(\theta;\mathcal{D})
     =\sum_{i=1}^{n}\ln P(d_i\mid\theta).
 \end{equation}
-This function $\ell(\theta; \mathcal{D})$ is the
-log-likelihood. Its derivative is a sum
-of $n$ simple terms.
+In the example above,
+$\ell=(1000 * \ln 0.1) \approx -2302.6$,
+an ordinary number, and the derivative of
+$\ell$ is a sum of $n$ simple terms.
 
-\paragraph{Loss Function.}
-In classification tasks, every data point is a labeled
-example $d_i = (\symbf{x}_i, c_i)$.
-By treating the input features as fixed, the model
-defines the probability of the observed label as
-$P(c_i \mid \symbf{x}_i, \theta) = q_{c_i}$, where
-the distribution $\symbf{q}$ is predicted from
-$\symbf{x}_{i}$. Summing over the dataset yields
-the log-likelihood $\ell(\theta;
-\mathcal{D}) = \sum_{i} \ln q_{c_i}$.
-Because we minimize loss rather than maximize
-likelihood, each example contributes
-$-\ln q_{c_{i}}$ to the final loss function,
-meaning the total loss is simply the sum of
-these individual negative log-likelihood values.
+\paragraph{Step 3: Negate, so that we minimise.}
+The optimisers in deep learning libraries are written to \emph{minimise}, by gradient
+descent. Maximising $\ell$ is the same as minimising $-\ell$, the
+\emph{negative log-likelihood}:
+\begin{equation}\label{eq:nll}
+  -\ell(\theta;\mathcal{D})=-\sum_{i=1}^{n}\ln P(d_i\mid\theta).
+\end{equation}
 
-For a single example, the loss $L = -\ln q_c$ is the
-negative log-likelihood of the observed label $c$
-given the input $\symbf{x}$ under the model
-(the per-example negative log-likelihood). For a
-one-hot target $\symbf{y}$, it equals the cross-entropy
+\paragraph{Step 4: Apply it to classification with $K$ classes.}
+In classification each data point is a labelled
+example $d_i=(\vc{x}_i,c_i)$, with label
+$c_i\in\{1,\dots,K\}$. The model predicts the label
+from the input. The model says nothing about how
+the inputs arise in the first place. Therefore,
+we consider the inputs as given, use
+$P(c_i\mid\vc{x}_i,\theta)$ in place of
+$P(d_i\mid\theta)$, and Steps 1--3 carry over
+unchanged.
+
+Let $\vc{z}_i$ be the logits for $\vc{x}_i$, $\vc{q}_i=\softmax(\vc{z}_i)$ the
+prediction (Eq.~\eqref{eq:softmax}) and $\vc{y}_i$ the one-hot target of the label
+$c_i$, with entries $q_{ik}$ and $y_{ik}$. The probability of the observed label is
+entry $c_i$ of $\vc{q}_i$, written $q_{c_i}$, and the target lets us write it as a
+product over all $K$ classes:
+\begin{equation}\label{eq:catlik}
+  P(c_i\mid\vc{x}_i,\theta)=q_{c_i}=\prod_{k=1}^{K}q_{ik}^{\,y_{ik}} .
+\end{equation}
+Every factor with $y_{ik}=0$ equals $q_{ik}^{0}=1$, which leaves only the factor
+for the true class.
+
+\paragraph{A short digression. Stating facts in simple language.}
+For the $i$-th example, the network turns the
+input $\vc{x}_i$ into logits $\vc{z}_i$.
+The softmax (Eq.~\eqref{eq:softmax}) turns
+these logits into the predicted probabilities
+$\vc{q}_i$. The target $\vc{y}_i$ is the one-hot
+vector for the label $c_i$. We write $q_{ik}$
+and $y_{ik}$ for the $k$-th entries of
+$\vc{q}_i$ and $\vc{y}_i$.
+
+``For example $i$, the input goes in and the network
+produces scores, the logits. The softmax turns the
+scores into probabilities. The target marks the
+correct class with a 1. $q_ik$ and $y_ik$ are entry
+$k$ of each.''
+
+\paragraph{Back to classification with $K$ classes.}
+Taking the logarithm and summing over the examples, as in
+Eq.~\eqref{eq:loglik},
+\begin{equation}\label{eq:condloglik}
+  \ell(\theta;\mathcal{D})=\sum_{i=1}^{n}\sum_{k=1}^{K}y_{ik}\ln q_{ik}
+    =\sum_{i=1}^{n}\ln q_{c_i}.
+\end{equation}
+The inner sum is minus the cross-entropy
+$H(\vc{y}_i,\vc{q}_i)=-\sum_k y_{ik}\ln q_{ik}$ (Table~\ref{tab:info}). Negating
+and averaging over the $n$ examples gives the mean loss minimised in training:
+\begin{equation}\label{eq:meanloss}
+  \bar L(\theta)=-\frac{1}{n}\,\ell(\theta;\mathcal{D})
+    =\frac{1}{n}\sum_{i=1}^{n}H(\vc{y}_i,\vc{q}_i)
+    =\frac{1}{n}\sum_{i=1}^{n}\bigl(-\ln q_{c_i}\bigr).
+\end{equation}
+Minimising $\bar L$ therefore maximises the likelihood. For a single example the
+loss is $L=-\ln q_c$, the per-example negative log-likelihood of the observed
+label, which is the starting point of Section~\ref{sec:loss}.
+
+\paragraph{The binary case is the logistic loss.}
+With $K=2$ the two logits carry one redundant degree of freedom: adding the same
+constant to both leaves $\vc{q}$ unchanged, so only their difference matters.
+With $z=z_1-z_2$,
 \[
-  H(\symbf{y}, \symbf{q}) = -\sum_{k=1}^{K} y_k \ln q_k .
+  q_1=\frac{e^{z_1}}{e^{z_1}+e^{z_2}}=\frac{1}{1+e^{-z}}=\sigma(z),
+  \qquad q_2=1-\sigma(z).
 \]
-Averaged over a dataset $\mathcal{D}$ of $n$ examples,
-the loss is $-\ell(\theta; \mathcal{D})/n$, so
-minimizing it maximizes the likelihood. A network with
-small random weights outputs a nearly uniform $\symbf{q}$,
-so its initial loss is close to $\ln K$, where $K$ is
-the number of classes.
+For example $i$ the target satisfies $y_{i2}=1-y_{i1}$, so
+Eq.~\eqref{eq:meanloss} becomes
+\begin{equation}\label{eq:logistic}
+  \bar L=\frac{1}{n}\sum_{i=1}^{n}\Bigl[-y_{i1}\ln\sigma(z_i)
+    -\bigl(1-y_{i1}\bigr)\ln\bigl(1-\sigma(z_i)\bigr)\Bigr],
+\end{equation}
+the \emph{logistic loss} of binary logistic regression, in which $y_{i1}\in\{0,1\}$
+plays the role of the binary label. Logistic loss is cross-entropy with two
+classes, and softmax with cross-entropy is its extension to $K\ge3$.
+
+\paragraph{Deep networks use the same loss.}
+Nothing above depends on how the logits are computed. In our network they are
+$\vc{z}^{(3)}$, the output of the last linear layer (Eq.~\eqref{eq:z}); the ReLU
+hidden layers only change how $\vc{z}^{(3)}$ depends on $\vc{x}$. The probability
+model, the likelihood and the loss keep the same form.
+
+\paragraph{The chain in one line.}
+\begin{equation}\label{eq:chain}
+  \underbrace{\max_{\theta}\,\mathcal{L}}_{\text{likelihood}}
+  \;\Longleftrightarrow\;
+  \underbrace{\max_{\theta}\,\ell}_{\text{a stable sum}}
+  \;\Longleftrightarrow\;
+  \underbrace{\min_{\theta}\,(-\ell)}_{\text{for gradient descent}}
+  \;\Longleftrightarrow\;
+  \underbrace{\min_{\theta}\,\bar L}_{\text{mean cross-entropy}},
+\end{equation}
+where the last step holds because $-\ell=n\bar L$ and $n$ is a positive constant.
+
+\medskip
+\noindent\emph{Note.} This development follows S.~Raschka's FAQ entry on negative
+log-likelihood and logistic
+loss,\footnote{\url{https://sebastianraschka.com/faq/docs/negative-log-likelihood-logistic-loss.html}}
+extended here from the binary sigmoid case to $K$ classes with softmax; the
+wording is our own.
+
+\section{The loss and its gradient at the logits}
+\label{sec:loss}
+
+For one example with label $c$, the loss is the per-example negative
+log-likelihood $L=-\ln q_c$ of Section~\ref{sec:likelihood}
+(Eq.~\eqref{eq:meanloss}). This section first looks at its value for an
+untrained network and then derives its gradient with respect to the logits,
+which starts the backward pass.
+
+\paragraph{The loss at initialisation.}
+A network with small random weights outputs a nearly uniform $\vc{q}$, so its
+initial loss is close to $\ln K$, where $K$ is the number of classes.
 
 \begin{quote}
 \textit{Derivation of the initial loss $\ln K$:}
 \begin{enumerate}
     \item \textbf{Near-equal logits:}
-        Let $\symbf{z} = \symbf{W}\symbf{h} + \symbf{b}$
-        be the final-layer scores (logits) for the
-        penultimate features $\symbf{h}$. With small
-        random $\symbf{W}$, $\symbf{b} = \symbf{0}$,
-        and features of moderate norm, the logits
-        are all close to zero:
+        The logits are
+        $\vc{z}^{(3)}=\vc{W}^{(3)}\vc{a}^{(2)}+\vc{b}^{(3)}$
+        (Eq.~\eqref{eq:z} with $l=3$), where $\vc{a}^{(2)}$
+        holds the activations of Layer~2. With small random
+        $\vc{W}^{(3)}$, $\vc{b}^{(3)}=\vc{0}$ and activations
+        of moderate size, every logit is close to zero.
+        Writing $z_k$ for $z^{(3)}_k$,
         \[
             z_k \approx 0 \quad \forall k \in \{1, \dots, K\}.
         \]
@@ -427,34 +546,79 @@ value usually indicates a bug or an overly large
 weight initialization.
 \end{quote}
 
-When loss is calculated using natural logarithm,
-\emph{nat} is the conventional unit. We may say, for
-instance, ``the loss is \(2.303\) nats''.
+When the loss is calculated with the natural logarithm, \emph{nat} is the
+conventional unit. We may say, for instance, ``the loss is $2.303$ nats''.
 
-\paragraph{Gradient of Softmax Cross-Entropy with Respect to Logits.}
-Writing $\vc{z}=\vc{z}^{(3)}$, the definition of the softmax gives
-$q_c=\softmax(\vc{z})_c=e^{z_c}/\sum_j e^{z_j}$, so
+\paragraph{The loss in terms of the logits.}
+Write $\vc{z}$ for $\vc{z}^{(3)}$. By the definition of the softmax,
+Eq.~\eqref{eq:softmax}, $q_c=e^{z_c}/\sum_j e^{z_j}$, so
 \begin{align}
     L &= -\ln q_c\label{eq:loss}\\[2pt]
       &= -\ln \, \dfrac{e^{z_c}}{\sum\nolimits_j e^{z_j}}\notag\\[2pt]
       &= -\bigg(\ln e^{z_c} - \ln \sum\nolimits_j e^{z_j}\bigg)\notag\\[2pt]
-      &= -z_c + \ln \sum\nolimits_j e^{z_j}\, . \label{eq:lse} %%\quad \blacksquare
+      &= -z_c + \ln \sum\nolimits_j e^{z_j}\, , \label{eq:lse} %%\quad \blacksquare
 \end{align}
 where $j$ ranges over the $K$ classes (the $K=3$ output units), and $c$ is
 the fixed label.
 
-The last line of the derivation, Eq.~\eqref{eq:lse}, is how libraries
-compute $L$ (a log-sum-exp), because it avoids taking
-the logarithm of a tiny probability. Note that
-$L\ge0$, because $\sum_j e^{z_j}\ge e^{z_c}$.
+The last line, Eq.~\eqref{eq:lse}, is how libraries compute $L$ (a
+log-sum-exp), because it avoids taking the logarithm of a tiny probability.
+Note that $L\ge0$, because $\sum_j e^{z_j}\ge e^{z_c}$.
 
+\paragraph{Differentiating term by term.}
+Let $k$ range over the $K$ classes. We differentiate the two terms of
+Eq.~\eqref{eq:lse} with respect to the logit $z_k$ separately.
 
-Let $k$ range over the $K$ classes (the $K=3$ output units).
-Differentiating $L=-z_c+\ln\sum_j e^{z_j}$ (Eq.~\eqref{eq:lse}) with respect
-to the logit $z_k$, the first term gives $-[k{=}c]=-y_k$
-(here $[k{=}c]$ is 1 if $k=c$ and 0 otherwise, which is
-exactly the one-hot target), and the second gives
-the softmax $q_k$:
+\emph{The first term, $-z_c$.} It depends on $z_k$ only when $k=c$, so its
+derivative is $-1$ if $k=c$ and $0$ otherwise. We write this as $-[k{=}c]$,
+where $[k{=}c]$ is $1$ if $k=c$ and $0$ otherwise. This is exactly the one-hot
+target, so the derivative of the first term is $-y_k$.
+
+\emph{The second term, $\ln\sum_j e^{z_j}$.} The chain rule is needed here. Let
+\begin{equation}\label{eq:u-sum-def}
+    u = {\sum_j e^{z_j}} = e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}.
+\end{equation}
+Applying the chain rule, we get
+\begin{equation}\label{eq:delta-intermediate-1}
+\begin{aligned}[b]
+    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_j e^{z_j}\right) &=
+        \dfrac{\partial}{\partial z_{k}} \left(\ln u \right) \\[1pt]
+        &=
+        \dfrac{\partial \ln u}{\partial u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
+        &=
+        \dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
+        &=
+        \dfrac{1}{\sum _{j}e^{z_{j}}} \cdot \dfrac{\partial}{\partial z_{k}}\left(\sum_j e^{z_j}\right).
+\end{aligned}
+\end{equation}
+It remains to differentiate every term of the sum with respect to $z_k$:
+\begin{equation}\label{eq:delta-intermediate-2}
+    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
+        \dfrac{\partial}{\partial z_{k}}\left(e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}\right).
+\end{equation}
+Note that
+\begin{itemize}
+  \item for any term with $j\ne k$ (such as $e^{z_1}$, $e^{z_2}$, etc.),
+        $z_{j}$ is treated as a constant, and the derivative of a constant is 0;
+  \item for the term with $j=k$, the derivative of $e^{z_{k}}$ with respect to
+        $z_{k}$ is simply $e^{z_{k}}$.
+\end{itemize}
+Therefore, out of the entire sum, only one term survives:
+\begin{equation}\label{eq:delta-sum-logit-zk}
+    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
+        0+0+\dots +e^{z_{k}}+\dots +0=e^{z_{k}} .
+\end{equation}
+Substituting this into Eq.~\eqref{eq:delta-intermediate-1},
+%(\(\dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_k}\)):
+\begin{equation}\label{eq:delta-wrt-logit}
+    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_{j}e^{z_{j}}\right)
+        = \left(\frac{1}{\sum_{j}e^{z_{j}}}\right)\cdot e^{z_{k}}
+        = \dfrac{e^{z_{k}}}{\sum_{j}e^{z_{j}}} = q_k ,
+\end{equation}
+the $k$-th entry of the softmax, Eq.~\eqref{eq:softmax}.
+
+\paragraph{The gradient at the logits.}
+Adding the derivatives of the two terms,
 \begin{equation}\label{eq:dLdz}
     \dfrac{\partial L}{\partial z_k}
       = -[k{=}c]+\dfrac{e^{z_k}}{\sum_j e^{z_j}}
@@ -467,63 +631,7 @@ $k$-th entry of the target $\vc{y}$. In vector form,
   \vc{\delta}^{(3)}:=\dfrac{\partial L}{\partial\vc{z}^{(3)}}=\vc{q}-\vc{y}\,.
 \end{equation}
 
-%\subsubsection*{From $L$ To ${\partial L}/{\partial z_k}$}
-\paragraph{Working Through the Gradient Derivation.}
-The chain rule is required to find the derivative of the
-term $\ln {\sum_j e^{z_j}}$ with respect to $z_{k}$. Let
-\begin{equation}\label{eq:u-sum-def}
-    u = {\sum_j e^{z_j}} = e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}.
-\end{equation}
-
-Applying the chain rule, we get
-\begin{equation}\label{eq:delta-intermediate-1}
-\begin{aligned}[b]
-    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_j e^{z_j}\right) &=
-        \dfrac{\partial}{\partial z_{k}} \left(\ln u \right) \\[1pt]
-        &=
-        \dfrac{\ln u}{\partial u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
-        &=
-        \dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_{k}} \\[1pt]
-        &=
-        \dfrac{1}{\sum _{j}e^{z_{j}}} \cdot \dfrac{\partial}{\partial z_{k}}\left(\sum_j e^{z_j}\right).
-\end{aligned}
-\end{equation}
-
-We now take the derivative of every single
-term in $\sum_j e^{z_j}$, with respect to the
-specific target logit \(z_{k}\):
-\begin{equation}\label{eq:delta-intermediate-2}
-    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
-        \dfrac{\partial}{\partial z_{k}}\left(e^{z_{1}}+e^{z_{2}}+\dots +e^{z_{K}}\right)
-\end{equation}
-Note that
-\begin{itemize}
-  \item for any term $j$ where the index is not $k$
-        (such as \(e^{z_1}, e^{z_2}\), etc.), $z_{j}$ is treated
-        as a constant. The derivative of a constant is 0.
-  \item for the specific term where the index is $k$
-        (the term \(e^{z_{k}}\)), the derivative of \(e^{z_{k}}\)
-        with respect to \(z_{k}\) is simply \(e^{z_{k}}\).
-\end{itemize}
-
-Therefore, out of the entire sum, only one term survives:
-\begin{equation}\label{eq:delta-sum-logit-zk}
-    \dfrac{\partial}{\partial z_{k}} \left(\sum_{j}e^{z_{j}}\right) =
-        0+0+\dots +e^{z_{k}}+\dots +0=e^{z_{k}}
-\end{equation}
-
-Finally, we plug these results back in the original equation
-\eqref{eq:delta-intermediate-1}
-%(\(\dfrac{1}{u} \cdot \dfrac{\partial u}{\partial z_k}\)):
-\begin{equation}\label{eq:delta-wrt-logit}
-    \dfrac{\partial}{\partial z_{k}}\left(\ln \sum_{j}e^{z_{j}}\right)
-        = \left(\frac{1}{\sum_{j}e^{z_{j}}}\right)\cdot e^{z_{k}}
-        = \dfrac{e^{z_{k}}}{\sum_{j}e^{z_{j}}}
-\end{equation}
-Notice this is same as the softmax function. Therefore, we simply
-refer to it as $q_{k}$.
-
-\paragraph{Remarks}
+\paragraph{Remarks.}
 Two remarks on the gradient $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
 at the logits:
 \begin{itemize}
