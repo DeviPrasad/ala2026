@@ -34,7 +34,7 @@
 \fi
 
 \setmathfont{texgyrepagella-math.otf}
-\pagecolor{brown!10}
+\pagecolor{white!98!black}
 
 %
 \newcommand{\scaletop}[1]{\raisebox{1.5pt}{\scalebox{0.75}{$#1\top$}}}
@@ -133,7 +133,7 @@
 \definecolor{relucol}{HTML}{D55E00}
 \definecolor{hlcol}{HTML}{0072B2}
 
-\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 5]}
+\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 6]}
 \author{Devi Prasad M.
   \thanks{Prepared with the assistance of Claude
   (Anthropic; model \texttt{claude-sonnet-5-5}), which produced
@@ -821,6 +821,40 @@ a batch is more columns, and the same products. None of this depends on the
 architecture. It holds for any feed-forward network trained by backpropagation;
 only the layer sizes and the activation functions differ.
 
+\paragraph{One update per batch.}
+The columns of $\vc{\Delta}^{(l)}$ are error signals, one per example; they are
+not instructions to update the weights one at a time. For the batch of five
+examples above, backpropagation computes $\vc{\Delta}^{(3)}$, $\vc{\Delta}^{(2)}$
+and $\vc{\Delta}^{(1)}$ in that order, from the output layer towards the input,
+using the same weights as the forward pass. At each layer it combines the five
+columns into one gradient for the mean loss:
+\begin{equation}\label{eq:batchgrad}
+  \grad{\vc{W}^{(l)}}=\frac{1}{B}\,\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}
+    =\frac{1}{B}\sum_{b=1}^{B}\vc{\delta}^{(l)}_b\bigl(\vc{a}^{(l-1)}_b\bigr)^{\top},
+  \qquad
+  \grad{\vc{b}^{(l)}}=\frac{1}{B}\sum_{b=1}^{B}\vc{\delta}^{(l)}_b ,
+\end{equation}
+with $B=5$. The weight gradient is the average of the per-example gradients of
+Eq.~\eqref{eq:dW}, and the bias gradient is the average of the deltas. Only
+after all the gradients have been computed does the optimiser update each
+layer, $\vc{W}^{(l)}\leftarrow\vc{W}^{(l)}-\eta\,\grad{\vc{W}^{(l)}}$ and
+$\vc{b}^{(l)}\leftarrow\vc{b}^{(l)}-\eta\,\grad{\vc{b}^{(l)}}$. So there is one
+update per minibatch, not one per example or per entry of $\vc{\Delta}^{(l)}$.
+The backward calculation has a layer order; the update does not follow the order
+of the entries in $\vc{\Delta}^{(l)}$.
+
+Since the per-example outer products are summed, reordering the examples
+consistently in both $\vc{\Delta}^{(l)}$ and $\vc{A}^{(l-1)}$ does not change the
+gradient. Reordering the columns means multiplying both matrices on the right by
+the same permutation matrix $\vc{P}$, and $\vc{P}\vc{P}^{\top}=\vc{I}$, so
+\[
+  \bigl(\vc{\Delta}^{(l)}\vc{P}\bigr)\bigl(\vc{A}^{(l-1)}\vc{P}\bigr)^{\top}
+  =\vc{\Delta}^{(l)}\vc{P}\vc{P}^{\top}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}
+  =\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}.
+\]
+Reordering only one of the two matrices would pair each delta with the wrong
+example, and the gradient would change.
+
 \paragraph{What practice adds.}
 Large-scale training typically uses large minibatches, an adaptive optimizer
 such as Adam in place of the plain step, a learning-rate schedule and gradient
@@ -1058,9 +1092,8 @@ $\lVert\nabla L\rVert^{2}=\gradSq$, so $\eta\lVert\nabla L\rVert^{2}=\dropPred$,
 against the actual decrease of $\dropAct$. The difference is the second-order
 term, and it shrinks as $\eta\to0$.
 
-\section{Beyond one example (Tasks 7 and 8)}
+\section{A second example (Tasks 7 and 8)}
 
-\paragraph{A second example.}
 For $\vc{x}'=\xTwoIn$ with label $c'=3$, under the \emph{original}
 parameters:
 \begin{gather}
@@ -1097,100 +1130,172 @@ $L=-\ln q_1=\LLabelOne$ (Eq.~\eqref{eq:loss}), and through
 $\vc{\delta}^{(3)}=\vc{q}-\vc{y}=\dThreeLabelOne$ (Eq.~\eqref{eq:delta3}).
 Everything downstream of $\vc{\delta}^{(3)}$ in the backward pass would change.
 
-
+\newpage
+\section{Key Quantities at a Glance}
 \begin{table}[htbp]
   \centering
   \small
   \renewcommand{\arraystretch}{1.15}
-  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{6.4cm}@{}}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{5.4cm}>{\raggedright\arraybackslash}p{6.8cm}@{}}
     \toprule
     \textbf{Quantity} & \textbf{Definition} & \textbf{Common-sense meaning} \\
     \midrule
-    Surprisal of outcome $k$ under $\vc{q}$
-      & $I_{\vc{q}}(k)=-\ln q_k$
-      & How surprised the model is when outcome $k$ occurs. It is $0$ when $q_k=1$ and grows without bound as $q_k\to0$; surprisals of independent events add. The loss $L=-\ln q_c$ is the surprisal of the true label. \\[6pt]
-    Entropy of $\vc{y}$
-      & $H(\vc{y})=-\sum_k y_k\ln y_k=\mathbb{E}_{k\sim\vc{y}}[-\ln y_k]$
-      & The average surprisal of outcomes drawn from $\vc{y}$, judged by $\vc{y}$ itself: the uncertainty built into $\vc{y}$. It is $0$ for a one-hot $\vc{y}$ and largest, $\ln K$, for the uniform one. \\[6pt]
+    Surprisal of outcome $k$
+      & $h_{\vc{q}}(k) = -\ln q_k$
+      & How surprised the model $\vc{q}$ is when outcome $k$ happens:
+        $0$ when $q_k = 1$, growing without limit as $q_k \to 0$.
+        Surprisals of independent outcomes add. \\[5pt]
+    Entropy
+      & $H(\vc{p}) = -\sum_k p_k \ln p_k$ \newline
+        $\phantom{H(\vc{p})} = \mathbb{E}_{k\sim\vc{p}}[-\ln p_k]$
+      & Average surprisal of outcomes from $\vc{p}$, judged by
+        $\vc{p}$ itself: the uncertainty built into $\vc{p}$. Needs
+        no model and no data. It is $0$ for a one-hot $\vc{p}$ and
+        $\ln K$ for the uniform $\vc{p}$. \\[5pt]
     Cross-entropy
-      & $H(\vc{y},\vc{q})=-\sum_k y_k\ln q_k=\mathbb{E}_{k\sim\vc{y}}[-\ln q_k]$
-      & The average surprisal of the model $\vc{q}$ when outcomes actually come from $\vc{y}$. This is the training loss; for a one-hot $\vc{y}$ it equals $-\ln q_c$. \\[6pt]
+      & $H(\vc{p},\vc{q}) = -\sum_k p_k \ln q_k$ \newline
+        $\phantom{H(\vc{p},\vc{q})} = \mathbb{E}_{k\sim\vc{p}}[-\ln q_k]$
+      & Average surprisal of the model $\vc{q}$ when outcomes come
+        from $\vc{p}$. Never below $H(\vc{p})$. For a one-hot
+        $\vc{p}$ on the true class $c$, it is $-\ln q_c$, the loss
+        for one example. \\[5pt]
     KL divergence
-      & $\operatorname{KL}(\vc{y}\,\|\,\vc{q})=\sum_k y_k\ln\dfrac{y_k}{q_k}=H(\vc{y},\vc{q})-H(\vc{y})$
-      & The extra surprisal caused by using $\vc{q}$ instead of the truth $\vc{y}$. It is never negative, it is $0$ only when $\vc{q}=\vc{y}$, and it is not symmetric in $\vc{y}$ and $\vc{q}$. \\[6pt]
-    Perplexity
-      & $\mathrm{PP}=e^{H(\vc{y},\vc{q})}$ (base $e$ with $\ln$; use $2^{H}$ if $H$ is in bits)
-      & The number of equally likely options the model is effectively hesitating between. A uniform $\vc{q}$ over $K$ classes has $\mathrm{PP}=K$ and a perfect model has $\mathrm{PP}=1$. In practice it is $e^{\text{mean loss}}$. \\
+      & $\operatorname{KL}(\vc{p}\,\|\,\vc{q}) = \sum_k p_k \ln (p_k/q_k)$ \newline
+        $\phantom{\operatorname{KL}(\vc{p}\,\|\,\vc{q})} = H(\vc{p},\vc{q}) - H(\vc{p})$
+      & Extra surprisal we pay for using $\vc{q}$ instead of $\vc{p}$.
+        Never negative, $0$ only when $\vc{q} = \vc{p}$, and not
+        symmetric in $\vc{p}$ and $\vc{q}$. For a one-hot $\vc{p}$,
+        $H(\vc{p}) = 0$, so the KL divergence equals the loss. \\[5pt]
+    Likelihood
+      & $\prod_{i} q_\theta(c_i \mid x_i)$
+      & How probable the model finds all the observed labels together
+        (examples assumed independent). A function of $\theta$ with
+        the data fixed, \emph{not} a distribution over $\theta$.
+        Training makes it large. \\[5pt]
+    Log-likelihood and NLL
+      & $\ell(\theta) = \sum_{i} \ln q_\theta(c_i \mid x_i)$ \newline
+        $\text{NLL} = -\ell(\theta)$
+      & The log turns the product into a sum, and
+        $\ell(\theta) \le 0$. Its negative, the negative
+        log-likelihood (NLL), is the \emph{total surprisal} of the
+        observed labels. \\[5pt]
+    Average cross-entropy loss
+      & $\bar{L}(\theta) = -\ell(\theta)/N$ \newline
+        $\phantom{\bar{L}(\theta)} = \tfrac{1}{N}\sum_{i} \big(-\ln q_\theta(c_i \mid x_i)\big)$
+      & The NLL per example: the one-hot cross-entropy averaged over
+        the data set. Libraries report this number. Minimising it is
+        maximum likelihood estimation. \\
     \bottomrule
   \end{tabular}
-  \caption{Surprisal, entropy, cross-entropy, KL divergence and perplexity}
+  \caption{Surprisal, entropy, cross-entropy, KL divergence,
+  and likelihood, and the cross-entropy loss. Here $\vc{p}$ is the target
+  distribution, $\vc{q}$ is the model's predicted distribution,
+  $c$ is the true class, and sums over $i$ run over the $N$
+  examples. All logarithms are natural, so the quantities are in
+  nats.}
   \label{tab:info}
 \end{table}
 
 \newpage
 
-\paragraph{Cross-entropy $=$ entropy $+$ KL divergence.}
-For each class $k$, $-\ln q_k=-\ln y_k+\ln\dfrac{y_k}{q_k}$, because
-$\ln\dfrac{y_k}{q_k}=\ln y_k-\ln q_k$. Multiplying by $y_k$ and summing over $k$ gives
+% Requires: amsmath, unicode-math; \vc{} = \symbf{}; Table \ref{tab:info}
+% Uses the worked-example macros \pTrue, \lnThree and label eq:wloss
+\section{Three Facts About Cross-Entropy}
+
+In this section, $\vc{p}$ is the target distribution and $\vc{q}$ is
+the model's predicted distribution, as in Table~\ref{tab:info}. A sum
+written as $\sum_{p_k>0}$ runs only over the classes whose target
+probability is positive.
+
+\paragraph{Fact 1: cross-entropy $=$ entropy $+$ KL divergence.}
+Take a class $k$ with $p_k > 0$. Since
+$\ln (p_k/q_k) = \ln p_k - \ln q_k$, we can write
 \begin{equation}
-  \underbrace{-\sum_k y_k\ln q_k}_{H(\vc{y},\vc{q})}
-  =\underbrace{-\sum_k y_k\ln y_k}_{H(\vc{y})}
-  +\underbrace{\sum_k y_k\ln\frac{y_k}{q_k}}_{\operatorname{KL}(\vc{y}\,\|\,\vc{q})}.
+  -\ln q_k = -\ln p_k + \ln\frac{p_k}{q_k}.
+  \label{eq:split}
+\end{equation}
+So the surprisal of the model splits into two parts: the surprisal
+that the target itself assigns to class $k$, and an extra part that
+comes from $\vc{q}$ being different from $\vc{p}$. Multiply both sides
+by $p_k$ and add over the classes with $p_k > 0$:
+\begin{equation}
+  \underbrace{-\sum_{p_k>0} p_k \ln q_k}_{H(\vc{p},\vc{q})}
+  = \underbrace{-\sum_{p_k>0} p_k \ln p_k}_{H(\vc{p})}
+  + \underbrace{\sum_{p_k>0} p_k \ln\frac{p_k}{q_k}}_{\operatorname{KL}(\vc{p}\,\|\,\vc{q})}.
   \label{eq:cekl}
 \end{equation}
-(Terms with $y_k=0$ contribute $0$ throughout, with the convention $0\ln0=0$.)
+Classes with $p_k = 0$ get zero weight in all three sums (using the
+convention $0 \ln 0 = 0$), so leaving them out changes nothing.
 
-\paragraph{KL divergence is never negative.}
-Use $\ln t\le t-1$ for $t>0$, with equality only at $t=1$. Taking
-$t=q_k/y_k$ for the classes with $y_k>0$,
-\[
-  -\operatorname{KL}(\vc{y}\,\|\,\vc{q})=\sum_{y_k>0}y_k\ln\frac{q_k}{y_k}
-  \le\sum_{y_k>0}y_k\Big(\frac{q_k}{y_k}-1\Big)
-  =\sum_{y_k>0}q_k-\sum_{y_k>0}y_k
-  =\sum_{y_k>0}q_k-1\le0 .
-\]
-Hence $\operatorname{KL}\ge0$, with equality only if $q_k=y_k$ for every $k$.
-By Eq.~\eqref{eq:cekl}, $H(\vc{y},\vc{q})\ge H(\vc{y})$: the loss cannot go
-below the entropy of the targets, and it reaches that value exactly when
-$\vc{q}=\vc{y}$. For a one-hot $\vc{y}$ the floor is $H(\vc{y})=0$.
+\textbf{In simple words:} the loss is the uncertainty already present
+in the target, plus a penalty for the model being different from the
+target.
 
-\paragraph{Maximum entropy, and why a fresh network has loss near $\ln K$.}
-Let $\vc{u}$ be the uniform distribution, $u_k=1/K$. Then
-\[
-  \operatorname{KL}(\vc{y}\,\|\,\vc{u})=\sum_k y_k\ln\frac{y_k}{1/K}
-  =\sum_k y_k\ln y_k+\ln K\sum_k y_k=-H(\vc{y})+\ln K .
-\]
-Since $\operatorname{KL}\ge0$, $H(\vc{y})\le\ln K$, with equality only for a
-uniform $\vc{y}$. Also, for any $\vc{y}$,
-$H(\vc{y},\vc{u})=-\sum_k y_k\ln\frac1K=\ln K$: a model that outputs a uniform
-$\vc{q}$ has loss $\ln K$ whatever the target.
+\paragraph{Fact 2: KL divergence is never negative.}
+We need one inequality:
+\begin{equation}
+  \ln t \le t - 1 \quad \text{for } t > 0,
+  \text{ with equality only at } t = 1.
+  \label{eq:lnineq}
+\end{equation}
+The straight line $t - 1$ touches the curve $\ln t$ at $t = 1$, and
+since the curve bends downwards, it stays below the line everywhere
+else. Now put $t = q_k/p_k$ for each class with $p_k > 0$:
+\begin{equation}
+  -\operatorname{KL}(\vc{p}\,\|\,\vc{q})
+  = \sum_{p_k>0} p_k \ln\frac{q_k}{p_k}
+  \le \sum_{p_k>0} p_k \Big(\frac{q_k}{p_k} - 1\Big)
+  = \sum_{p_k>0} q_k - 1
+  \le 0.
+  \label{eq:klpos}
+\end{equation}
+The last step holds because the $q_k$ over only \emph{some} of the
+classes add up to at most $1$. Hence
+$\operatorname{KL}(\vc{p}\,\|\,\vc{q}) \ge 0$. Both inequalities in
+Eq.~\eqref{eq:klpos} become equalities only when $q_k = p_k$ for every
+class $k$. Putting this into Eq.~\eqref{eq:cekl} gives
+\begin{equation}
+  H(\vc{p},\vc{q}) \ge H(\vc{p}).
+  \label{eq:floor}
+\end{equation}
 
-\paragraph{Perplexity is the exponential of the mean loss.}
-For labelled examples $(\vc{x}_i,c_i)$, $i=1,\dots,n$, let
-$\bar L=-\frac1n\sum_{i=1}^{n}\ln q_{c_i}$ be the mean loss. Then
-\[
-  e^{\bar L}=\exp\Big(-\frac1n\sum_{i=1}^{n}\ln q_{c_i}\Big)
-  =\Big(\prod_{i=1}^{n}q_{c_i}\Big)^{-1/n},
-\]
-the reciprocal of the geometric mean of the probabilities given to the true
-labels. For $n=1$ it is $1/q_c$: in the worked example the perplexity was
-$1/0.3158\approx3.17$ before the update and $1/0.4077\approx2.45$ after it, so
-the model went from hesitating between about three classes to about two and a
-half.
+\textbf{In simple words:} the loss can never go below the entropy of
+the target, and it reaches that value exactly when the model matches
+the target. For a one-hot target, $H(\vc{p}) = 0$, so the smallest
+possible loss is $0$.
 
-\iffalse
-\section{What to take from the computation}
-\begin{itemize}
-  \item The backward pass mirrors the forward pass: the same matrices, transposed,
-        with the stored forward values supplying $\vc{a}^{(l-1)}$ and the ReLU masks.
-  \item Gradient reaches a weight only through active units: the zero row and
-        zero column above are exactly the inactive unit.
-  \item One step of size $\eta=0.1$ lowered the loss from $\Lzero$ to $\Lone$ and
-        moved probability toward the true class, as the first-order estimate
-        predicted.
-  \item A numerical derivative agreed with backpropagation to the digits shown,
-        which is the standard way to trust a hand-derived gradient.
-\end{itemize}
-\fi
+\paragraph{Fact 3: entropy is at most $\ln K$, and a uniform model has
+loss $\ln K$.}
+Let $\vc{u}$ be the uniform distribution over the $K$ classes,
+$u_k = 1/K$. Then
+\begin{equation}
+  \operatorname{KL}(\vc{p}\,\|\,\vc{u})
+  = \sum_{p_k>0} p_k \ln\frac{p_k}{1/K}
+  = \sum_{p_k>0} p_k \ln p_k + \ln K \sum_{p_k>0} p_k
+  = -H(\vc{p}) + \ln K.
+  \label{eq:klunif}
+\end{equation}
+Since KL is never negative (Fact 2), $H(\vc{p}) \le \ln K$, with
+equality only when $\vc{p}$ is itself uniform. This is the largest
+entropy any distribution over $K$ classes can have.
+
+Now let the \emph{model} be uniform. For any target $\vc{p}$,
+\begin{equation}
+  H(\vc{p},\vc{u}) = -\sum_{k} p_k \ln\frac{1}{K}
+  = \ln K \sum_{k} p_k = \ln K.
+  \label{eq:unifloss}
+\end{equation}
+So a model that predicts $1/K$ for every class has loss exactly
+$\ln K$, whatever the target is.
+
+\textbf{Why this matters at the start of training.} If a network
+starts with its logits all close to $0$ (for example, when the last
+layer has small weights), the softmax gives
+$q_k \approx e^0 / (K e^0) = 1/K$ for every class. So $\vc{q}$ is
+nearly uniform, and by Eq.~\eqref{eq:unifloss} the first loss is
+close to $\ln K$. In our worked example, $K = 3$, and the loss in
+Eq.~\eqref{eq:wloss} is $-\ln q_2 = -\ln \pTrue$, just above
+$\ln 3 = \lnThree$. In practice, a starting loss much larger than
+$\ln K$ is a useful warning that the initialisation needs a look.
 
 \end{document}

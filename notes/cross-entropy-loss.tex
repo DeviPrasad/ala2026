@@ -1,0 +1,457 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{geometry}
+\usepackage{titling}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{relsize}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+
+\geometry{a4paper, top=2.2cm, bottom=3cm, left=2.5cm, right=2.5cm}
+\setlength{\droptitle}{-3cm}
+
+\definecolor{charcoal}{HTML}{36454F}
+
+\iftrue
+%\setstretch{1.025} % a little more space between lines
+\setmainfont{texgyrepagella}[
+  Extension = .otf,
+  UprightFont = *-regular,
+  BoldFont = *-bold,
+  ItalicFont = *-italic,
+  BoldItalicFont = *-bolditalic,
+  Color=charcoal,
+]
+\fi
+
+\setmathfont{texgyrepagella-math.otf}[Color=charcoal]
+\pagecolor{white!6}
+
+\pretitle{\begin{center}\Large\addfontfeatures{LetterSpace=-1.5}}
+\posttitle{\end{center}\vspace*{-0.5em}}
+\preauthor{\begin{center}\large\addfontfeatures{LetterSpace=-1.5}}
+\postauthor{\end{center}\vspace*{-0.6cm}}
+
+\title{A Short Note on Surprisal, Entropy, and Cross-Entropy Loss\\\vspace*{2pt}[Draft 1]}
+\author{Devi Prasad M\\Manipal School of Information Sciences}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\section{Surprisal of an outcome}
+
+Let $\symbf{q}$ be a discrete probability distribution over
+possible outcomes, with $q_k = \symbf{q}(X = k)$.
+The \emph{surprisal} of outcome $k$ under $\symbf{q}$ is
+\begin{equation}
+  h_{\symbf{q}}(k) = \log \dfrac{1}{q_k} = -\log q_k.
+  \label{eq:surprisal}
+\end{equation}
+If $q_k = 0$, we define $h_{\symbf{q}}(k) = +\infty$.
+This is a quantity for \emph{one specified outcome}.
+We will see later that entropy is the average surprisal
+over outcomes.
+
+Throughout this note, $\log$ means the natural logarithm
+$\ln$, so surprisal is measured in nats.
+
+Why the minus sign? Let us first look at $\log q_k$
+on its own. Figure~\ref{fig:ln} shows it for $q_k \in (0, 1]$.
+
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=0.7\textwidth, height=5.5cm,
+      xlabel={$q_k$}, ylabel={$\log q_k$},
+      xmin=0, xmax=1, ymin=-5, ymax=0.8,
+      domain=0.01:1, samples=100, grid=major,
+      axis x line=middle, axis y line=left,
+      xticklabel style={anchor=south, yshift=2pt},
+      xlabel style={at={(ticklabel cs:1.03)}, anchor=west}]
+      \addplot[thick] {ln(x)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{The curve $\log q_k$ for $q_k \in (0, 1]$.
+  It is $0$ at $q_k = 1$, is negative everywhere
+  else, and drops without bound as $q_k \to 0^{+}$.}
+  \label{fig:ln}
+\end{figure}
+
+Two things are clear from the curve.
+
+\begin{itemize}
+  \item \textbf{Direction:} $\log q_k$ goes
+  \emph{up} as $q_k$ goes up. But surprise should
+  go the other way: a likely outcome should be
+  unsurprising, and a rare one very surprising.
+  \item \textbf{Sign:} $\log q_k \le 0$. But we
+  want surprise to be a non-negative number,
+  like a length.
+\end{itemize}
+
+Putting a minus sign in front flips the curve
+about the horizontal axis, and this fixes both
+problems:
+\begin{itemize}
+  \item $q_k = 1$ gives surprisal $0$. A certain
+        outcome is not surprising at all.
+  \item $q_k \to 0^{+}$ gives surprisal
+        $\to \infty$. A nearly impossible outcome
+        is very surprising.
+\end{itemize}
+
+\newpage
+
+Figure~\ref{fig:surprisal} shows the flipped curve.
+
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=0.7\textwidth, height=5.5cm,
+      xlabel={$q_k$}, ylabel={$-\log q_k$},
+      xmin=0, xmax=1, ymin=-0.5, ymax=5,
+      domain=0.01:1, samples=100, grid=major,
+      axis x line=middle, axis y line=left,
+      xlabel style={at={(ticklabel cs:1.03)}, anchor=west}]
+      \addplot[thick] {-ln(x)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Surprisal $-\log q_k$ against $q_k$.
+  It is $0$ at $q_k = 1$ and grows without bound
+  as $q_k \to 0^{+}$.}
+  \label{fig:surprisal}
+\end{figure}
+
+\section{Why surprisals add}
+
+For two independent events $A$ and $B$,
+probabilities multiply:
+\begin{equation}
+  P(A, B) = P(A)\,P(B).
+  \label{eq:indep}
+\end{equation}
+We want a measure of surprise that \emph{adds}
+for independent events, just like length or mass.
+The logarithm turns a product into a sum.
+Writing $h(A) = -\log P(A)$ for the surprisal
+of an event, we get
+\begin{equation}
+  \begin{aligned}
+    h(A, B) &= -\log P(A, B) = -\log\big(P(A)\,P(B)\big) \\
+            &= -\log P(A) - \log P(B) = h(A) + h(B).
+  \end{aligned}
+  \label{eq:add}
+\end{equation}
+Thus, adding surprisals is nothing but the
+multiplication rule of probability, transformed
+via a logarithm. This is the same reason we
+use log-likelihood for i.i.d. data, turning
+a product of probabilities
+into a sum.
+
+\section{Entropy: average surprisal}
+
+If we draw $N$ independent outcomes from $\symbf{q}$,
+outcome $k$ comes up about $N q_k$ times, and each time
+it brings surprisal $-\log q_k$. The average surprisal
+per draw is therefore
+\begin{equation}
+  H(\symbf{q}) = \sum_{k} q_k \,(-\log q_k) = -\sum_{k} q_k \log q_k .
+  \label{eq:entropy}
+\end{equation}
+The factor $q_k$ is simply the fraction of time outcome
+$k$ actually happens. Every average needs such weights.
+
+Here $\symbf{q}$ plays two roles: it gives the
+\emph{weights}, and it also decides the \emph{surprisal}.
+
+Outcomes with $q_k = 0$ contribute nothing. The term
+$q_k(-\log q_k)$ is then of the form $0 \cdot \infty$,
+which we take to be $0$ by convention
+($0 \log 0 = 0$, justified because $q \log q \to 0$
+as $q \to 0^{+}$).
+
+\textbf{Example.} Take $\symbf{q} = (0.9,\, 0.1)$. Then
+\begin{equation}
+  H(\symbf{q}) = 0.9 \times 0.105 + 0.1 \times 2.303 \approx 0.325 \text{ nats}.
+  \label{eq:example}
+\end{equation}
+The common outcome has small surprisal and large
+weight, so it dominates the average.
+
+\textbf{Two observations.}
+\begin{enumerate}
+    \item If one outcome has probability
+            $1$, then $H = 0$.
+
+    \item If all $K$ outcomes are equally
+    likely, then $H = \log K$, the maximum.
+    \begin{equation}
+        H(\symbf{q})
+        = \mathlarger{\sum_{k=1}^{K}} q_k \,(-\log q_k)
+        = \mathlarger{\sum_{k=1}^{K}} \dfrac{1}{K} \bigg(-\log \dfrac{1}{K}\bigg)
+        = K \cdot \dfrac{1}{K} \cdot \log K
+        = \log K.
+        \label{eq:uniform}
+    \end{equation}
+\end{enumerate}
+
+\section{Cross-entropy: separating the two roles}
+
+Now suppose outcomes really occur according to a
+distribution $\symbf{p}$ (the truth), but we measure
+surprise using our model $\symbf{q}$. Then the weights
+come from $\symbf{p}$ and the surprisal comes
+from $\symbf{q}$:
+\begin{equation}
+    H(\symbf{p}, \symbf{q}) = \sum_{k} p_k \,(-\log q_k) = -\sum_{k} p_k \log q_k .
+    \label{eq:xent}
+\end{equation}
+\paragraph{In simple words:}
+cross-entropy is the average surprise
+of the model $\symbf{q}$ when the data actually comes
+from $\symbf{p}$.
+
+Replacing $\symbf{q} = \symbf{p}$ gives back
+the entropy:
+\begin{equation}
+    H(\symbf{p}, \symbf{p}) = -\sum_{k} p_k \log p_k = H(\symbf{p}).
+    \label{eq:xent-self}
+\end{equation}
+
+\section{One-hot labels}
+
+In classification, the label is one-hot. If the true
+class is $c$, then $p_c = 1$ and $p_k = 0$ for all
+$k \neq c$. Every term with $p_k = 0$ vanishes,
+and Eq.~\eqref{eq:xent} leaves us with
+\begin{equation}
+  H(\symbf{p}, \symbf{q}) = -\log q_c .
+  \label{eq:onehot}
+\end{equation}
+So the cross-entropy loss for one example is simply
+\emph{how surprised the model is by the correct class}.
+If $q_c$ is near $1$, the loss is near $0$.
+If $q_c$ is near $0$, the loss is large.
+
+The probabilities given to wrong classes do not appear
+directly. They matter only because $\symbf{q}$ sums
+to $1$: whatever mass goes to wrong classes is
+taken away from $q_c$.
+
+\section{Surprisal, likelihood, and log-likelihood}
+
+We often come across these five terms: surprisal,
+likelihood, log-likelihood, entropy, and cross-entropy.
+All these ideas are directly related to one another.
+In this section we will connect them.
+
+\paragraph{A data set of N examples.}
+In training, we have $N$
+examples $(x_1, c_1), \dots, (x_N, c_N)$,
+where $c_i$ is the true class of input
+$x_i$. Let $\theta$ denote the parameters
+of the network. We write
+$q_\theta(c_i \mid x_i)$ for the probability
+that the network gives to the correct class of
+example $i$. This is just the $q_c$ of
+Eq.~\eqref{eq:onehot}, written for example $i$.
+
+\paragraph{Likelihood.}
+Assume the examples are independent. Then, by
+Eq.~\eqref{eq:indep}, the probability that the network
+gives to \emph{all} the observed labels together is a
+product:
+\begin{equation}
+  P(c_1, \dots, c_N \mid x_1, \dots, x_N;\ \theta)
+  = \prod_{i=1}^{N} q_\theta(c_i \mid x_i).
+  \label{eq:lik}
+\end{equation}
+When we keep the data fixed and look at this number as a
+function of $\theta$, we call it the \emph{likelihood} of
+$\theta$. A good $\theta$ is one that makes the observed
+labels probable, so we want the likelihood to be large.
+
+\paragraph{Log-likelihood.}
+The logarithm turns this product into a sum, just as in
+Eq.~\eqref{eq:add}:
+\begin{equation}
+  \ell(\theta) = \log \prod_{i=1}^{N} q_\theta(c_i \mid x_i)
+  = \sum_{i=1}^{N} \log q_\theta(c_i \mid x_i).
+  \label{eq:loglik}
+\end{equation}
+This is the \emph{log-likelihood}. Each term is $\le 0$, so
+$\ell(\theta) \le 0$. Since $\log$ is an increasing
+function, making $\ell(\theta)$ large is the same as making
+the likelihood large.
+
+There is also a practical reason to prefer the log. A
+product of thousands of numbers below $1$ becomes so small
+that a computer rounds it to $0$. The sum in
+Eq.~\eqref{eq:loglik} has no such problem.
+
+\paragraph{Negative log-likelihood is total surprisal.}
+Now put a minus sign in front of Eq.~\eqref{eq:loglik}.
+Each term becomes a surprisal, Eq.~\eqref{eq:surprisal}:
+\begin{equation}
+  -\ell(\theta)
+  = \sum_{i=1}^{N} \big(-\log q_\theta(c_i \mid x_i)\big)
+  = \text{total surprisal of the observed labels}.
+  \label{eq:nll}
+\end{equation}
+This quantity is called the \emph{negative log-likelihood}
+(NLL). So surprisal and log-likelihood are the same numbers
+with opposite signs: log-likelihood measures how
+\emph{plausible} the model finds the data, and surprisal
+measures how \emph{surprised} the model is by it.
+
+\paragraph{Average surprisal is the cross-entropy loss.}
+Divide Eq.~\eqref{eq:nll} by $N$:
+\begin{equation}
+  \bar{L}(\theta)
+  = -\frac{1}{N}\,\ell(\theta)
+  = \frac{1}{N}\sum_{i=1}^{N} \big(-\log q_\theta(c_i \mid x_i)\big).
+  \label{eq:meanloss}
+\end{equation}
+Each term in the sum is the one-hot cross-entropy of
+Eq.~\eqref{eq:onehot} for one example. So $\bar{L}(\theta)$
+is the average cross-entropy loss over the data set, which
+is exactly the number that deep learning libraries report.
+
+Putting it all together, these four statements are the
+same:
+\begin{center}
+\begin{tabular}{rl}
+         & maximise the likelihood \\[2pt]
+$\iff$   & maximise $\ell(\theta)$ \\[2pt]
+$\iff$   & minimise the total surprisal $-\ell(\theta)$ \\[2pt]
+$\iff$   & minimise $\bar{L}(\theta)$.
+\end{tabular}
+\end{center}
+The first step holds because $\log$ is increasing. The
+second is just a change of sign. The third holds because
+dividing by $N$ does not change which $\theta$ is best.
+This method of choosing $\theta$ is called
+\emph{maximum likelihood estimation}.
+
+\textbf{Example.} Take a coin model with
+$\symbf{q} = (0.6,\, 0.4)$ for (Heads, Tails), and suppose
+we observe Heads, Heads, Tails. Then
+\begin{align*}
+  \text{likelihood} &= 0.6 \times 0.6 \times 0.4 = 0.144, \\
+  \text{log-likelihood} &= \log 0.144 \approx -1.938, \\
+  \text{total surprisal} &= 0.511 + 0.511 + 0.916 \approx 1.938, \\
+  \text{average surprisal} &\approx 1.938 / 3 \approx 0.646 \text{ nats}.
+\end{align*}
+The same number appears in every line, only with a change
+of sign or a division by $N = 3$.
+
+\paragraph{Who is who.}
+Table~\ref{tab:names} puts the five names side by side.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{llll}
+  \toprule
+  Name & What it is about & Needs observed data? & In training \\
+  \midrule
+  Surprisal & one outcome & no & a score \\
+  Entropy & one distribution & no & a property \\
+  Likelihood & the model's $\theta$ & yes & make large \\
+  Log-likelihood & the model's $\theta$ & yes & make large \\
+  Cross-entropy loss & the model's $\theta$ & yes & make small \\
+  \bottomrule
+\end{tabular}
+\caption{Five names and how they relate. Negative
+log-likelihood is total surprisal, and dividing it by $N$
+gives the average cross-entropy loss.}
+\label{tab:names}
+\end{table}
+
+\paragraph{Two points to keep in mind.}
+\begin{enumerate}
+  \item The likelihood is a function of $\theta$, with the
+  data held fixed. It is \emph{not} a probability
+  distribution over $\theta$: its values over different
+  $\theta$ need not add up to $1$.
+  \item Entropy $H(\symbf{q})$ belongs to a single
+  distribution, and we can compute it without seeing any
+  data. Likelihood, log-likelihood, and the cross-entropy
+  loss always involve observed outcomes: they ask how well
+  the model explains what actually happened.
+\end{enumerate}
+
+\section{From logits to $\symbf{q}$: the softmax}
+
+A network does not output probabilities directly.
+It outputs real numbers $z_1, \dots, z_K$,
+called \emph{logits}. The softmax converts them
+into a distribution:
+\begin{equation}
+  q_k = \frac{e^{z_k}}{\sum_{j} e^{z_j}} .
+  \label{eq:softmax}
+\end{equation}
+Each $q_k$ is positive and they add up to $1$,
+so $\symbf{q}$ is a valid distribution.
+
+Putting this in the loss for true class $c$:
+\begin{equation}
+  L = -\log q_c = -z_c + \log \sum_{j} e^{z_j} .
+  \label{eq:loss}
+\end{equation}
+\paragraph{In simple words:} the loss is small when
+the correct logit $z_c$ is large compared with the other
+logits. The log-sum-exp is then close to $z_c$, and the
+two terms in Eq.~\eqref{eq:loss} nearly cancel. Raising
+$z_c$ also raises the log-sum-exp, but by less (by $q_c$
+per unit), so the loss still falls.
+
+\paragraph{Note.} Deep learning libraries
+compute $L$ directly from the logits using this
+last form (with the log-sum-exp trick), instead
+of first computing $q_k$ and then taking its log.
+This avoids overflow in $e^{z_j}$ and avoids $\log 0$.
+
+\paragraph{Gradient.} Differentiating with respect to
+a logit gives
+\begin{equation}
+  \frac{\partial L}{\partial z_k} = q_k - p_k .
+  \label{eq:grad}
+\end{equation}
+This is the model's probability minus the label.
+Gradient descent moves each logit against its gradient.
+For the true class the gradient is $q_c - 1 \le 0$, so the
+logit is pushed up. For the wrong classes it
+is $q_k \ge 0$, so those logits are pushed down.
+
+\section{Summary}
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  Eq. & Quantity & Meaning \\
+  \midrule
+  \eqref{eq:surprisal} & $-\log q_k$ & surprisal of outcome $k$
+  under $\symbf{q}$ \\
+  \eqref{eq:entropy} & $H(\symbf{q}) = -\sum_k q_k \log q_k$ & average surprisal
+  under $\symbf{q}$ \\
+  \eqref{eq:xent} & $H(\symbf{p}, \symbf{q}) = -\sum_k p_k \log q_k$ &
+    average surprisal under $\symbf{q}$, data from $\symbf{p}$ \\
+  \eqref{eq:onehot} & $-\log q_c$ & cross-entropy loss for one-hot label $c$ \\
+  \eqref{eq:loglik} & $\ell(\theta) = \sum_i \log q_\theta(c_i \mid x_i)$ &
+    log-likelihood of the data set \\
+  \eqref{eq:meanloss} & $\bar{L}(\theta) = -\ell(\theta)/N$ &
+    average cross-entropy loss \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
