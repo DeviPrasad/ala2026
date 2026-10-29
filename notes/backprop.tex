@@ -133,7 +133,13 @@
 \definecolor{relucol}{HTML}{D55E00}
 \definecolor{hlcol}{HTML}{0072B2}
 
-\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 6]}
+\definecolor{boxred}{HTML}{DD7777}
+% green-bordered box for a symbol; sized correctly in subscripts too
+\newcommand{\gbox}[1]{\mathpalette\gboxaux{#1}}
+\newcommand{\gboxaux}[2]{{\setlength{\fboxsep}{0.7pt}\setlength{\fboxrule}{0.6pt}%
+  \color{boxred}\fbox{$\normalcolor#1#2$}}}
+
+\title{Backpropagation with Cross-Entropy Loss\\\vspace*{4pt}\small[Draft 8]}
 \author{Devi Prasad M.
   \thanks{Prepared with the assistance of Claude
   (Anthropic; model \texttt{claude-sonnet-5-5}), which produced
@@ -169,11 +175,11 @@ to a probability vector $\vc{q}\in\R^3$.
 
     % ---------- neurons ----------
     \foreach \n/\y in {1/0.5,2/-0.5}
-    \node[neuron] (i\n) at (0,\y*\dy) {$x_{\n}$};
+        \node[neuron] (i\n) at (0,\y*\dy) {$x_{\n}$};
     \foreach \n/\y in {1/1,2/0,3/-1} {
-    \node[neuron] (h\n) at (\dx,\y*\dy) {};
-    \node[neuron] (g\n) at (2*\dx,\y*\dy) {};
-    \node[neuron] (o\n) at (3*\dx,\y*\dy) {};
+        \node[neuron] (h\n) at (\dx,\y*\dy) {};
+        \node[neuron] (g\n) at (2*\dx,\y*\dy) {};
+        \node[neuron] (o\n) at (3*\dx,\y*\dy) {};
     }
 
     % ---------- weights: edges, then labels a quarter of the way along each edge ----------
@@ -186,22 +192,22 @@ to a probability vector $\vc{q}\in\R^3$.
     %\draw[hlcol,line width=0.6pt] (i2) -- (h1);
 
     \foreach \j in {1,2} \foreach \i in {1,2,3}
-    \node[wl] at ($(i\j)!0.24!(h\i)$) {$W_{\i\j}$};
+        \node[wl] at ($(i\j)!0.24!(h\i)$) {$W_{\i\j}$};
     \foreach \j in {1,2,3} \foreach \i in {1,2,3} {
-    \node[wl] at ($(h\j)!0.24!(g\i)$) {$W_{\i\j}$};
-    \node[wl] at ($(g\j)!0.24!(o\i)$) {$W_{\i\j}$};
+        \node[wl] at ($(h\j)!0.24!(g\i)$) {$W_{\i\j}$};
+        \node[wl] at ($(g\j)!0.24!(o\i)$) {$W_{\i\j}$};
     }
     %\node[wl,text=hlcol] at ($(i2)!0.25!(h1)$) {$W_{12}$};
 
     % ---------- ReLU marks (orange hinge) and identity marks ----------
     \foreach \n in {1,2,3} {
-    \foreach \c in {h,g}
-        \draw[relucol,line width=1.2pt]
+        \foreach \c in {h,g}
+            \draw[relucol,line width=1.2pt]
         ($(\c\n)+(-0.23,-0.14)$) -- ($(\c\n)+(0,-0.14)$) -- ($(\c\n)+(0.21,0.16)$);
-    \draw[black,line width=0.9pt] ($(o\n)+(-0.2,-0.17)$) -- ($(o\n)+(0.2,0.17)$);
-    \node[font=\scriptsize] at ($(h\n)+(0,0.72)$) {\n};
-    \node[font=\scriptsize] at ($(g\n)+(0,0.72)$) {\n};
-    \node[font=\scriptsize] at ($(o\n)+(0,0.72)$) {\n};
+        \draw[black,line width=0.9pt] ($(o\n)+(-0.2,-0.17)$) -- ($(o\n)+(0.2,0.17)$);
+        \node[font=\scriptsize] at ($(h\n)+(0,-0.72)$) {\n};% node number below the circle
+        \node[font=\scriptsize] at ($(g\n)+(0,-0.72)$) {\n};% node number below the circle
+        \node[font=\scriptsize] at ($(o\n)+(0,-0.72)$) {\n};% node number below the circle
     }
 
     % ---------- layer headings ----------
@@ -658,55 +664,218 @@ at the logits:
 \end{itemize}
 
 \section{Backpropagation through a layer}
+In order to make the rest of this section more
+accessible, let us write out expressions for
+the logits of layer 3 and the pre-activations of
+layer 1. We will also state a few
+observations that help formalize the ideas.
 
-Consider layer $l$ with input $\vc{a}^{(l-1)}$,
-and suppose
+Consider the logits in layer 3 ($l = 3$)
+\begin{align*}
+    z^{(3)}_{1} &= W^{(3)}_{11}a^{(2)}_1 + W^{(3)}_{12}a^{(2)}_2 + W^{(3)}_{13}a^{(2)}_3 + b^{(3)}_1 \\[3pt]
+    z^{(3)}_{2} &= W^{(3)}_{21}a^{(2)}_1 + W^{(3)}_{22}a^{(2)}_2 + W^{(3)}_{23}a^{(2)}_3 + b^{(3)}_2 \\[3pt]
+    z^{(3)}_{3} &= W^{(3)}_{31}a^{(2)}_1 + W^{(3)}_{32}a^{(2)}_2 + W^{(3)}_{33}a^{(2)}_3 + b^{(3)}_3
+\end{align*}
+Notice $z^{(3)}_{1}$ depends on
+$W^{(3)}_{1j}$ only through $W^{(3)}_{1j}a^{(2)}_j$,
+and also $z^{(3)}_{1}$ does not involve
+$W^{(3)}_{2j}$ and $W^{(3)}_{3j}$.
+Similarly, $z^{(3)}_{3}$ depends on
+$W^{(3)}_{3j}$ only through $W^{(3)}_{3j}a^{(2)}_j$,
+and $z^{(3)}_{3}$ does not involve
+$W^{(3)}_{1j}$ and $W^{(3)}_{2j}$. In other words,
+each $z^{(3)}_i$ contains only the weights in
+row~$i$ of $\vc{W}^{(3)}$, namely
+$W^{(3)}_{i1}$, $W^{(3)}_{i2}$ and $W^{(3)}_{i3}$,
+each multiplied by one entry of
+$\vc{a}^{(2)}$, together with the bias
+$b^{(3)}_i$. It contains no weight from
+any other row.
+
+Consider the pre-activations in layer 1 ($l = 1$). The input is
+$\vc{a}^{(0)}=\vc{x}$, which has only two entries:
+\begin{align*}
+    z^{(1)}_{1} &= W^{(1)}_{11}x_1 + W^{(1)}_{12}x_2 + b^{(1)}_1 \\[3pt]
+    z^{(1)}_{2} &= W^{(1)}_{21}x_1 + W^{(1)}_{22}x_2 + b^{(1)}_2 \\[3pt]
+    z^{(1)}_{3} &= W^{(1)}_{31}x_1 + W^{(1)}_{32}x_2 + b^{(1)}_3
+\end{align*}
+These are not logits: each one goes through the ReLU to give the activation
+of that unit,
+\[
+    a^{(1)}_i=\relu\bigl(z^{(1)}_i\bigr)=\max\bigl(z^{(1)}_i,\,0\bigr),
+    \qquad i=1,2,3 .
+\]
+Layer~2 has the same form as layer~3, with input $\vc{a}^{(1)}$; its
+$z^{(2)}_i$ are also pre-activations, which go through the ReLU.
+
+Now consider layer $l$ with
+input $\vc{a}^{(l-1)}$, and suppose
 $\vc{\delta}^{(l)}=\partial L/\partial\vc{z}^{(l)}$
-is known. Three results follow from the chain rule.
+is known. Three results follow from the chain rule,
+which are discussed in the three subsections below.
 
-\paragraph{Gradient of the weights and biases.}
-The pre-activation $z^{(l)}_i=\sum_j W^{(l)}_{ij}a^{(l-1)}_j+b^{(l)}_i$ depends
-on $W^{(l)}_{ij}$ only through the single term $W^{(l)}_{ij}a^{(l-1)}_j$, and
-no other pre-activation $z^{(l)}_{i'}$ ($i'\ne i$) involves $W^{(l)}_{ij}$,
-so by the chain rule only one term survives:
+
+\subsection{Gradient of the weights and biases}
+Each $z^{(l)}_i=\sum_j W^{(l)}_{ij}a^{(l-1)}_j+b^{(l)}_i$
+depends on $W^{(l)}_{ij}$ only through the single
+term $W^{(l)}_{ij}a^{(l-1)}_j$, and no other
+$z^{(l)}_{k}$ ($k \ne i$) involves
+$W^{(l)}_{ij}$. Therefore, by the chain rule, only one
+term survives:
 \begin{equation}\label{eq:dW}
-  \frac{\partial L}{\partial W^{(l)}_{ij}}
-  =\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial W^{(l)}_{ij}}
-  =\delta^{(l)}_i\,a^{(l-1)}_j .
+    \frac{\partial L}{\partial W^{(l)}_{ij}}
+     =\sum_{k}\frac{\partial L}{\partial z^{(l)}_{\gbox{k}}}\,
+       \frac{\partial z^{(l)}_{\gbox{k}}}{\partial W^{(l)}_{ij}}
+     =\frac{\partial L}{\partial z^{(l)}_{\gbox{i}}}\,\frac{\partial z^{(l)}_{\gbox{i}}}{\partial W^{(l)}_{ij}}
+     =\delta^{(l)}_i\,a^{(l-1)}_j .
 \end{equation}
-The bias $b^{(l)}_i$ likewise enters only $z^{(l)}_i$, as a plain additive term, so
-$\partial z^{(l)}_i/\partial b^{(l)}_i=1$ and
-\begin{equation}\label{eq:db}
+Eq.~\eqref{eq:dW} gives entry $(i,j)$ of the gradient as
+$\delta^{(l)}_i a^{(l-1)}_j$. Collecting these entries into a matrix of the same
+shape as $\vc{W}^{(l)}$ gives exactly the column vector $\vc{\delta}^{(l)}$ times
+the row vector $(\vc{a}^{(l-1)})^{\Trans}$, an \emph{outer product}:
+\[
+  \grad{\vc{W}^{(l)}}=\vc{\delta}^{(l)}\bigl(\vc{a}^{(l-1)}\bigr)^{\Trans}.
+\]
+Row $i$ is $\delta^{(l)}_i$ times the input vector, and column $j$ is
+$a^{(l-1)}_j$ times $\vc{\delta}^{(l)}$.
+
+The bias $b^{(l)}_i$ likewise enters only $z^{(l)}_i$,
+as a plain additive term. So
+\[
+    \partial z^{(l)}_i/\partial b^{(l)}_i=1
+\]
+and
+\begin{equation}\label{eq:dB}
   \frac{\partial L}{\partial b^{(l)}_i}
   =\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial b^{(l)}_i}
   =\delta^{(l)}_i\cdot 1=\delta^{(l)}_i .
 \end{equation}
-A bias behaves like a weight on an input that is always~$1$.
-In matrix form, $\grad{\vc{W}^{(l)}}=\vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top}$, an
-outer product, and $\grad{\vc{b}^{(l)}}=\vc{\delta}^{(l)}$.
+In matrix form, the gradient of the bias vector is therefore
+\[\grad{\vc{b}^{(l)}}=\vc{\delta}^{(l)},\]
+just as the gradient of the weights is the outer product
+$\vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\Trans}$ shown above.
+Comparing Eqs.~\eqref{eq:dW} and~\eqref{eq:dB},
+a bias behaves like a weight whose input is always~$1$.
 
-\paragraph{Gradient passed to the layer below.}
+\paragraph{The weight gradients written out.}
+To see the outer product, write out every entry. %As in
+%Eq.~\eqref{eq:Wmats}, we drop the layer index on the entries: in layer $l$,
+%$\delta_i$ stands for $\delta^{(l)}_i$ and $a_j$ for $a^{(l-1)}_j$.
+For Layer~3 the input is $\vc{a}^{(2)}$, and Eq.~\eqref{eq:dW} gives
+\begin{equation}\label{eq:gW3full}
+\begin{aligned}
+  \grad{\vc{W}^{(3)}}
+  &=\begin{bmatrix}
+     \dfrac{\partial L}{\partial W^{(3)}_{11}} & \dfrac{\partial L}{\partial W^{(3)}_{12}} & \dfrac{\partial L}{\partial W^{(3)}_{13}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(3)}_{21}} & \dfrac{\partial L}{\partial W^{(3)}_{22}} & \dfrac{\partial L}{\partial W^{(3)}_{23}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(3)}_{31}} & \dfrac{\partial L}{\partial W^{(3)}_{32}} & \dfrac{\partial L}{\partial W^{(3)}_{33}}
+   \end{bmatrix}
+  =\begin{bmatrix}
+     \delta^{(3)}_1 a^{(2)}_1 & \delta^{(3)}_1 a^{(2)}_2 & \delta^{(3)}_1 a^{(2)}_3\\[3mm]
+     \delta^{(3)}_2 a^{(2)}_1 & \delta^{(3)}_2 a^{(2)}_2 & \delta^{(3)}_2 a^{(2)}_3\\[3mm]
+     \delta^{(3)}_3 a^{(2)}_1 & \delta^{(3)}_3 a^{(2)}_2 & \delta^{(3)}_3 a^{(2)}_3
+   \end{bmatrix}\\[4mm]
+  &=\begin{bmatrix}
+    \delta^{(3)}_1\\[3mm]
+    \delta^{(3)}_2\\[3mm]
+    \delta^{(3)}_3
+    \end{bmatrix}
+   \begin{bmatrix}a^{(2)}_1 & a^{(2)}_2 & a^{(2)}_3\end{bmatrix}
+   =\vc{\delta}^{(3)}\bigl(\vc{a}^{(2)}\bigr)^{\Trans}.
+\end{aligned}
+\end{equation}
+The gradient has the same shape as $\vc{W}^{(3)}$, and entry $(i,j)$ belongs
+to the weight $W^{(3)}_{ij}$. Read across a row: row $i$ is $\delta^{(3)}_i$
+times the whole input $\vc{a}^{(2)}$, so the error of unit $i$ scales every
+weight coming into unit $i$. Read down a column: column $j$ is $a^{(2)}_j$
+times the whole $\vc{\delta}^{(3)}$, so if $a^{(2)}_j=0$ (an inactive unit of
+layer~2), the whole column is zero.
+
+Layer~2 has exactly the same form, with $\vc{\delta}^{(2)}$ and input
+$\vc{a}^{(1)}$.
+\begin{equation}\label{eq:gW2full}
+\begin{aligned}
+  \grad{\vc{W}^{(2)}}
+  &=\begin{bmatrix}
+     \dfrac{\partial L}{\partial W^{(2)}_{11}} & \dfrac{\partial L}{\partial W^{(2)}_{12}} & \dfrac{\partial L}{\partial W^{(2)}_{13}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(2)}_{21}} & \dfrac{\partial L}{\partial W^{(2)}_{22}} & \dfrac{\partial L}{\partial W^{(2)}_{23}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(2)}_{31}} & \dfrac{\partial L}{\partial W^{(2)}_{32}} & \dfrac{\partial L}{\partial W^{(2)}_{33}}
+   \end{bmatrix}
+  =\begin{bmatrix}
+     \delta^{(2)}_1 a^{(1)}_1 & \delta^{(2)}_1 a^{(1)}_2 & \delta^{(2)}_1 a^{(1)}_3\\[3mm]
+     \delta^{(2)}_2 a^{(1)}_1 & \delta^{(2)}_2 a^{(1)}_2 & \delta^{(2)}_2 a^{(1)}_3\\[3mm]
+     \delta^{(2)}_3 a^{(1)}_1 & \delta^{(2)}_3 a^{(1)}_2 & \delta^{(2)}_3 a^{(1)}_3
+   \end{bmatrix}\\[4mm]
+  &=\begin{bmatrix}
+    \delta^{(2)}_1\\[3mm]
+    \delta^{(2)}_2\\[3mm]
+    \delta^{(2)}_3
+    \end{bmatrix}
+   \begin{bmatrix}a^{(1)}_1 & a^{(1)}_2 & a^{(1)}_3\end{bmatrix}
+   =\vc{\delta}^{(2)}\bigl(\vc{a}^{(1)}\bigr)^{\Trans}.
+\end{aligned}
+\end{equation}
+
+Layer~1 has only two inputs, $\vc{a}^{(0)}=\vc{x}$, so its
+gradient has two columns, like $\vc{W}^{(1)}$:
+\begin{equation}\label{eq:gW1full}
+\begin{aligned}
+  \grad{\vc{W}^{(1)}}
+  &=\begin{bmatrix}
+     \dfrac{\partial L}{\partial W^{(1)}_{11}} & \dfrac{\partial L}{\partial W^{(1)}_{12}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(1)}_{21}} & \dfrac{\partial L}{\partial W^{(1)}_{22}}\\[6mm]
+     \dfrac{\partial L}{\partial W^{(1)}_{31}} & \dfrac{\partial L}{\partial W^{(1)}_{32}}
+   \end{bmatrix}
+  =\begin{bmatrix}
+     \delta^{(1)}_1 x_1 & \delta^{(1)}_1 x_2\\[3mm]
+     \delta^{(1)}_2 x_1 & \delta^{(1)}_2 x_2\\[3mm]
+     \delta^{(1)}_3 x_1 & \delta^{(1)}_3 x_2
+   \end{bmatrix}\\[4mm]
+  &=\begin{bmatrix}
+    \delta^{(1)}_1\\[3mm]
+    \delta^{(1)}_2\\[3mm]
+    \delta^{(1)}_3
+    \end{bmatrix}
+   \begin{bmatrix}x_1 & x_2\end{bmatrix}
+   =\vc{\delta}^{(1)}\vc{x}^{\Trans}.
+\end{aligned}
+\end{equation}
+
+In every layer the bias gradient is just the column of deltas,
+\[
+  \grad{\vc{b}^{(l)}}
+  =\begin{bmatrix}
+     \delta^{(l)}_1\\[3mm]
+     \delta^{(l)}_2\\[3mm]
+     \delta^{(l)}_3
+   \end{bmatrix}
+  =\vc{\delta}^{(l)}
+\]
+(Eq.~\eqref{eq:dB}): the same column as on the left of the outer product, with
+the input replaced by~$1$.
+
+\subsection{Gradient passed to the layer below}
 The entry $a^{(l-1)}_j$ influences the loss through every $z^{(l)}_i$, so the
 contributions add:
 \begin{equation}\label{eq:da}
   \frac{\partial L}{\partial a^{(l-1)}_j}
   =\sum_i\frac{\partial L}{\partial z^{(l)}_i}\,\frac{\partial z^{(l)}_i}{\partial a^{(l-1)}_j}
   =\sum_i\delta^{(l)}_i\,W^{(l)}_{ij}
-  =\Big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\Big)_j .
+  =\Big((\vc{W}^{(l)})^{\Trans}\vc{\delta}^{(l)}\Big)_j .
 \end{equation}
 
-\paragraph{Through the activation.}
+\subsection{Through the activation}
 Since $a^{(l-1)}_j=f(z^{(l-1)}_j)$, where $f$ is the activation function
 (ReLU in layers 1 and 2) and acts elementwise,
 $\partial L/\partial z^{(l-1)}_j=\big(\partial L/\partial a^{(l-1)}_j\big)\,f'(z^{(l-1)}_j)$,
 and in vector form
 \begin{equation}\label{eq:deltarec}
-  \vc{\delta}^{(l-1)}=\Big((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\Big)\odot f'(\vc{z}^{(l-1)}).
+  \vc{\delta}^{(l-1)}=\Big((\vc{W}^{(l)})^{\Trans}\vc{\delta}^{(l)}\Big)\odot f'(\vc{z}^{(l-1)}).
 \end{equation}
 
 The backward pass is therefore: start from $\vc{\delta}^{(3)}=\vc{q}-\vc{y}$
 (Eq.~\eqref{eq:delta3}); at each layer form the weight gradient as an outer
-product (Eq.~\eqref{eq:dW}), multiply by $(\vc{W}^{(l)})^{\top}$
+product (Eq.~\eqref{eq:dW}), multiply by $(\vc{W}^{(l)})^{\Trans}$
 (Eq.~\eqref{eq:da}), and multiply elementwise by $f'$ of the stored
 pre-activation (Eq.~\eqref{eq:deltarec}). Shapes provide a check: with $n_l$ the number of units in layer $l$,
 $\vc{\delta}^{(l)}\in\R^{n_l}$ and
@@ -722,7 +891,7 @@ it.
 \paragraph{Cost.}
 Each layer costs about one matrix--vector product in the forward pass, and
 about two operations of the same size in the backward pass (the outer product
-for the weight gradient and the product with $\vc{W}^{\top}$). A backward
+for the weight gradient and the product with $\vc{W}^{\Trans}$). A backward
 sweep therefore costs roughly twice a forward pass, whatever the number of
 parameters, whereas finite differences need two forward passes per parameter.
 That is what makes backpropagation practical.
@@ -736,7 +905,7 @@ unit with $z\le0$ is \emph{inactive}, and:
   \item its $\delta$ is zero, so the weights feeding it (a row of
         $\grad{\vc{W}^{(l)}}$) and its bias receive no gradient;
   \item its output is $a=0$, so the weights leaving it (a column of the next
-        layer's weight gradient, $\vc{\delta}\,\vc{a}^{\top}$) receive none
+        layer's weight gradient, $\vc{\delta}\,\vc{a}^{\Trans}$) receive none
         either;
   \item a unit that is inactive for \emph{every} training example is never
         updated and cannot recover; it is called \emph{dead}.
@@ -809,14 +978,14 @@ column $b$ of $\vc{X}$. With labels $c=(2,3,1,2,3)$,
   \end{pmatrix}.
 \]
 Column $b$ of $\vc{X}$ is $\vc{x}_b$ and column $b$ of $\vc{Y}$ is
-$\vc{y}_b$, so the first column of each is the pair $\vc{x}=(1,2)^{\top}$,
-$\vc{y}=(0,1,0)^{\top}$ of the exercise. The forward pass keeps the same
+$\vc{y}_b$, so the first column of each is the pair $\vc{x}=(1,2)^{\Trans}$,
+$\vc{y}=(0,1,0)^{\Trans}$ of the exercise. The forward pass keeps the same
 shapes with one column per example: $\vc{A}^{(0)}=\vc{X}$, and $\vc{Z}^{(l)}$,
 $\vc{A}^{(l)}$, the output $\vc{Q}$ and $\vc{\Delta}^{(3)}=\vc{Q}-\vc{Y}$ each
 have $5$ columns. In general, if the examples of a batch are the columns of
 $\vc{A}^{(l-1)}$ and the matching $\vc{\delta}$'s the columns of
 $\vc{\Delta}^{(l)}$, the weight gradient is
-$\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\top}$ (divided by $B$ for the mean loss):
+$\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\Trans}$ (divided by $B$ for the mean loss):
 a batch is more columns, and the same products. None of this depends on the
 architecture. It holds for any feed-forward network trained by backpropagation;
 only the layer sizes and the activation functions differ.
@@ -829,8 +998,8 @@ and $\vc{\Delta}^{(1)}$ in that order, from the output layer towards the input,
 using the same weights as the forward pass. At each layer it combines the five
 columns into one gradient for the mean loss:
 \begin{equation}\label{eq:batchgrad}
-  \grad{\vc{W}^{(l)}}=\frac{1}{B}\,\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}
-    =\frac{1}{B}\sum_{b=1}^{B}\vc{\delta}^{(l)}_b\bigl(\vc{a}^{(l-1)}_b\bigr)^{\top},
+  \grad{\vc{W}^{(l)}}=\frac{1}{B}\,\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\Trans}
+    =\frac{1}{B}\sum_{b=1}^{B}\vc{\delta}^{(l)}_b\bigl(\vc{a}^{(l-1)}_b\bigr)^{\Trans},
   \qquad
   \grad{\vc{b}^{(l)}}=\frac{1}{B}\sum_{b=1}^{B}\vc{\delta}^{(l)}_b ,
 \end{equation}
@@ -846,11 +1015,11 @@ of the entries in $\vc{\Delta}^{(l)}$.
 Since the per-example outer products are summed, reordering the examples
 consistently in both $\vc{\Delta}^{(l)}$ and $\vc{A}^{(l-1)}$ does not change the
 gradient. Reordering the columns means multiplying both matrices on the right by
-the same permutation matrix $\vc{P}$, and $\vc{P}\vc{P}^{\top}=\vc{I}$, so
+the same permutation matrix $\vc{P}$, and $\vc{P}\vc{P}^{\Trans}=\vc{I}$, so
 \[
-  \bigl(\vc{\Delta}^{(l)}\vc{P}\bigr)\bigl(\vc{A}^{(l-1)}\vc{P}\bigr)^{\top}
-  =\vc{\Delta}^{(l)}\vc{P}\vc{P}^{\top}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}
-  =\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\top}.
+  \bigl(\vc{\Delta}^{(l)}\vc{P}\bigr)\bigl(\vc{A}^{(l-1)}\vc{P}\bigr)^{\Trans}
+  =\vc{\Delta}^{(l)}\vc{P}\vc{P}^{\Trans}\bigl(\vc{A}^{(l-1)}\bigr)^{\Trans}
+  =\vc{\Delta}^{(l)}\bigl(\vc{A}^{(l-1)}\bigr)^{\Trans}.
 \]
 Reordering only one of the two matrices would pair each delta with the wrong
 example, and the gradient would change.
@@ -879,15 +1048,15 @@ gradient differs.
         \[
           \begin{aligned}
             \grad{\vc{W}^{(l)}}
-              &= \vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\top},\\
+              &= \vc{\delta}^{(l)}(\vc{a}^{(l-1)})^{\Trans},\\
             \grad{\vc{b}^{(l)}}
               &= \vc{\delta}^{(l)},\\
             \vc{\delta}^{(l-1)}
-              &= \bigl((\vc{W}^{(l)})^{\top}\vc{\delta}^{(l)}\bigr)
+              &= \bigl((\vc{W}^{(l)})^{\Trans}\vc{\delta}^{(l)}\bigr)
                  \odot \relu'(\vc{z}^{(l-1)}).
           \end{aligned}
         \]
-        See Eqs.~\eqref{eq:dW}, \eqref{eq:db}, and \eqref{eq:deltarec}.
+        See Eqs.~\eqref{eq:dW}, \eqref{eq:dB}, and \eqref{eq:deltarec}.
 
   \item \textbf{Check:} Central difference with step $\varepsilon$
         (Eq.~\eqref{eq:cd}).
@@ -927,7 +1096,7 @@ Table~\ref{tab:pytorch} lists the differences.
       & $\vc{Z}^{(l)}=\vc{W}^{(l)}\vc{A}^{(l-1)}+\vc{b}^{(l)}$ (Eq.~\eqref{eq:z})
       & \texttt{Z = X @ weight.T + bias} \\[4pt]
     Weight gradient
-      & $\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\top}$, divided by $B$ for the mean loss
+      & $\vc{\Delta}^{(l)}(\vc{A}^{(l-1)})^{\Trans}$, divided by $B$ for the mean loss
       & \texttt{weight.grad}, same shape as \texttt{weight}; includes the $1/B$ of the default mean loss \\[4pt]
     Loss
       & $L=-\ln q_c$, computed as $-z_c+\ln\sum_j e^{z_j}$ (Eq.~\eqref{eq:lse})
@@ -944,7 +1113,7 @@ Table~\ref{tab:pytorch} lists the differences.
 The transpose in \texttt{X @ weight.T} appears because examples are stored as
 rows; the weight matrix itself is the same $\vc{W}^{(l)}$. When comparing code
 with these notes, read \texttt{weight} as $\vc{W}^{(l)}$ and \texttt{X} as
-$(\vc{A}^{(l-1)})^{\top}$. Remember too that classes are numbered from~0 in
+$(\vc{A}^{(l-1)})^{\Trans}$. Remember too that classes are numbered from~0 in
 code, so the label $c=2$ of the worked example is the index \texttt{1}.
 
 %----------------------------------------------------------
@@ -959,7 +1128,7 @@ code, so the label $c=2$ of the worked example is the index \texttt{1}.
 \[
   \vc{W}^{(3)}=\WThree,\qquad \vc{b}^{(1)}=\vc{b}^{(2)}=\vc{b}^{(3)}=\vc{0}.
 \]
-Input $\vc{x}=\xIn$, label $c=2$ (so the target is $\vc{y}=(0,1,0)^{\top}$), learning
+Input $\vc{x}=\xIn$, label $c=2$ (so the target is $\vc{y}=(0,1,0)^{\Trans}$), learning
 rate $\eta=\etaVal$.
 
 \section{Forward pass and loss (Tasks 1 and 2)}
@@ -1003,15 +1172,15 @@ so $\vc{\delta}^{(3)}=\dThree$, and its entries sum to zero.
 \section{Backward pass (Task 4)}
 
 \paragraph{Layer 3.}
-By Eqs.~\eqref{eq:dW} and~\eqref{eq:db},
+By Eqs.~\eqref{eq:dW} and~\eqref{eq:dB},
 \begin{gather}
-  \grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\top}
+  \grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\Trans}
   =\dThree\,\aTwoRow=\gWThree,\label{eq:wgW3}\\
   \grad{\vc{b}^{(3)}}=\vc{\delta}^{(3)}=\gbThree .\label{eq:wgb3}
 \end{gather}
 
 \paragraph{Layer 2.}
-First pass the gradient down through $(\vc{W}^{(3)})^{\top}$
+First pass the gradient down through $(\vc{W}^{(3)})^{\Trans}$
 (Eq.~\eqref{eq:da}):
 \begin{equation}\label{eq:wd2raw}
 \arDTwo
@@ -1019,14 +1188,14 @@ First pass the gradient down through $(\vc{W}^{(3)})^{\top}$
 All second-layer units are active, $\relu'(\vc{z}^{(2)})=\maskTwo$, so
 $\vc{\delta}^{(2)}=\dTwo$. Then
 \begin{equation}\label{eq:wgW2}
-  \grad{\vc{W}^{(2)}}=\vc{\delta}^{(2)}(\vc{a}^{(1)})^{\top}
+  \grad{\vc{W}^{(2)}}=\vc{\delta}^{(2)}(\vc{a}^{(1)})^{\Trans}
   =\dTwo\,\aOneRow=\gWTwo,
 \end{equation}
 and $\grad{\vc{b}^{(2)}}=\vc{\delta}^{(2)}$. The third column is zero because
 $a^{(1)}_3=0$.
 
 \paragraph{Layer 1.}
-The product with $(\vc{W}^{(2)})^{\top}$ (Eq.~\eqref{eq:da}) gives
+The product with $(\vc{W}^{(2)})^{\Trans}$ (Eq.~\eqref{eq:da}) gives
 \begin{equation}\label{eq:wd1raw}
 \arDOneRaw
 \end{equation}
@@ -1037,7 +1206,7 @@ Now apply the mask $\relu'(\vc{z}^{(1)})=\maskOne$ (Eq.~\eqref{eq:deltarec}):
 The value $0.1883$ is discarded: unit 3 is inactive, so it cannot pass gradient
 on. Finally
 \begin{gather}
-  \grad{\vc{W}^{(1)}}=\vc{\delta}^{(1)}\vc{x}^{\top}
+  \grad{\vc{W}^{(1)}}=\vc{\delta}^{(1)}\vc{x}^{\Trans}
   =\dOne\,\xRow=\gWOne,\label{eq:wgW1}\\
   \grad{\vc{b}^{(1)}}=\vc{\delta}^{(1)}=\gbOne .\label{eq:wgb1}
 \end{gather}
@@ -1109,7 +1278,7 @@ minibatches of size $B=2$ give 2.
 
 \paragraph{All parameters zero.}
 Every $\vc{z}$ and $\vc{a}$ is then zero and $\vc{q}$ is uniform. The weight
-gradients vanish, $\grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\top}=\vc{0}$
+gradients vanish, $\grad{\vc{W}^{(3)}}=\vc{\delta}^{(3)}(\vc{a}^{(2)})^{\Trans}=\vc{0}$
 because $\vc{a}^{(2)}=\vc{0}$, and $\vc{\delta}^{(2)}=\vc{0}$ because
 $\vc{W}^{(3)}=\vc{0}$. Only the output bias has a gradient,
 \begin{equation}\label{eq:wzero}
@@ -1122,7 +1291,7 @@ since they receive identical gradients; this is why weights are initialised
 randomly.
 
 \paragraph{A different label.}
-If the label were 1 instead of 2, so that $\vc{y}=(1,0,0)^{\top}$, the forward
+If the label were 1 instead of 2, so that $\vc{y}=(1,0,0)^{\Trans}$, the forward
 quantities $\vc{z}^{(l)}$, $\vc{a}^{(l)}$, $\vc{q}$ of
 Eqs.~\eqref{eq:wz1}--\eqref{eq:wsoft} would not change, because they do not
 depend on the label. The label enters only through the loss,

@@ -70,7 +70,7 @@
 \newcommand{\abs}[1]{\lvert {#1} \rvert}
 \newcommand{\Avg}[1]{\mathbf{avg}(\mathbf{#1})}
 \newcommand{\Std}[1]{\mathbf{std}(\mathbf{#1})}
-\newcommand{\Draft}[1]{\big[\!\big[{#1}{\big]\!\big]}}
+\newcommand{\Draft}[1]{\big[{#1}\big]}
 
 \let\oldnl\nl % used in the next line.
 \newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
@@ -84,7 +84,7 @@
 \begin{document}
 \maketitle
 
-\section*{The Formal Algorithms for GPT-2 Small Model}
+\section{The Formal Algorithms for GPT-2 Small Model}
 The technical report Formal Algorithms for Transformers
 by Phuong and Hutter of DeepMind (2022, arXiv:2207.09238)
 provides a formal yet readable breakdown of the original
@@ -130,7 +130,7 @@ of passing hyperparameter arguments to the algorithms.
 We will indicate this change when we first encounter
 the affected code.
 
-\section*{Hyperparameters of GPT2-small}
+\section{Hyperparameters of GPT2-small}
 \begin{center}
 \begin{tabular}{r@{}llll@{}}
 \toprule
@@ -146,7 +146,7 @@ $d_\text{attn}=d_\text{mid}=d_{\text{e}}/H=768/12=64$: each of the 12 heads work
 query, key, and value space; $H\cdot d_\text{mid}=768=d_{\text{e}}$, so the concatenated heads equal the
 model width before $W_o$ is applied.
 
-\section*{Notation Simplification}
+\section{Notation Simplification}
 To simplify notation, we denote by $\symbfcal{W}$ the entire set of parameters (query, key,
 value and output linear projections) required by a multi-head attention layer:
 \begin{equation}
@@ -195,7 +195,7 @@ $\forall t:\ \alpha_t = \dfrac{\exp\bigl(\symbf{q}^{\Trans}\symbf{k}_t / \sqrt{d
 
 \newpage
 
-\section*{List of Notation}
+\section{List of Notation}
 \addcontentsline{toc}{section}{List of notation}
 %\begin{group}
 %\begin{longtable}{@{} l l p{7cm} @{}}
@@ -262,7 +262,7 @@ $\symbf{\theta},\hat{\symbf{\theta}}$ & $\in\mathbb{R}^d$ & collection of all le
 
 
 \medskip
-\section*{Mathematical Conventions of the Report}
+\section{Mathematical Conventions of the Report}
 Phuong and Hutter use the column-vector convention throughout:
 tokens are \emph{columns} of $X$ and $Z$, which represent the
 primary and the context token sequences, respectively.
@@ -341,7 +341,7 @@ allows each query to attend to its own position and all
 earlier positions.
 
 \newpage
-\section*{Token Embedding and Unembedding.}
+\section{Token Embedding and Unembedding.}
 The token embedding learns to represent each
 vocabulary element as a vector in $R^{d_{\text{e}}}$.
 
@@ -395,7 +395,7 @@ the transpose of the embedding matrix.
 \end{algorithm}
 
 \newpage
-\section*{Causal (unidirectional/masked) self-attention}
+\section{Causal (unidirectional/masked) self-attention}
 
 Given a sequence of token representations, Algorithm~\ref{alg:attn}
 with the causal mask applies attention at every position, treating
@@ -500,7 +500,7 @@ itself and earlier positions. Applying this reasoning layer by layer,
 column $t$ of the final output depends only on the tokens $x[1{:}t]$
 and can therefore be used to predict $x[t+1]$.
 
-\subsection*{Prediction and the Causal Mask}
+\subsection{Prediction and the Causal Mask}
 Nothing in the prefix $x[1{:}t]$ determines $x[t+1]$. To
 ``predict'' $x[t+1]$ means to estimate its conditional distribution
 $\hat{P}(x[t+1] \mid x[1{:}t])$ from the observed prefix, not to
